@@ -1,0 +1,34 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 21
+    buildToolsVersion "22.0.1"
+    defaultConfig {
+        applicationId "eu.stepanvyterna.games.zombieshooter"
+        minSdkVersion 21
+        targetSdkVersion 21
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+        }
+    }
+    productFlavors {
+    }
+}
+
+dependencies {
+    compile files('libs/libprotobuf-java-2.6-nano.jar')
+    compile files('libs/unity-classes.jar')
+    compile files('libs/unitycardboardactivity.jar')
+    compile files('libs/unityvractivity.jar')
+    compile files('libs/vrtoolkit.jar')
+    repositories {
+        maven {
+//            url 'C:\\Users\\svyterna\\StudioProjects\\myorepository'
+            url 'd:\\WORK\\Games_Unity\\ZombieShooter\\ZombieShooterAndroidProject\\myorepository\\'
+        }
+    }
+    compile 'com.thalmic:myosdk:0.10.+@aar'
+}

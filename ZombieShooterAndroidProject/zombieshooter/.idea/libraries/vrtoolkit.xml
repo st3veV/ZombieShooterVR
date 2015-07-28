@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="vrtoolkit">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/app/libs/vrtoolkit.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

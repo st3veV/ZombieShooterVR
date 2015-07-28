@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="unitycardboardactivity">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/app/libs/unitycardboardactivity.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
