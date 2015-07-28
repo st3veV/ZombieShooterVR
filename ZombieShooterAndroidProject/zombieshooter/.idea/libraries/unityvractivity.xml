@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="unityvractivity">
-    <CLASSES>
-      <root url="jar://$PROJECT_DIR$/app/libs/unityvractivity.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>
