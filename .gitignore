@@ -20,6 +20,8 @@ sysinfo.txt
 *.unityproj
 *.booproj
  
+ 
+ 
 # ============ #
 # OS generated #
 # ============ #
@@ -61,3 +63,5 @@ proguard/
 
 # Log Files
 *.log
+
+ZombieShooter/ZombieShooter/Android/zombieshooter
