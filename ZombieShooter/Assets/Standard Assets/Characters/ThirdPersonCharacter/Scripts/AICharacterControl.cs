@@ -11,6 +11,8 @@ namespace UnityStandardAssets.Characters.ThirdPerson
         public ThirdPersonCharacter character { get; private set; } // the character we are controlling
         public Transform target; // target to aim for
 
+        public event Action<GameObject> OnPositionReached;
+
         // Use this for initialization
         private void Start()
         {
@@ -34,6 +36,10 @@ namespace UnityStandardAssets.Characters.ThirdPerson
 				
                 // use the values to move the character
                 character.Move(agent.desiredVelocity, false, false);
+                if(IsWithinBoundaries(character.transform.position,target.position,.5f))
+                {
+                    OnPositionReached(gameObject);
+                }
             }
             else
             {
@@ -43,6 +49,10 @@ namespace UnityStandardAssets.Characters.ThirdPerson
 
         }
 
+        private bool IsWithinBoundaries(Vector3 obj, Vector3 target, float boundarySize)
+        {
+            return Vector3.Distance(obj, target) <= boundarySize;
+        }
 
         public void SetTarget(Transform target)
         {
