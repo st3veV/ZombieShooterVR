@@ -364,7 +364,12 @@ ModelImporter:
     bakeSimulation: 0
     optimizeGameObjects: 0
     motionNodeName: 
-    pivotNodeName: 
+    animationImportErrors: 
+    animationImportWarnings: "MuscleClip 'Ethan' conversion warning: Bone length is
+      different in avatar and animation\n\n     'EthanLeftLeg' : position error =
+      3.271857 mm\n\n"
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
     animationCompression: 3
     animationRotationError: .5
     animationPositionError: .5
@@ -383,6 +388,7 @@ ModelImporter:
     generateSecondaryUV: 0
     useFileUnits: 0
     optimizeMeshForGPU: 1
+    keepQuads: 0
     weldVertices: 1
     secondaryUVAngleDistortion: 8
     secondaryUVAreaDistortion: 15.000001
@@ -1251,3 +1257,4 @@ ModelImporter:
   additionalBone: 0
   userData: 
   assetBundleName: 
+  assetBundleVariant: 

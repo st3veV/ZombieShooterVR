@@ -4,7 +4,7 @@ using System.Collections;
 public class Bullet : MonoBehaviour {
 
     
-   private float startTime; 
+    private float startTime; 
     public float SecondsUntilDestroy = 10;
 	// Use this for initialization
 	void Start () {
@@ -15,8 +15,17 @@ public class Bullet : MonoBehaviour {
 	void Update () {
 	    if(Time.time-startTime >= SecondsUntilDestroy)
         {
-            Destroy(this.gameObject);
+            Destroy(gameObject);
         }
 	}
 
+    void OnCollisionEnter(Collision collision)
+    {
+        LifetimeComponent lifetime = collision.gameObject.GetComponent<LifetimeComponent>();
+        if (lifetime != null)
+        {
+            lifetime.ReceiveDamage(200f);
+            Destroy(gameObject);
+        }
+    }
 }

@@ -7,10 +7,13 @@ public class ZombieSpawner : MonoBehaviour {
     public AICharacterControl Zombie;
     public Transform ZombieTarget;
     public Transform SpawnPoint;
+    public LifetimeComponent AttactTarget;
     public float Diameter = 0f;
 
     private float timer = 0f;
     public float SpawnInterval = 5f;
+
+    public bool IsSpawning = true;
 
 	void Start () {
         if (SpawnPoint == null)
@@ -22,14 +25,24 @@ public class ZombieSpawner : MonoBehaviour {
             float distance = Mathf.Sqrt(SpawnPoint.transform.position.x * SpawnPoint.transform.position.x + SpawnPoint.transform.position.z * SpawnPoint.transform.position.z);
             Diameter = distance;
         }
+
+        AttactTarget.OnDie += AttactTarget_OnDie;
 	}
+
+    void AttactTarget_OnDie()
+    {
+        IsSpawning = false;
+    }
 	
 	void Update () {
-        timer -= Time.deltaTime;
-        if(timer <= 0)
+        if (IsSpawning)
         {
-            SpawnZombie();
-            timer = SpawnInterval;
+            timer -= Time.deltaTime;
+            if (timer <= 0)
+            {
+                SpawnZombie();
+                timer = SpawnInterval;
+            }
         }
 	}
 
@@ -46,6 +59,7 @@ public class ZombieSpawner : MonoBehaviour {
     void clone_OnPositionReached(GameObject obj)
     {
         Destroy(obj);
+        AttactTarget.ReceiveDamage(100f);
     }
 
     private void ChoseNextPosition()
