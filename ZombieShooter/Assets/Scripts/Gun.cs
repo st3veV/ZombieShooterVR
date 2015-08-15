@@ -19,6 +19,6 @@ public class Gun : MonoBehaviour {
     {
         //Debug.Log("Fire!");
         Rigidbody clone = Instantiate(bullet, transform.position, transform.rotation) as Rigidbody;
-        clone.AddForce(clone.transform.forward * 500);
+        clone.AddForce(clone.transform.forward * 1500);
     }
 }
