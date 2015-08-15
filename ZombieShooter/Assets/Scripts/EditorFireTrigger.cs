@@ -11,11 +11,11 @@ public class EditorFireTrigger : MonoBehaviour {
         gunInternal = gun.GetComponent<Gun>();
     }
 
-	// Update is called once per frame
-	void Update () {
-	    if(Input.GetKeyDown("x"))
+    // Update is called once per frame
+    void Update () {
+        if(Input.GetKeyDown("x"))
         {
             gunInternal.Fire();
         }
-	}
+    }
 }

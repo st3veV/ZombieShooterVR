@@ -8,14 +8,14 @@ public class LifetimeComponent : MonoBehaviour {
     public event Action OnDie;
     public event Action<float> OnDamage;
 
-	// Use this for initialization
-	void Start () {
-	    
-	}
-	
-	// Update is called once per frame
-	void Update () {
-	    if(LifetimeDamage <= 0)
+    // Use this for initialization
+    void Start () {
+        
+    }
+    
+    // Update is called once per frame
+    void Update () {
+        if(LifetimeDamage <= 0)
         {
             if (OnDie != null)
             {
@@ -23,7 +23,7 @@ public class LifetimeComponent : MonoBehaviour {
             }
             Destroy(gameObject);
         }
-	}
+    }
 
     public void ReceiveDamage(float damage)
     {

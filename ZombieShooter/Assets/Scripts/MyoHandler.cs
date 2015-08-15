@@ -9,7 +9,10 @@ using VibrationType = Thalmic.Myo.VibrationType;
 public class MyoHandler : MonoBehaviour
 {
     public GameObject myo = null;
+    private ThalmicMyo thalmicMyo;
+
     public Cardboard cardboard;
+
     public GameObject gun;
     private Gun gunInternal;
 
@@ -22,13 +25,18 @@ public class MyoHandler : MonoBehaviour
     void Start()
     {
         gunInternal = gun.GetComponent<Gun>();
+        gunInternal.OnWeaponKick += gunInternal_OnWeaponKick;
+        thalmicMyo = myo.GetComponent<ThalmicMyo>();
+    }
+
+    void gunInternal_OnWeaponKick()
+    {
+        thalmicMyo.NotifyUserAction();
     }
 
     // Update is called once per frame.
     void Update ()
     {
-        ThalmicMyo thalmicMyo = myo.GetComponent<ThalmicMyo> ();
-
         bool updateReference = false;
         if (thalmicMyo.pose != _lastPose) {
             _lastPose = thalmicMyo.pose;
@@ -73,35 +81,19 @@ public class MyoHandler : MonoBehaviour
                                                 -transform.localRotation.w);
         }
 
-        if(thalmicMyo.pose == Pose.Fist)
+
+        if (thalmicMyo.pose == Pose.Rest)
         {
-            if(isFiring == false)
-            {
-                thalmicMyo.NotifyUserAction();
-            }
-            isFiring = true;
-        }
-        else if(thalmicMyo.pose == Pose.Rest)
-        {
-            if(isFiring == true)
-            {
-                thalmicMyo.NotifyUserAction();
-            }
-            isFiring = false;
+            gunInternal.StopShooting();
         }
 
-        if(isFiring)
+        if (thalmicMyo.pose == Pose.Fist)
         {
-            gunInternal.Fire();
+            gunInternal.StartShooting();
         }
+
     }
 
-    bool isFiring = false;
-
-    private void toggleFire()
-    {
-        isFiring = !isFiring;
-    }
 
     float rollFromZero (Vector3 zeroRoll, Vector3 forward, Vector3 up)
     {
