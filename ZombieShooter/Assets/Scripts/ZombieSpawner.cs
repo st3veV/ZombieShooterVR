@@ -8,8 +8,10 @@ public class ZombieSpawner : MonoBehaviour {
     public Transform ZombieTarget;
     public Transform SpawnPoint;
     public LifetimeComponent AttactTarget;
+    public UserDataComponent UserData;
+    
     public float Diameter = 0f;
-    public float ZombieDamage = 100.0f;
+    public float ZombieDamage = BalancingData.ZOMBIE_DAMAGE;
 
     private float timer = 0f;
     public float SpawnInterval = 5f;
@@ -30,8 +32,9 @@ public class ZombieSpawner : MonoBehaviour {
         AttactTarget.OnDie += AttactTarget_OnDie;
 	}
 
-    void AttactTarget_OnDie()
+    void AttactTarget_OnDie(LifetimeComponent lifetimeComponent)
     {
+        AttactTarget.OnDie -= AttactTarget_OnDie;
         IsSpawning = false;
     }
 	
@@ -54,7 +57,18 @@ public class ZombieSpawner : MonoBehaviour {
         clone.transform.position = SpawnPoint.position;
         clone.target = ZombieTarget;
         clone.OnPositionReached += clone_OnPositionReached;
+        LifetimeComponent lifetimeComponent = clone.GetComponent<LifetimeComponent>();
+        if (lifetimeComponent != null)
+        {
+            lifetimeComponent.OnDie += Zombie_OnDie;
+        }
         ChoseNextPosition();
+    }
+
+    void Zombie_OnDie(LifetimeComponent lifetimeComponent)
+    {
+        lifetimeComponent.OnDie -= Zombie_OnDie;
+        UserData.IncreaseScore(BalancingData.SCORE_FOR_ZOMBIE);
     }
 
     void clone_OnPositionReached(GameObject obj)

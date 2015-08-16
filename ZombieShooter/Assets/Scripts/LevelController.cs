@@ -16,7 +16,7 @@ public class LevelController : MonoBehaviour {
         Debug.Log("Boom, you just got hit!! (this much: "+damage+")");
     }
 
-    void UserLifetime_OnDie()
+    void UserLifetime_OnDie(LifetimeComponent lifetimeComponent)
     {
         Debug.Log("You just died :(");
     }

@@ -32,13 +32,13 @@ public class HealthVisualizer : MonoBehaviour
         }
     }
 
-    private void ObjectToMonitor_OnDie()
+    private void ObjectToMonitor_OnDie(LifetimeComponent lifetimeComponent)
     {
-        removeListeners();
+        RemoveListeners();
         ObjectToMonitor = null;
     }
 
-    private void removeListeners()
+    private void RemoveListeners()
     {
         ObjectToMonitor.OnDamage -= ObjectToMonitor_OnDamage;
         ObjectToMonitor.OnDie -= ObjectToMonitor_OnDie;

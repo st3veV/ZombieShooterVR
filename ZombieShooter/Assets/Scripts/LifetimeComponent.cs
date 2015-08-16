@@ -6,7 +6,7 @@ public class LifetimeComponent : MonoBehaviour {
 
     public float LifetimeDamage = 100f;
     private float OriginalHealth;
-    public event Action OnDie;
+    public event Action<LifetimeComponent> OnDie;
     public event Action<float> OnDamage;
 
     public float CurrentHealthPercentage
@@ -26,7 +26,7 @@ public class LifetimeComponent : MonoBehaviour {
         {
             if (OnDie != null)
             {
-                OnDie();
+                OnDie(this);
             }
             Destroy(gameObject);
         }

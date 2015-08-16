@@ -24,7 +24,7 @@ public class Bullet : MonoBehaviour {
         LifetimeComponent lifetime = collision.gameObject.GetComponent<LifetimeComponent>();
         if (lifetime != null)
         {
-            lifetime.ReceiveDamage(200f);
+            lifetime.ReceiveDamage(BalancingData.BULLET_DAMAGE);
             Destroy(gameObject);
         }
     }
