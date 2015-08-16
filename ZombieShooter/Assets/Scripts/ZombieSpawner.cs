@@ -9,6 +9,7 @@ public class ZombieSpawner : MonoBehaviour {
     public Transform SpawnPoint;
     public LifetimeComponent AttactTarget;
     public float Diameter = 0f;
+    public float ZombieDamage = 100.0f;
 
     private float timer = 0f;
     public float SpawnInterval = 5f;
@@ -59,7 +60,7 @@ public class ZombieSpawner : MonoBehaviour {
     void clone_OnPositionReached(GameObject obj)
     {
         Destroy(obj);
-        AttactTarget.ReceiveDamage(100f);
+        AttactTarget.ReceiveDamage(ZombieDamage);
     }
 
     private void ChoseNextPosition()

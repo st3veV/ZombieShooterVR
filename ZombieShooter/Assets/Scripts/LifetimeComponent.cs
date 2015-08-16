@@ -5,12 +5,19 @@ using System.Collections;
 public class LifetimeComponent : MonoBehaviour {
 
     public float LifetimeDamage = 100f;
+    private float OriginalHealth;
     public event Action OnDie;
     public event Action<float> OnDamage;
 
+    public float CurrentHealthPercentage
+    {
+        get { return LifetimeDamage/OriginalHealth; }
+    }
+
     // Use this for initialization
-    void Start () {
-        
+    void Start ()
+    {
+        OriginalHealth = LifetimeDamage;
     }
     
     // Update is called once per frame
