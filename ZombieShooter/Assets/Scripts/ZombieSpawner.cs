@@ -69,10 +69,20 @@ public class ZombieSpawner : MonoBehaviour {
     {
         lifetimeComponent.OnDie -= Zombie_OnDie;
         UserData.IncreaseScore(BalancingData.SCORE_FOR_ZOMBIE);
+        SpawnInterval -= BalancingData.ZOMBIE_SPAWN_INTERVAL_DECREASE;
+        if (SpawnInterval < BalancingData.ZOMBIE_SPAWN_INTERVAL_MINIMUM)
+        {
+            SpawnInterval = BalancingData.ZOMBIE_SPAWN_INTERVAL_MINIMUM;
+        }
     }
 
     void clone_OnPositionReached(GameObject obj)
     {
+        LifetimeComponent lifetimeComponent = obj.GetComponent<LifetimeComponent>();
+        if (lifetimeComponent != null)
+        {
+            lifetimeComponent.OnDie -= Zombie_OnDie;
+        }
         Destroy(obj);
         AttactTarget.ReceiveDamage(ZombieDamage);
     }

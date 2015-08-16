@@ -23,7 +23,6 @@ public class Gun : MonoBehaviour {
         if (_isFiring)
         {
             timer -= (Time.deltaTime * 1000f);
-            Debug.Log(timer);
             if (timer <= 0)
             {
                 Fire();

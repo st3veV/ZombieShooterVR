@@ -18,7 +18,7 @@ public class LevelController : MonoBehaviour {
 
     void UserLifetime_OnDie(LifetimeComponent lifetimeComponent)
     {
-        Debug.Log("You just died :(");
+        //Debug.Log("You just died :(");
     }
 	
 	// Update is called once per frame
