@@ -1,21 +1,22 @@
 ﻿using System;
 using UnityEngine;
-using System.Collections;
 
 public class Gun : MonoBehaviour {
 
     public Rigidbody Bullet;
-    public int Cadency = 1000;
 
     public event Action OnWeaponKick;
 
     private bool _isFiring = false;
     private float timer = 0;
+    private IWeapon _currentWeapon;
+    private int _shellsInMagazine;
 
     // Use this for initialization
     void Start ()
     {
-        timer = Cadency;
+        timer = 0;
+        SetWeapon(new BasicGun());
     }
     
     // Update is called once per frame
@@ -25,10 +26,23 @@ public class Gun : MonoBehaviour {
             timer -= (Time.deltaTime * 1000f);
             if (timer <= 0)
             {
-                Fire();
-                timer = Cadency;
+                if (_shellsInMagazine > 0)
+                {
+                    Fire();
+                    _shellsInMagazine--;
+                }
+                else
+                {
+                    Klick();
+                }
+                timer = _currentWeapon.CooldownDelay;
             }
         }
+    }
+
+    private void Klick()
+    {
+        Debug.Log("Klick!");
     }
 
     public void Fire()
@@ -36,6 +50,8 @@ public class Gun : MonoBehaviour {
         Kick();
         //Debug.Log("Fire!");
         Rigidbody clone = Instantiate(Bullet, transform.position, transform.rotation) as Rigidbody;
+        Bullet bulletClone = clone.GetComponent<Bullet>();
+        bulletClone.SetDamage(_currentWeapon.Damage);
         clone.AddForce(clone.transform.forward * 1500);
     }
 
@@ -59,9 +75,26 @@ public class Gun : MonoBehaviour {
         }
     }
 
+    public void Reload()
+    {
+        _shellsInMagazine = _currentWeapon.MagazineSize;
+    }
+
     protected virtual void Kick()
     {
         var handler = OnWeaponKick;
         if (handler != null) handler();
     }
+
+    public void SetWeapon(IWeapon weapon)
+    {
+        _currentWeapon = weapon;
+        _shellsInMagazine = _currentWeapon.MagazineSize;
+    }
+
+    public int ShellsInMagazine
+    {
+        get { return _shellsInMagazine; }
+    }
+
 }

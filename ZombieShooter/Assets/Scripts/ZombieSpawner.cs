@@ -52,7 +52,6 @@ public class ZombieSpawner : MonoBehaviour {
 
     public void SpawnZombie()
     {
-        Debug.Log("Spawn");
         AICharacterControl clone = Instantiate(Zombie) as AICharacterControl;
         clone.transform.position = SpawnPoint.position;
         clone.target = ZombieTarget;
@@ -91,12 +90,10 @@ public class ZombieSpawner : MonoBehaviour {
     {
         System.Random rand = new System.Random();
         float angle = rand.Next(0,360);
-        Debug.Log("angle: " + angle);
         float value = angle * (Mathf.PI / 180f);
         float xpos = Diameter * Mathf.Cos(value);
         float zpos = Diameter * Mathf.Sin(value);
         SpawnPoint.Rotate(270f, angle, 0f);
         SpawnPoint.position = new Vector3(xpos,0.5f,zpos);
-        Debug.Log("next position: " + SpawnPoint.position);
     }
 }

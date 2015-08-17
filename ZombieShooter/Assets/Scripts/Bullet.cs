@@ -6,6 +6,8 @@ public class Bullet : MonoBehaviour {
     
     private float startTime; 
     public float SecondsUntilDestroy = 10;
+    private float _currentDamage;
+
     // Use this for initialization
     void Start () {
         startTime = Time.time;
@@ -24,8 +26,13 @@ public class Bullet : MonoBehaviour {
         LifetimeComponent lifetime = collision.gameObject.GetComponent<LifetimeComponent>();
         if (lifetime != null)
         {
-            lifetime.ReceiveDamage(BalancingData.BULLET_DAMAGE);
+            lifetime.ReceiveDamage(_currentDamage);
             Destroy(gameObject);
         }
+    }
+
+    public void SetDamage(float damage)
+    {
+        _currentDamage = damage;
     }
 }

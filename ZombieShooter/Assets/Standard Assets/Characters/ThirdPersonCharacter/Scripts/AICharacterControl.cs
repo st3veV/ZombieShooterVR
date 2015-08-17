@@ -32,13 +32,16 @@ namespace UnityStandardAssets.Characters.ThirdPerson
             {
                 agent.SetDestination(target.position);
 
-				
-				
                 // use the values to move the character
                 character.Move(agent.desiredVelocity, false, false);
+
+                // check position reached
                 if(IsWithinBoundaries(character.transform.position,target.position,.5f))
                 {
-                    OnPositionReached(gameObject);
+                    if (OnPositionReached != null)
+                    {
+                        OnPositionReached(gameObject);
+                    }
                 }
             }
             else
