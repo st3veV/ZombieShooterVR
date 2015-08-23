@@ -8,14 +8,14 @@ public class Gun : MonoBehaviour {
     public event Action OnWeaponKick;
 
     private bool _isFiring = false;
-    private float timer = 0;
+    private float _timer = 0;
     private IWeapon _currentWeapon;
     private int _shellsInMagazine;
 
     // Use this for initialization
     void Start ()
     {
-        timer = 0;
+        _timer = 0;
         SetWeapon(new BasicGun());
     }
     
@@ -23,8 +23,8 @@ public class Gun : MonoBehaviour {
     void Update () {
         if (_isFiring)
         {
-            timer -= (Time.deltaTime * 1000f);
-            if (timer <= 0)
+            _timer -= (Time.deltaTime * 1000f);
+            if (_timer <= 0)
             {
                 if (_shellsInMagazine > 0)
                 {
@@ -35,7 +35,7 @@ public class Gun : MonoBehaviour {
                 {
                     Klick();
                 }
-                timer = _currentWeapon.CooldownDelay;
+                _timer = _currentWeapon.CooldownDelay;
             }
         }
     }
@@ -60,8 +60,7 @@ public class Gun : MonoBehaviour {
         if (_isFiring == false)
         {
             _isFiring = true;
-            timer = 0;
-            //Kick();
+            _timer = 0;
         }
     }
 
@@ -69,7 +68,6 @@ public class Gun : MonoBehaviour {
     {
         if (_isFiring)
         {
-            //timer = 0;
             _isFiring = false;
             Kick();
         }
