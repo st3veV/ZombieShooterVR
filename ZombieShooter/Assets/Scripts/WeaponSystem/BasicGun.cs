@@ -1,9 +1,8 @@
-﻿
-class BasicGun : IWeapon
+﻿public class BasicGun : IWeapon
 {
     public int BulletType
     {
-        get { return 0; }
+        get { return 1; }
     }
 
     public int MagazineSize
@@ -25,4 +24,21 @@ class BasicGun : IWeapon
     {
         get { return "Basic gun"; }
     }
+
+    public int AvailableAmmo { get; set; }
+}
+
+public class BasicWeaponAmmo : IAmmo
+{
+    public BasicWeaponAmmo(int initialAmount)
+    {
+        Amount = initialAmount;
+    }
+
+    public int Type
+    {
+        get { return 1; }
+    }
+
+    public int Amount { get; set; }
 }

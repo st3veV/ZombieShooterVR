@@ -16,7 +16,6 @@ public class Gun : MonoBehaviour {
     void Start ()
     {
         _timer = 0;
-        SetWeapon(new BasicGun());
     }
     
     // Update is called once per frame
