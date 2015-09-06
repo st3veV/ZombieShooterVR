@@ -45,4 +45,8 @@ public class LifetimeComponent : MonoBehaviour {
         }
     }
 
+    public void Reset()
+    {
+        LifetimeDamage = OriginalHealth;
+    }
 }
