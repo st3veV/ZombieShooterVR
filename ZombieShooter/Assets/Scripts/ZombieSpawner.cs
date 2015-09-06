@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 using UnityStandardAssets.Characters.ThirdPerson;
 
 public class ZombieSpawner : MonoBehaviour {
@@ -18,6 +19,8 @@ public class ZombieSpawner : MonoBehaviour {
 
     public bool IsSpawning = true;
 
+    private List<AICharacterControl> zombiePool;
+
 	void Start () {
         if (SpawnPoint == null)
         {
@@ -30,6 +33,7 @@ public class ZombieSpawner : MonoBehaviour {
         }
 
         AttactTarget.OnDie += AttactTarget_OnDie;
+	    zombiePool = new List<AICharacterControl>();
 	}
 
     void AttactTarget_OnDie(LifetimeComponent lifetimeComponent)
@@ -52,7 +56,18 @@ public class ZombieSpawner : MonoBehaviour {
 
     public void SpawnZombie()
     {
-        AICharacterControl clone = Instantiate(Zombie) as AICharacterControl;
+        AICharacterControl clone;
+
+        if (zombiePool.Count > 0)
+        {
+            clone = zombiePool[zombiePool.Count - 1];
+            zombiePool.Remove(clone);
+            clone.gameObject.SetActive(true);
+        }
+        else
+        {
+            clone = Instantiate(Zombie) as AICharacterControl;
+        }
         clone.transform.position = SpawnPoint.position;
         clone.target = ZombieTarget;
         clone.OnPositionReached += clone_OnPositionReached;
@@ -82,7 +97,9 @@ public class ZombieSpawner : MonoBehaviour {
         {
             lifetimeComponent.OnDie -= Zombie_OnDie;
         }
-        Destroy(obj);
+        //Destroy(obj);
+        obj.SetActive(false);
+        zombiePool.Add(obj.GetComponent<AICharacterControl>());
         AttactTarget.ReceiveDamage(ZombieDamage);
     }
 
@@ -93,7 +110,7 @@ public class ZombieSpawner : MonoBehaviour {
         float value = angle * (Mathf.PI / 180f);
         float xpos = Diameter * Mathf.Cos(value);
         float zpos = Diameter * Mathf.Sin(value);
-        SpawnPoint.Rotate(270f, angle, 0f);
+        //SpawnPoint.Rotate(270f, angle, 0f);
         SpawnPoint.position = new Vector3(xpos,0.5f,zpos);
     }
 }
