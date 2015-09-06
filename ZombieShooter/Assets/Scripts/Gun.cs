@@ -6,6 +6,7 @@ public class Gun : MonoBehaviour {
     public Rigidbody Bullet;
 
     public event Action OnWeaponKick;
+    public event Action<IWeapon> OnWeaponChange;
 
     private bool _isFiring = false;
     private float _timer = 0;
@@ -74,7 +75,18 @@ public class Gun : MonoBehaviour {
 
     public void Reload()
     {
-        _shellsInMagazine = _currentWeapon.MagazineSize;
+        if (_currentWeapon.AvailableAmmo <= 0) return;
+
+        if (_currentWeapon.AvailableAmmo >= _currentWeapon.MagazineSize)
+        {
+            _currentWeapon.AvailableAmmo -= _currentWeapon.MagazineSize;
+            _shellsInMagazine = _currentWeapon.MagazineSize;
+        }
+        else
+        {
+            _shellsInMagazine = _currentWeapon.AvailableAmmo;
+            _currentWeapon.AvailableAmmo = 0;
+        }
     }
 
     protected virtual void Kick()
@@ -86,7 +98,8 @@ public class Gun : MonoBehaviour {
     public void SetWeapon(IWeapon weapon)
     {
         _currentWeapon = weapon;
-        _shellsInMagazine = _currentWeapon.MagazineSize;
+        Reload();
+        OnOnWeaponChange(_currentWeapon);
     }
 
     public int ShellsInMagazine
@@ -94,4 +107,9 @@ public class Gun : MonoBehaviour {
         get { return _shellsInMagazine; }
     }
 
+    protected virtual void OnOnWeaponChange(IWeapon obj)
+    {
+        var handler = OnWeaponChange;
+        if (handler != null) handler(obj);
+    }
 }

@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Thalmic.Myo;
 
-public class Inventory
+public class InventorySystem
 {
 
     public Gun UserGun;
@@ -58,15 +58,15 @@ public class Inventory
     }
 }
 
-public class InventoryView : MonoBehaviour
+public class Inventory : MonoBehaviour
 {
     public Gun UserGun;
     public ThalmicMyo Myo;
-    private Inventory _inventory;
+    private InventorySystem _inventory;
 
     void Start()
     {
-        _inventory = new Inventory {UserGun = UserGun};
+        _inventory = new InventorySystem {UserGun = UserGun};
         _inventory.Init();
     }
 

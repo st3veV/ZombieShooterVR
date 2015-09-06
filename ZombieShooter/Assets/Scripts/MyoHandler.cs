@@ -21,6 +21,7 @@ public class MyoHandler : MonoBehaviour
     private float _referenceRoll = 0.0f;
 
     private Pose _lastPose = Pose.Unknown;
+    private bool _reloadLock = false;
 
     void Start()
     {
@@ -90,6 +91,24 @@ public class MyoHandler : MonoBehaviour
         if (thalmicMyo.pose == Pose.Fist)
         {
             gunInternal.StartShooting();
+        }
+
+        if (gunInternal.ShellsInMagazine == 0 || thalmicMyo.pose == Pose.DoubleTap)
+        {
+            if (thalmicMyo.transform.forward.y >= 0.9)
+            {
+                if (!_reloadLock)
+                {
+                    gunInternal.Reload();
+                    thalmicMyo.NotifyUserAction();
+                    _reloadLock = true;
+                }
+            }
+            else
+            {
+                if (_reloadLock)
+                    _reloadLock = false;
+            }
         }
 
     }
