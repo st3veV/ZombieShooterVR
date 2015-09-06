@@ -1,23 +1,25 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿using System;
+using UnityEngine;
 
-public class Bullet : MonoBehaviour {
-
+public class Bullet : MonoBehaviour
+{
     
     private float startTime; 
     public float SecondsUntilDestroy = 10;
     private float _currentDamage;
 
-    // Use this for initialization
+    public event Action<Bullet> OnBulletDie;
+    private InternalTimer _timer;
+
     void Start () {
-        startTime = Time.time;
+        _timer = new InternalTimer();
+        Reset();
     }
     
-    // Update is called once per frame
     void Update () {
-        if(Time.time-startTime >= SecondsUntilDestroy)
+        if (_timer.Update())
         {
-            Destroy(gameObject);
+            OnOnBulletDie(this);
         }
     }
 
@@ -27,12 +29,30 @@ public class Bullet : MonoBehaviour {
         if (lifetime != null)
         {
             lifetime.ReceiveDamage(_currentDamage);
-            Destroy(gameObject);
+            if (OnBulletDie != null)
+            {
+                OnOnBulletDie(this);
+            }
+            else
+            {
+                Destroy(gameObject);
+            }
         }
     }
 
     public void SetDamage(float damage)
     {
         _currentDamage = damage;
+    }
+
+    public void Reset()
+    {
+        _timer.Set(SecondsUntilDestroy*1000);
+    }
+
+    protected virtual void OnOnBulletDie(Bullet obj)
+    {
+        var handler = OnBulletDie;
+        if (handler != null) handler(obj);
     }
 }

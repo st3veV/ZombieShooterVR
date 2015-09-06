@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class Gun : MonoBehaviour {
@@ -9,22 +10,24 @@ public class Gun : MonoBehaviour {
     public event Action<IWeapon> OnWeaponChange;
 
     private bool _isFiring = false;
-    private float _timer = 0;
+    private InternalTimer _timer;
     private IWeapon _currentWeapon;
     private int _shellsInMagazine;
+
+    private List<Rigidbody> bulletPool;
 
     // Use this for initialization
     void Start ()
     {
-        _timer = 0;
+        bulletPool = new List<Rigidbody>();
+        _timer = new InternalTimer();
     }
-    
+
     // Update is called once per frame
     void Update () {
         if (_isFiring)
         {
-            _timer -= (Time.deltaTime * 1000f);
-            if (_timer <= 0)
+            if (_timer.Update())
             {
                 if (_shellsInMagazine > 0)
                 {
@@ -35,24 +38,47 @@ public class Gun : MonoBehaviour {
                 {
                     Klick();
                 }
-                _timer = _currentWeapon.CooldownDelay;
+                _timer.Set(_currentWeapon.CooldownDelay);
             }
         }
     }
 
     private void Klick()
     {
-        Debug.Log("Klick!");
+        //Debug.Log("Klick!");
     }
 
     public void Fire()
     {
         Kick();
         //Debug.Log("Fire!");
-        Rigidbody clone = Instantiate(Bullet, transform.position, transform.rotation) as Rigidbody;
-        Bullet bulletClone = clone.GetComponent<Bullet>();
+        Rigidbody clone;
+        Bullet bulletClone;
+        if (bulletPool.Count > 0)
+        {
+            clone = bulletPool[bulletPool.Count - 1];
+            bulletPool.Remove(clone);
+            bulletClone = clone.GetComponent<Bullet>();
+            clone.transform.position = transform.position;
+            clone.transform.rotation = transform.rotation;
+            bulletClone.Reset();
+            clone.velocity = new Vector3(0,0,0);
+            clone.gameObject.SetActive(true);
+        }
+        else
+        {
+            clone = Instantiate(Bullet, transform.position, transform.rotation) as Rigidbody;
+            bulletClone = clone.GetComponent<Bullet>();
+            bulletClone.OnBulletDie += OnBulletDie;
+        }
         bulletClone.SetDamage(_currentWeapon.Damage);
         clone.AddForce(clone.transform.forward * 1500);
+    }
+
+    private void OnBulletDie(Bullet bullet)
+    {
+        bullet.gameObject.SetActive(false);
+        bulletPool.Add(bullet.gameObject.GetComponent<Rigidbody>());
     }
 
     public void StartShooting()
@@ -60,7 +86,7 @@ public class Gun : MonoBehaviour {
         if (_isFiring == false)
         {
             _isFiring = true;
-            _timer = 0;
+            _timer.Set(0);
         }
     }
 

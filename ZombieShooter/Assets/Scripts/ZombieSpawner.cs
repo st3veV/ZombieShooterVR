@@ -15,6 +15,7 @@ public class ZombieSpawner : MonoBehaviour {
     public float ZombieDamage = BalancingData.ZOMBIE_DAMAGE;
 
     private float timer = 0f;
+    private InternalTimer _timer;
     public float SpawnInterval = 5f;
 
     public bool IsSpawning = true;
@@ -34,6 +35,8 @@ public class ZombieSpawner : MonoBehaviour {
 
         AttactTarget.OnDie += AttactTarget_OnDie;
 	    zombiePool = new List<AICharacterControl>();
+        _timer = new InternalTimer();
+	    _timer.Set(SpawnInterval*1000);
 	}
 
     void AttactTarget_OnDie(LifetimeComponent lifetimeComponent)
@@ -45,9 +48,13 @@ public class ZombieSpawner : MonoBehaviour {
 	void Update () {
         if (IsSpawning)
         {
+            /*
             timer -= Time.deltaTime;
             if (timer <= 0)
+                */
+            if(_timer.Update())
             {
+                _timer.Reset();
                 SpawnZombie();
                 timer = SpawnInterval;
             }
@@ -57,8 +64,6 @@ public class ZombieSpawner : MonoBehaviour {
     public void SpawnZombie()
     {
         AICharacterControl clone;
-
-        Debug.Log("Spawn -> pool size: " + zombiePool.Count);
 
         if (zombiePool.Count > 0)
         {
@@ -106,7 +111,6 @@ public class ZombieSpawner : MonoBehaviour {
     {
         go.SetActive(false);
         zombiePool.Add(go.GetComponent<AICharacterControl>());
-        Debug.Log("Dispose -> pool size: " + zombiePool.Count);
     }
 
     private void ChoseNextPosition()
