@@ -9,6 +9,7 @@ public class Radar : MonoBehaviour
     public GameObject EnemyAvatarPrefab;
     public GameObject LookAtGameObject;
     public GameObject ControlRotationGameObject;
+    public ZombieSpawner Spawner;
 
     private List<GameObject> avatars;
     private Transform helperTransform;
@@ -17,13 +18,12 @@ public class Radar : MonoBehaviour
     private int invisibleLayer;
 
     private GameObject[] enemies;
-
-    private int timer = 0;
+    private Dictionary<GameObject, GameObject> zAvatars;
 
 	// Use this for initialization
 	void Start () {
 	    avatars = new List<GameObject>();
-        
+
         GameObject Helper = new GameObject("helper");
         Helper.transform.SetParent(transform);
 	    helperTransform = Helper.transform;
@@ -31,7 +31,36 @@ public class Radar : MonoBehaviour
 	    radarLayer = LayerMask.NameToLayer("Radar");
         invisibleLayer = LayerMask.NameToLayer("Invisible");
 
+        if(Spawner != null)
+        {
+            Spawner.OnZombieSpawned += OnZombieSpawned;
+        }
+        enemies = new GameObject[0];
+        zAvatars = new Dictionary<GameObject, GameObject>();
+
 	}
+
+    private void OnZombieSpawned(GameObject zombie)
+    {
+        LifetimeComponent zombieLife = zombie.GetComponent<LifetimeComponent>();
+        zombieLife.OnDie += zombieLife_OnDie;
+
+        if (!zAvatars.ContainsKey(zombie))
+        {
+            zAvatars.Add(zombie, zombie.transform.FindChild("EnemyAvatar").gameObject);
+        }
+        UpdateEnemySet();
+    }
+
+    private void zombieLife_OnDie(LifetimeComponent obj)
+    {
+        if(zAvatars.ContainsKey(obj.gameObject))
+        {
+            zAvatars.Remove(obj.gameObject);
+        }
+        obj.OnDie -= zombieLife_OnDie;
+        UpdateEnemySet();
+    }
 
 	// Update is called once per frame
 	void Update ()
@@ -41,18 +70,26 @@ public class Radar : MonoBehaviour
 	    helperTransform.rotation = Quaternion.Euler(90, eulerAngles.y, 0);
 	    ControlRotationGameObject.transform.rotation = helperTransform.rotation;
 
-	    UpdateTrackedObjects();
+        if (enemies.Length > 0)
+        {
+            UpdateTrackedObjects();
+        }
 
 	}
 
     private void UpdateEnemySet()
     {
-        enemies = GameObject.FindGameObjectsWithTag("Enemy");
+        List<GameObject> en = new List<GameObject>();
+        foreach(GameObject o in zAvatars.Keys)
+        {
+            en.Add(o);
+        }
+        enemies = en.ToArray();
     }
 
     private void UpdateTrackedObjects()
     {
-        UpdateEnemySet();
+        //UpdateEnemySet();
         int i = 0;
         GameObject avatar;
         Vector3 position;
@@ -73,31 +110,15 @@ public class Radar : MonoBehaviour
             }
 
             //get or create avatar and move it to position
-            if (needsAvatar)
+            avatar = zAvatars[o];
+            if (needsAvatar && avatar != null)
             {
-                if (i < avatars.Count)
-                {
-                    avatar = avatars[i];
-                    avatar.layer = radarLayer;
-                    avatar.transform.position = position;
-                }
-                else
-                {
-                    avatar = Instantiate(EnemyAvatarPrefab, position, Quaternion.identity) as GameObject;
-                    avatars.Add(avatar);
-                }
-
-                i++;
+                avatar.transform.SetParent(o.transform.parent);
+                avatar.transform.position = position;
             }
-        }
-
-        // remove unnecessary avatars
-        if (i < avatars.Count)
-        {
-            for (int j = i; j < avatars.Count; j++)
+            else
             {
-                avatar = avatars[j];
-                avatar.layer = invisibleLayer;
+                avatar.transform.SetParent(o.transform);
             }
         }
     }

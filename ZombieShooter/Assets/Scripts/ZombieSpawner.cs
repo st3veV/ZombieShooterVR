@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityStandardAssets.Characters.ThirdPerson;
 using Random = System.Random;
@@ -14,7 +15,8 @@ public class ZombieSpawner : MonoBehaviour {
     public float Diameter = 0f;
     public float ZombieDamage = BalancingData.ZOMBIE_DAMAGE;
 
-    private float timer = 0f;
+    public Action<GameObject> OnZombieSpawned;
+
     private InternalTimer _timer;
     public float SpawnInterval = 5f;
 
@@ -56,7 +58,7 @@ public class ZombieSpawner : MonoBehaviour {
             {
                 _timer.Reset();
                 SpawnZombie();
-                timer = SpawnInterval;
+                _timer.Set(SpawnInterval*1000);
             }
         }
 	}
@@ -84,7 +86,16 @@ public class ZombieSpawner : MonoBehaviour {
         clone.transform.position = SpawnPoint.position;
         clone.gameObject.SetActive(true);
 
+        zombieSpawned(clone.gameObject);
+
         ChoseNextPosition();
+    }
+
+    private void zombieSpawned(GameObject zombie)
+    {
+        var handler = OnZombieSpawned;
+        if (handler != null)
+            handler(zombie);
     }
 
     private void Zombie_OnDie(LifetimeComponent lifetimeComponent)
