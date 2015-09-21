@@ -11,32 +11,24 @@ public class Radar : MonoBehaviour
     public GameObject ControlRotationGameObject;
     public ZombieSpawner Spawner;
 
-    private List<GameObject> avatars;
     private Transform helperTransform;
     private float radarRadius = 10.0f;
-    private int radarLayer;
-    private int invisibleLayer;
 
     private GameObject[] enemies;
-    private Dictionary<GameObject, GameObject> zAvatars;
+    private Dictionary<GameObject, GameObject> enemyAvatars;
 
 	// Use this for initialization
 	void Start () {
-	    avatars = new List<GameObject>();
-
         GameObject Helper = new GameObject("helper");
         Helper.transform.SetParent(transform);
 	    helperTransform = Helper.transform;
-
-	    radarLayer = LayerMask.NameToLayer("Radar");
-        invisibleLayer = LayerMask.NameToLayer("Invisible");
 
         if(Spawner != null)
         {
             Spawner.OnZombieSpawned += OnZombieSpawned;
         }
         enemies = new GameObject[0];
-        zAvatars = new Dictionary<GameObject, GameObject>();
+        enemyAvatars = new Dictionary<GameObject, GameObject>();
 
 	}
 
@@ -45,18 +37,18 @@ public class Radar : MonoBehaviour
         LifetimeComponent zombieLife = zombie.GetComponent<LifetimeComponent>();
         zombieLife.OnDie += zombieLife_OnDie;
 
-        if (!zAvatars.ContainsKey(zombie))
+        if (!enemyAvatars.ContainsKey(zombie))
         {
-            zAvatars.Add(zombie, zombie.transform.FindChild("EnemyAvatar").gameObject);
+            enemyAvatars.Add(zombie, zombie.transform.FindChild("EnemyAvatar").gameObject);
         }
         UpdateEnemySet();
     }
 
     private void zombieLife_OnDie(LifetimeComponent obj)
     {
-        if(zAvatars.ContainsKey(obj.gameObject))
+        if(enemyAvatars.ContainsKey(obj.gameObject))
         {
-            zAvatars.Remove(obj.gameObject);
+            enemyAvatars.Remove(obj.gameObject);
         }
         obj.OnDie -= zombieLife_OnDie;
         UpdateEnemySet();
@@ -80,7 +72,7 @@ public class Radar : MonoBehaviour
     private void UpdateEnemySet()
     {
         List<GameObject> en = new List<GameObject>();
-        foreach(GameObject o in zAvatars.Keys)
+        foreach(GameObject o in enemyAvatars.Keys)
         {
             en.Add(o);
         }
@@ -90,7 +82,6 @@ public class Radar : MonoBehaviour
     private void UpdateTrackedObjects()
     {
         //UpdateEnemySet();
-        int i = 0;
         GameObject avatar;
         Vector3 position;
         bool needsAvatar = false;
@@ -110,7 +101,7 @@ public class Radar : MonoBehaviour
             }
 
             //get or create avatar and move it to position
-            avatar = zAvatars[o];
+            avatar = enemyAvatars[o];
             if (needsAvatar && avatar != null)
             {
                 avatar.transform.SetParent(o.transform.parent);
