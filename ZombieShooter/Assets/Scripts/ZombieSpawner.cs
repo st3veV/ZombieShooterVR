@@ -15,7 +15,7 @@ public class ZombieSpawner : MonoBehaviour {
     public float Diameter = 0f;
     public float ZombieDamage = BalancingData.ZOMBIE_DAMAGE;
 
-    public Action<GameObject> OnZombieSpawned;
+    public event Action<GameObject> OnZombieSpawned;
 
     private InternalTimer _timer;
     public float SpawnInterval = 5f;

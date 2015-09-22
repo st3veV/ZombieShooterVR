@@ -9,13 +9,14 @@ public class Radar : MonoBehaviour
     public GameObject EnemyAvatarPrefab;
     public GameObject LookAtGameObject;
     public GameObject ControlRotationGameObject;
-    public ZombieSpawner Spawner;
+    public ZombieSpawner ZombieSpawner;
+    public WeaponSpawner WeaponSpawner;
 
     private Transform helperTransform;
     private float radarRadius = 10.0f;
 
-    private GameObject[] enemies;
-    private Dictionary<GameObject, GameObject> enemyAvatars;
+    private GameObject[] trackedObjects;
+    private Dictionary<GameObject, GameObject> trackedAvatars;
 
 	// Use this for initialization
 	void Start () {
@@ -23,35 +24,57 @@ public class Radar : MonoBehaviour
         Helper.transform.SetParent(transform);
 	    helperTransform = Helper.transform;
 
-        if(Spawner != null)
+        if(ZombieSpawner != null)
         {
-            Spawner.OnZombieSpawned += OnZombieSpawned;
+            ZombieSpawner.OnZombieSpawned += OnZombieSpawned;
         }
-        enemies = new GameObject[0];
-        enemyAvatars = new Dictionary<GameObject, GameObject>();
+
+        if(WeaponSpawner != null)
+        {
+            WeaponSpawner.OnWeaponTargetSpawned += WeaponSpawner_OnWeaponTargetSpawned;
+        }
+
+        trackedObjects = new GameObject[0];
+        trackedAvatars = new Dictionary<GameObject, GameObject>();
 
 	}
+
+    private void WeaponSpawner_OnWeaponTargetSpawned(GameObject weaponTarget)
+    {
+        LifetimeComponent weaponTargetLife = weaponTarget.GetComponent<LifetimeComponent>();
+        weaponTargetLife.OnDie += weaponTargetLife_OnDie;
+
+        if(!trackedAvatars.ContainsKey(weaponTarget))
+        {
+            trackedAvatars.Add(weaponTarget, weaponTarget.transform.FindChild("TargetAvatar").gameObject);
+        }
+        UpdateTrackedObjectsSet();
+    }
+
+    private void weaponTargetLife_OnDie(LifetimeComponent obj)
+    {
+        resetAvatar(obj);
+        obj.OnDie -= weaponTargetLife_OnDie;
+        UpdateTrackedObjectsSet();
+    }
 
     private void OnZombieSpawned(GameObject zombie)
     {
         LifetimeComponent zombieLife = zombie.GetComponent<LifetimeComponent>();
         zombieLife.OnDie += zombieLife_OnDie;
 
-        if (!enemyAvatars.ContainsKey(zombie))
+        if (!trackedAvatars.ContainsKey(zombie))
         {
-            enemyAvatars.Add(zombie, zombie.transform.FindChild("EnemyAvatar").gameObject);
+            trackedAvatars.Add(zombie, zombie.transform.FindChild("EnemyAvatar").gameObject);
         }
-        UpdateEnemySet();
+        UpdateTrackedObjectsSet();
     }
 
     private void zombieLife_OnDie(LifetimeComponent obj)
     {
-        if(enemyAvatars.ContainsKey(obj.gameObject))
-        {
-            enemyAvatars.Remove(obj.gameObject);
-        }
+        resetAvatar(obj);
         obj.OnDie -= zombieLife_OnDie;
-        UpdateEnemySet();
+        UpdateTrackedObjectsSet();
     }
 
 	// Update is called once per frame
@@ -62,21 +85,31 @@ public class Radar : MonoBehaviour
 	    helperTransform.rotation = Quaternion.Euler(90, eulerAngles.y, 0);
 	    ControlRotationGameObject.transform.rotation = helperTransform.rotation;
 
-        if (enemies.Length > 0)
+        if (trackedObjects.Length > 0)
         {
             UpdateTrackedObjects();
         }
 
 	}
 
-    private void UpdateEnemySet()
+    private void resetAvatar(LifetimeComponent obj)
     {
-        List<GameObject> en = new List<GameObject>();
-        foreach(GameObject o in enemyAvatars.Keys)
+        if (trackedAvatars.ContainsKey(obj.gameObject))
         {
-            en.Add(o);
+            GameObject avatar = trackedAvatars[obj.gameObject];
+            avatar.transform.SetParent(obj.gameObject.transform);
+            trackedAvatars.Remove(obj.gameObject);
         }
-        enemies = en.ToArray();
+    }
+
+    private void UpdateTrackedObjectsSet()
+    {
+        List<GameObject> tObjs = new List<GameObject>();
+        foreach(GameObject o in trackedAvatars.Keys)
+        {
+            tObjs.Add(o);
+        }
+        trackedObjects = tObjs.ToArray();
     }
 
     private void UpdateTrackedObjects()
@@ -85,7 +118,7 @@ public class Radar : MonoBehaviour
         GameObject avatar;
         Vector3 position;
         bool needsAvatar = false;
-        foreach (GameObject o in enemies)
+        foreach (GameObject o in trackedObjects)
         {
             //Find proper position for avatar
             if (Vector3.Distance(o.transform.position, transform.position) > radarRadius)
@@ -101,7 +134,7 @@ public class Radar : MonoBehaviour
             }
 
             //get or create avatar and move it to position
-            avatar = enemyAvatars[o];
+            avatar = trackedAvatars[o];
             if (needsAvatar && avatar != null)
             {
                 avatar.transform.SetParent(o.transform.parent);
