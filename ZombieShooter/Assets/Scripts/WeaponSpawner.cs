@@ -55,7 +55,7 @@ public class WeaponSpawner : MonoBehaviour {
         spawned(target);
     }
 
-    void targetLife_OnDie(LifetimeComponent obj)
+    private void targetLife_OnDie(LifetimeComponent obj)
     {
         PickAmmo(obj.gameObject);
     }
