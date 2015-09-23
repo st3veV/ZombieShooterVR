@@ -98,8 +98,9 @@ public class ThalmicHub : MonoBehaviour
             throw new UnityException (errorMessage);
 #endif
         }
-
+        
 #if UNITY_ANDROID && !UNITY_EDITOR
+        /*
         AndroidJavaClass unityPlayerClass = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
         var unityActivity = unityPlayerClass.GetStatic<AndroidJavaObject>("currentActivity");
         var applicationContext = unityActivity.Call<AndroidJavaObject>("getApplicationContext");
@@ -112,6 +113,7 @@ public class ThalmicHub : MonoBehaviour
         unityActivity.Call("runOnUiThread", new AndroidJavaRunnable(() => {
             createHub ();
         }));
+        */
 #else
         createHub ();
 #endif

@@ -77,6 +77,9 @@ public class ThalmicMyo : MonoBehaviour {
     }
 
     void Start() {
+#if UNITY_ANDROID
+        messageManager.Init();
+#endif
     }
 
     void Update() {

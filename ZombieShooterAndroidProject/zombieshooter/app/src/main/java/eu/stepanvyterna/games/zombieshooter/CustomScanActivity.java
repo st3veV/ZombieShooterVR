@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.google.unity.GoogleUnityActivity;
 import com.thalmic.myo.Hub;
 import com.thalmic.myo.scanner.ScanActivity;
 
@@ -34,7 +35,8 @@ public class CustomScanActivity extends ScanActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == 1337) {
-            Intent intent = new Intent(this, UnityPlayerNativeActivity.class);
+            //Intent intent = new Intent(this, UnityPlayerNativeActivity.class);
+            Intent intent = new Intent(this, GoogleUnityActivity.class);
             this.startActivity(intent);
             return true;
         }

@@ -42,6 +42,7 @@ public class MessageManager : MonoBehaviour
 
     public void MyoPose(string param)
     {
+        Debug.Log("pose: " + param);
         curPose = param;
         if (param != null)
         {
@@ -106,59 +107,52 @@ public class MessageManager : MonoBehaviour
 
     public string GetMyoPose() { return curPose; }
 
+    public void Init()
+    {
+        Debug.Log("initializing");
+        android.Call("init");
+    }
+
+    private AndroidJavaObject jo;
+    private AndroidJavaObject android
+    {
+        get
+        {
+            if (jo == null)
+            {
+                AndroidJavaClass jc = new AndroidJavaClass("eu.stepanvyterna.games.zombieshooter.MyoHandler");
+                jo = jc.CallStatic<AndroidJavaObject>("instance");
+                Debug.Log("got instance");
+            }
+            return jo;
+        }
+    }
+
     internal void Unlock(Thalmic.Myo.UnlockType type)
     {
 #if UNITY_ANDROID
-        using (AndroidJavaClass jc = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
-        {
-            using (AndroidJavaObject jo = jc.GetStatic<AndroidJavaObject>("currentActivity"))
-            {
-                int result = jo.Call<int>("myoUnlock", type.ToString());
-
-            }
-        }
+        android.Call<int>("myoUnlock", type.ToString());
 #endif
     }
 
     internal void Lock()
     {
 #if UNITY_ANDROID
-        using (AndroidJavaClass jc = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
-        {
-            using (AndroidJavaObject jo = jc.GetStatic<AndroidJavaObject>("currentActivity"))
-            {
-                int result = jo.Call<int>("myoLock");
-
-            }
-        } 
+        android.Call<int>("myoLock");
 #endif
     }
 
     internal void NotifyUserAction()
     {
 #if UNITY_ANDROID
-        using (AndroidJavaClass jc = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
-        {
-            using (AndroidJavaObject jo = jc.GetStatic<AndroidJavaObject>("currentActivity"))
-            {
-                int result = jo.Call<int>("myoNotifyUserAction");
-
-            }
-        }
+        android.Call<int>("myoNotifyUserAction");
 #endif 
     }
 
     internal void Vibrate(Thalmic.Myo.VibrationType type)
     {
 #if UNITY_ANDROID
-        using (AndroidJavaClass jc = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
-        {
-            using (AndroidJavaObject jo = jc.GetStatic<AndroidJavaObject>("currentActivity"))
-            {
-                int result = jo.Call<int>("myoVibrate", type.ToString());
-
-            }
-        }
+        android.Call<int>("myoVibrate", type.ToString());
 #endif
     }
 }
