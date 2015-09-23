@@ -46,6 +46,7 @@ public class WeaponSpawner : MonoBehaviour {
         targetPosition.y = 0;
         target.transform.position = targetPosition;
         target.transform.LookAt(PlayerLocation);
+        
 
         LifetimeComponent targetLife = target.GetComponent<LifetimeComponent>();
         targetLife.OnDie += targetLife_OnDie;
@@ -61,6 +62,7 @@ public class WeaponSpawner : MonoBehaviour {
 
     public void PickAmmo(GameObject target)
     {
+        Debug.Log("Ammo picked");
         target.SetActive(false);
         targetPool.Add(target);
     }

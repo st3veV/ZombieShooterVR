@@ -26,7 +26,7 @@ public class Radar : MonoBehaviour
 
         if(ZombieSpawner != null)
         {
-            ZombieSpawner.OnZombieSpawned += OnZombieSpawned;
+            ZombieSpawner.OnZombieSpawned += ZombieSpawner_OnZombieSpawned;
         }
 
         if(WeaponSpawner != null)
@@ -58,11 +58,10 @@ public class Radar : MonoBehaviour
         UpdateTrackedObjectsSet();
     }
 
-    private void OnZombieSpawned(GameObject zombie)
+    private void ZombieSpawner_OnZombieSpawned(GameObject zombie)
     {
         LifetimeComponent zombieLife = zombie.GetComponent<LifetimeComponent>();
         zombieLife.OnDie += zombieLife_OnDie;
-
         if (!trackedAvatars.ContainsKey(zombie))
         {
             trackedAvatars.Add(zombie, zombie.transform.FindChild("EnemyAvatar").gameObject);
