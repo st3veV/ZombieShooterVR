@@ -15,14 +15,19 @@ public class InventorySystem
 	public void Init ()
 	{
 	    _availableWeapons = new List<IWeapon>();
+        /*
         AddWeapon(new BasicGun());
         AddAmmo(new BasicWeaponAmmo(99));
 	    SetWeapon(0);
+        */
 	}
 	
     public void AddWeapon(IWeapon weapon)
     {
-        _availableWeapons.Add(weapon);
+        if (_availableWeapons.IndexOf(weapon) == -1)
+        {
+            _availableWeapons.Add(weapon);
+        }
         if (weapon.Damage >= _availableWeapons[_currentWeaponIndex].Damage)
         {
             SetWeapon(_availableWeapons.IndexOf(weapon));

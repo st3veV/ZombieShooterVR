@@ -1,5 +1,9 @@
 ﻿public class BasicGun : IWeapon
 {
+    public void SetValues(string name, float damage, float cooldownDelay, int magazineSize, int bulletType)
+    {
+    }
+
     public int BulletType
     {
         get { return 1; }

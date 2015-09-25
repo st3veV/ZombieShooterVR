@@ -6,8 +6,7 @@ using UnityEditor;
 #endif
 
 public class WeaponDatabase : ScriptableObject {
-
-    private static string databaseName = "WeaponDB";
+    private const string databaseName = "WeaponDB";
     private static WeaponDatabase _instance;
     public static WeaponDatabase Instance
     {
@@ -21,14 +20,15 @@ public class WeaponDatabase : ScriptableObject {
                 AssetDatabase.CreateAsset(_instance, "Assets/Resources/"+databaseName+".asset");
 #endif
             }
-            if (_instance.weapons == null)
+            if (_instance.Weapons == null)
             {
-                _instance.weapons = new List<IWeapon>();
+                _instance.Weapons = new List<IWeapon>();
             }
             return _instance;
         }
     }
 
-    public List<IWeapon> weapons;
+    [SerializeField]
+    public List<IWeapon> Weapons;
 
 }
