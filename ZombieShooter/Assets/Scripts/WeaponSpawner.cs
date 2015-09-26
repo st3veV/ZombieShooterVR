@@ -14,10 +14,12 @@ public class WeaponSpawner : MonoBehaviour {
 
     private List<GameObject> targetPool;
 
-    public WeaponDatabase WeaponDatabase = WeaponDatabase.Instance;
+    public WeaponDatabase WeaponDatabase;
 
-	void Start () {
+	void Start ()
+	{
 
+	    WeaponDatabase = WeaponDatabase.Instance;
         ZombieSpawner.OnZombieSpawned += ZombieSpawner_OnZombieSpawned;
 
         targetPool = new List<GameObject>();

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using UnityEditor;
 #endif
 
+[InitializeOnLoad]
 public class WeaponDatabase : ScriptableObject {
     private const string databaseName = "WeaponDB";
     private static WeaponDatabase _instance;
