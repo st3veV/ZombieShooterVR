@@ -17,6 +17,9 @@ public class Weapon : IWeapon
     [SerializeField]
     private int _availableAmmo;
 
+    [SerializeField]
+    private GameObject _weaponModel;
+
     public void SetValues(string name, float damage, float cooldownDelay, int magazineSize, int bulletType)
     {
         _name = name;
@@ -55,5 +58,11 @@ public class Weapon : IWeapon
     {
         get { return _availableAmmo; }
         set { _availableAmmo = value; }
+    }
+
+    public GameObject WeaponModel
+    {
+        get { return _weaponModel; }
+        set { _weaponModel = value; }
     }
 }

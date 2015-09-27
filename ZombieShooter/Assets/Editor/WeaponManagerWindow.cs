@@ -101,13 +101,13 @@ public class WeaponManagerWindow : EditorWindow {
 
     private Weapon fillEditorWindow(Weapon weapon, out bool delete, out bool save)
     {
-
         string weaponName = weapon == null ? "New weapon" : weapon.Name;
         float cooldownDelay = weapon == null ? 1000f : weapon.CooldownDelay;
         float damage = weapon == null ? 100f : weapon.Damage;
         int magazineSize = weapon == null ? 10 : weapon.MagazineSize;
         int bulletType = weapon == null ? 0 : weapon.BulletType;
         int initialAmmo = weapon == null ? 10 : weapon.AvailableAmmo;
+        GameObject weaponModel = weapon == null ? null : weapon.WeaponModel;
         
         GUILayout.BeginHorizontal();
         GUILayout.Label("Name");
@@ -140,6 +140,11 @@ public class WeaponManagerWindow : EditorWindow {
         GUILayout.EndHorizontal();
 
         GUILayout.BeginHorizontal();
+        GUILayout.Label("Weapon model");
+        weaponModel = EditorGUILayout.ObjectField("", weaponModel, typeof (GameObject), false) as GameObject;
+        GUILayout.EndHorizontal();
+
+        GUILayout.BeginHorizontal();
         delete = GUILayout.Button("Delete");
         save = GUILayout.Button("Save");
         GUILayout.EndHorizontal();
@@ -150,6 +155,7 @@ public class WeaponManagerWindow : EditorWindow {
         }
         weapon.SetValues(weaponName, damage, cooldownDelay, magazineSize, bulletType);
         weapon.AvailableAmmo = initialAmmo;
+        weapon.WeaponModel = weaponModel;
 
         return weapon;
     }
