@@ -22,6 +22,18 @@ public class WeaponSpawner : MonoBehaviour {
 	    WeaponDatabase = WeaponDatabase.Instance;
         ZombieSpawner.OnZombieSpawned += ZombieSpawner_OnZombieSpawned;
 
+        //init - selecting first weapon
+        Debug.Log("pick weapon");
+	    Weapon weapon = WeaponDatabase.Weapons[0];
+        Debug.Log("selecting weapon: " + weapon.Name);
+	    Inventory.PickWeapon(weapon);
+
+        //adding enough bullets
+	    var modularAmmo = new ModularAmmo();
+	    modularAmmo.SetValues(weapon.BulletType, weapon.MagazineSize + 100);
+	    Inventory.PickAmmo(modularAmmo);
+
+
         targetPool = new List<GameObject>();
 	}
 

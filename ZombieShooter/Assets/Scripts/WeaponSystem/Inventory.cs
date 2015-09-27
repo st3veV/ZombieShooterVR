@@ -15,11 +15,6 @@ public class InventorySystem
 	public void Init ()
 	{
 	    _availableWeapons = new List<IWeapon>();
-        /*
-        AddWeapon(new BasicGun());
-        AddAmmo(new BasicWeaponAmmo(99));
-	    SetWeapon(0);
-        */
 	}
 	
     public void AddWeapon(IWeapon weapon)
@@ -71,8 +66,8 @@ public class Inventory : MonoBehaviour
 
     void Start()
     {
-        _inventory = new InventorySystem {UserGun = UserGun};
-        _inventory.Init();
+        Debug.Log(("inventory.start"));
+        InitInventory();
     }
 
     void Update()
@@ -92,12 +87,24 @@ public class Inventory : MonoBehaviour
 
     public void PickWeapon(IWeapon weapon)
     {
+        InitInventory();
         _inventory.AddWeapon(weapon);
     }
 
     public void PickAmmo(IAmmo ammo)
     {
+        InitInventory();
         _inventory.AddAmmo(ammo);
     }
+
+    private void InitInventory()
+    {
+        if (_inventory == null)
+        {
+            _inventory = new InventorySystem {UserGun = UserGun};
+            _inventory.Init();
+        }
+    }
+
 
 }

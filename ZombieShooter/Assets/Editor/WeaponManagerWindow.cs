@@ -16,7 +16,7 @@ public class WeaponManagerWindow : EditorWindow {
 
     private int selectedWeaponIndex = -2;
     private bool editMode = false;
-    private IWeapon editedWeapon = null;
+    private Weapon editedWeapon = null;
 
     void OnGUI()
     {
@@ -80,7 +80,10 @@ public class WeaponManagerWindow : EditorWindow {
             {
                 editMode = false;
                 if (indexOf > -1)
+                {
                     Database.Weapons.Remove(editedWeapon);
+                    EditorUtility.SetDirty(Database);
+                }
             }
             else if(save)
             {
@@ -89,20 +92,22 @@ public class WeaponManagerWindow : EditorWindow {
                     Database.Weapons[indexOf] = editedWeapon;
                 else
                     Database.Weapons.Add(editedWeapon);
+                EditorUtility.SetDirty(Database);
             }
         }
         GUILayout.EndVertical();
         GUILayout.EndArea();
     }
 
-    private IWeapon fillEditorWindow(IWeapon weapon, out bool delete, out bool save)
+    private Weapon fillEditorWindow(Weapon weapon, out bool delete, out bool save)
     {
 
         string weaponName = weapon == null ? "New weapon" : weapon.Name;
-        float cooldownDelay = weapon == null ? 1.0f : weapon.CooldownDelay;
-        float damage = weapon == null ? 1000f : weapon.Damage;
+        float cooldownDelay = weapon == null ? 1000f : weapon.CooldownDelay;
+        float damage = weapon == null ? 100f : weapon.Damage;
         int magazineSize = weapon == null ? 10 : weapon.MagazineSize;
         int bulletType = weapon == null ? 0 : weapon.BulletType;
+        int initialAmmo = weapon == null ? 10 : weapon.AvailableAmmo;
         
         GUILayout.BeginHorizontal();
         GUILayout.Label("Name");
@@ -130,62 +135,22 @@ public class WeaponManagerWindow : EditorWindow {
         GUILayout.EndHorizontal();
 
         GUILayout.BeginHorizontal();
+        GUILayout.Label("Initial ammo");
+        initialAmmo = EditorGUILayout.IntField(initialAmmo);
+        GUILayout.EndHorizontal();
+
+        GUILayout.BeginHorizontal();
         delete = GUILayout.Button("Delete");
         save = GUILayout.Button("Save");
         GUILayout.EndHorizontal();
 
         if (weapon == null)
         {
-            weapon = new ModularWeapon();
+            weapon = new Weapon();
         }
         weapon.SetValues(weaponName, damage, cooldownDelay, magazineSize, bulletType);
+        weapon.AvailableAmmo = initialAmmo;
 
         return weapon;
     }
 }
-
-class ModularWeapon : IWeapon
-{
-    private int _bulletType;
-    private int _magazineSize;
-    private float _cooldownDelay;
-    private float _damage;
-    private string _name;
-
-    public void SetValues(string name, float damage, float cooldownDelay, int magazineSize, int bulletType)
-    {
-        _name = name;
-        _damage = damage;
-        _cooldownDelay = cooldownDelay;
-        _magazineSize = magazineSize;
-        _bulletType = bulletType;
-    }
-
-    public int BulletType
-    {
-        get { return _bulletType; }
-    }
-
-    public int MagazineSize
-    {
-        get { return _magazineSize; }
-    }
-
-    public float CooldownDelay
-    {
-        get { return _cooldownDelay; }
-    }
-
-    public float Damage
-    {
-        get { return _damage; }
-    }
-
-    public string Name
-    {
-        get { return _name; }
-    }
-
-    public int AvailableAmmo { get; set; }
-}
-
