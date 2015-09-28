@@ -17,6 +17,7 @@ public class Radar : MonoBehaviour
 
     private GameObject[] trackedObjects;
     private Dictionary<GameObject, GameObject> trackedAvatars;
+    private Dictionary<GameObject, Transform> avatarParents;
 
 	// Use this for initialization
 	void Start () {
@@ -36,7 +37,7 @@ public class Radar : MonoBehaviour
 
         trackedObjects = new GameObject[0];
         trackedAvatars = new Dictionary<GameObject, GameObject>();
-
+        avatarParents = new Dictionary<GameObject, Transform>();
 	}
 
     private void WeaponSpawner_OnWeaponTargetSpawned(GameObject weaponTarget)
@@ -46,7 +47,9 @@ public class Radar : MonoBehaviour
 
         if(!trackedAvatars.ContainsKey(weaponTarget))
         {
-            trackedAvatars.Add(weaponTarget, weaponTarget.transform.FindChild("TargetAvatar").gameObject);
+            Transform avatarParent = weaponTarget.transform.FindChild("Container");
+            trackedAvatars.Add(weaponTarget, avatarParent.FindChild("TargetAvatar").gameObject);
+            avatarParents.Add(weaponTarget, avatarParent);
         }
         UpdateTrackedObjectsSet();
     }
@@ -65,6 +68,7 @@ public class Radar : MonoBehaviour
         if (!trackedAvatars.ContainsKey(zombie))
         {
             trackedAvatars.Add(zombie, zombie.transform.FindChild("EnemyAvatar").gameObject);
+            avatarParents.Add(zombie, zombie.transform);
         }
         UpdateTrackedObjectsSet();
     }
@@ -98,6 +102,7 @@ public class Radar : MonoBehaviour
             GameObject avatar = trackedAvatars[obj.gameObject];
             avatar.transform.SetParent(obj.gameObject.transform);
             trackedAvatars.Remove(obj.gameObject);
+            avatarParents.Remove(obj.gameObject);
         }
     }
 
@@ -134,14 +139,15 @@ public class Radar : MonoBehaviour
 
             //get or create avatar and move it to position
             avatar = trackedAvatars[o];
+            Transform avatarParent = avatarParents[o];
             if (needsAvatar && avatar != null)
             {
-                avatar.transform.SetParent(o.transform.parent);
+                avatar.transform.SetParent(avatarParent.parent);
                 avatar.transform.position = position;
             }
             else
             {
-                avatar.transform.SetParent(o.transform);
+                avatar.transform.SetParent(avatarParent);
             }
         }
     }

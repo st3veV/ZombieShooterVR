@@ -32,7 +32,7 @@ public class WeaponManagerWindow : EditorWindow {
             editedWeapon = null;
             selectedWeaponIndex = -2;
             int i = 0;
-            foreach (IWeapon weapon in Database.Weapons)
+            foreach (Weapon weapon in Database.Weapons)
             {
                 bool selected = GUILayout.Button(weapon.Name);
                 if (selected)
@@ -153,9 +153,7 @@ public class WeaponManagerWindow : EditorWindow {
         {
             weapon = new Weapon();
         }
-        weapon.SetValues(weaponName, damage, cooldownDelay, magazineSize, bulletType);
-        weapon.AvailableAmmo = initialAmmo;
-        weapon.WeaponModel = weaponModel;
+        weapon.SetValues(weaponName, damage, cooldownDelay, magazineSize, bulletType, initialAmmo, weaponModel);
 
         return weapon;
     }

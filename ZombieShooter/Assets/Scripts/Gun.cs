@@ -16,11 +16,16 @@ public class Gun : MonoBehaviour {
 
     private List<Rigidbody> bulletPool;
 
+    private GameObject _weaponContainer;
+
     // Use this for initialization
     void Start ()
     {
         bulletPool = new List<Rigidbody>();
         _timer = new InternalTimer();
+
+        _weaponContainer = transform.FindChild("GunContainer").gameObject;
+
     }
 
     // Update is called once per frame
@@ -124,8 +129,24 @@ public class Gun : MonoBehaviour {
     public void SetWeapon(IWeapon weapon)
     {
         _currentWeapon = weapon;
+        LoadWeaponModel(weapon.WeaponModel);
         Reload();
         OnOnWeaponChange(_currentWeapon);
+    }
+
+    private void LoadWeaponModel(GameObject weaponModel)
+    {
+        //delete old gun
+        if (_weaponContainer.transform.childCount > 0)
+        {
+            Destroy(_weaponContainer.transform.GetChild(0).gameObject);
+        }
+
+        //instantiate new gun
+        GameObject newWeapon = (GameObject) Instantiate(weaponModel,_weaponContainer.transform.position,_weaponContainer.transform.rotation);
+        
+        newWeapon.transform.SetParent(_weaponContainer.transform);
+        newWeapon.transform.localScale = new Vector3(1f, 1f, 1f);
     }
 
     public int ShellsInMagazine

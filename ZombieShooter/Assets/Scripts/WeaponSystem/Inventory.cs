@@ -48,7 +48,11 @@ public class InventorySystem
             newIndex += _availableWeapons.Count;
         else
             newIndex = newIndex%_availableWeapons.Count;
-        SetWeapon(newIndex);
+
+        if (newIndex != _currentWeaponIndex)
+        {
+            SetWeapon(newIndex);
+        }
     }
 
     private void SetWeapon(int index)
