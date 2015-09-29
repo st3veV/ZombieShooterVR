@@ -101,17 +101,20 @@ public class WeaponSpawner : MonoBehaviour {
 
     public void PickAmmo(GameObject target)
     {
-        Debug.Log("Ammo picked");
+        Debug.Log("Weapon target picked");
         PickupHolder pickupHolder = target.GetComponent<PickupHolder>();
-        if (pickupHolder.Pickable.Weapon != null)
+        if (pickupHolder.Pickable != null)
         {
-            Inventory.PickWeapon(pickupHolder.Pickable.Weapon);
+            if (pickupHolder.Pickable.Weapon != null)
+            {
+                Inventory.PickWeapon(pickupHolder.Pickable.Weapon);
+            }
+            if (pickupHolder.Pickable.Ammo != null)
+            {
+                Inventory.PickAmmo(pickupHolder.Pickable.Ammo);
+            }
         }
-        if (pickupHolder.Pickable.Ammo != null)
-        {
-            Inventory.PickAmmo(pickupHolder.Pickable.Ammo);
-        }
-
+        pickupHolder.Clear();
         target.SetActive(false);
         targetPool.Add(target);
     }

@@ -139,11 +139,11 @@ public class Gun : MonoBehaviour {
         //delete old gun
         if (_weaponContainer.transform.childCount > 0)
         {
-            Destroy(_weaponContainer.transform.GetChild(0).gameObject);
+            foreach (Transform childTransform in _weaponContainer.transform) Destroy(childTransform.gameObject);
         }
 
         //instantiate new gun
-        GameObject newWeapon = (GameObject) Instantiate(weaponModel,_weaponContainer.transform.position,_weaponContainer.transform.rotation);
+        GameObject newWeapon = (GameObject) Instantiate(weaponModel, _weaponContainer.transform.position, _weaponContainer.transform.rotation);
         
         newWeapon.transform.SetParent(_weaponContainer.transform);
         newWeapon.transform.localScale = new Vector3(1f, 1f, 1f);

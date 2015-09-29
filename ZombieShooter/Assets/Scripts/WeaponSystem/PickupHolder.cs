@@ -4,6 +4,11 @@ using System.Collections;
 public class PickupHolder : MonoBehaviour
 {
     public IPickable Pickable;
+
+    public void Clear()
+    {
+        this.Pickable = null;
+    }
 }
 
 public interface IPickable

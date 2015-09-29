@@ -99,8 +99,9 @@ public class Radar : MonoBehaviour
     {
         if (trackedAvatars.ContainsKey(obj.gameObject))
         {
+            Transform avatarParent = avatarParents[obj.gameObject];
             GameObject avatar = trackedAvatars[obj.gameObject];
-            avatar.transform.SetParent(obj.gameObject.transform);
+            avatar.transform.SetParent(avatarParent);
             trackedAvatars.Remove(obj.gameObject);
             avatarParents.Remove(obj.gameObject);
         }
@@ -122,6 +123,7 @@ public class Radar : MonoBehaviour
         GameObject avatar;
         Vector3 position;
         bool needsAvatar = false;
+        Transform avatarParent;
         foreach (GameObject o in trackedObjects)
         {
             //Find proper position for avatar
@@ -139,10 +141,10 @@ public class Radar : MonoBehaviour
 
             //get or create avatar and move it to position
             avatar = trackedAvatars[o];
-            Transform avatarParent = avatarParents[o];
+            avatarParent = avatarParents[o];
             if (needsAvatar && avatar != null)
             {
-                avatar.transform.SetParent(avatarParent.parent);
+                avatar.transform.SetParent(o.transform.parent);
                 avatar.transform.position = position;
             }
             else
