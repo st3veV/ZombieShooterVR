@@ -17,6 +17,7 @@ public class Radar : MonoBehaviour
 
     private GameObject[] trackedObjects;
     private Dictionary<GameObject, GameObject> trackedAvatars;
+    private Dictionary<GameObject, Transform> avatarParents;
 
 	// Use this for initialization
 	void Start () {
@@ -36,7 +37,7 @@ public class Radar : MonoBehaviour
 
         trackedObjects = new GameObject[0];
         trackedAvatars = new Dictionary<GameObject, GameObject>();
-
+        avatarParents = new Dictionary<GameObject, Transform>();
 	}
 
     private void WeaponSpawner_OnWeaponTargetSpawned(GameObject weaponTarget)
@@ -46,7 +47,9 @@ public class Radar : MonoBehaviour
 
         if(!trackedAvatars.ContainsKey(weaponTarget))
         {
-            trackedAvatars.Add(weaponTarget, weaponTarget.transform.FindChild("TargetAvatar").gameObject);
+            Transform avatarParent = weaponTarget.transform.FindChild("Container");
+            trackedAvatars.Add(weaponTarget, avatarParent.FindChild("TargetAvatar").gameObject);
+            avatarParents.Add(weaponTarget, avatarParent);
         }
         UpdateTrackedObjectsSet();
     }
@@ -65,6 +68,7 @@ public class Radar : MonoBehaviour
         if (!trackedAvatars.ContainsKey(zombie))
         {
             trackedAvatars.Add(zombie, zombie.transform.FindChild("EnemyAvatar").gameObject);
+            avatarParents.Add(zombie, zombie.transform);
         }
         UpdateTrackedObjectsSet();
     }
@@ -95,9 +99,11 @@ public class Radar : MonoBehaviour
     {
         if (trackedAvatars.ContainsKey(obj.gameObject))
         {
+            Transform avatarParent = avatarParents[obj.gameObject];
             GameObject avatar = trackedAvatars[obj.gameObject];
-            avatar.transform.SetParent(obj.gameObject.transform);
+            avatar.transform.SetParent(avatarParent);
             trackedAvatars.Remove(obj.gameObject);
+            avatarParents.Remove(obj.gameObject);
         }
     }
 
@@ -117,6 +123,7 @@ public class Radar : MonoBehaviour
         GameObject avatar;
         Vector3 position;
         bool needsAvatar = false;
+        Transform avatarParent;
         foreach (GameObject o in trackedObjects)
         {
             //Find proper position for avatar
@@ -134,6 +141,7 @@ public class Radar : MonoBehaviour
 
             //get or create avatar and move it to position
             avatar = trackedAvatars[o];
+            avatarParent = avatarParents[o];
             if (needsAvatar && avatar != null)
             {
                 avatar.transform.SetParent(o.transform.parent);
@@ -141,7 +149,7 @@ public class Radar : MonoBehaviour
             }
             else
             {
-                avatar.transform.SetParent(o.transform);
+                avatar.transform.SetParent(avatarParent);
             }
         }
     }
