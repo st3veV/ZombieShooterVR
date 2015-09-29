@@ -140,8 +140,7 @@ public class WeaponManagerWindow : EditorWindow {
         GUILayout.EndHorizontal();
 
         GUILayout.BeginHorizontal();
-        GUILayout.Label("Weapon model");
-        weaponModel = EditorGUILayout.ObjectField("", weaponModel, typeof (GameObject), false) as GameObject;
+        weaponModel = EditorGUILayout.ObjectField("Weapon model", weaponModel, typeof(GameObject), false) as GameObject;
         GUILayout.EndHorizontal();
 
         GUILayout.BeginHorizontal();
