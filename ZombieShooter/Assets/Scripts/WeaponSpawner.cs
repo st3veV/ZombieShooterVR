@@ -81,7 +81,7 @@ public class WeaponSpawner : MonoBehaviour {
         }
         //spawn ammo
         ModularAmmo ammo = new ModularAmmo();
-        ammo.SetValues(newWeapon.BulletType, (int) (Random.value*20) + 20);
+        ammo.SetValues(newWeapon.BulletType, (int) (Random.value*2 + 1)*newWeapon.MagazineSize);
         pickable.SetItem(ammo);
 
         PickupHolder pickupHolder = target.GetComponent<PickupHolder>();

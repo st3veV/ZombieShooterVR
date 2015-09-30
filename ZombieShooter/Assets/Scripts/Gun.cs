@@ -19,7 +19,7 @@ public class Gun : MonoBehaviour {
     private GameObject _weaponContainer;
 
     // Use this for initialization
-    void Start ()
+    void Awake ()
     {
         bulletPool = new List<Rigidbody>();
         _timer = new InternalTimer();

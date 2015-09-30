@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using System.Collections;
 
 using LockingPolicy = Thalmic.Myo.LockingPolicy;
@@ -23,6 +24,8 @@ public class MyoHandler : MonoBehaviour
     private Pose _lastPose = Pose.Unknown;
     private bool _reloadLock = false;
 
+    public event Action OnMyoReset;
+
     void Start()
     {
         gunInternal = gun.GetComponent<Gun>();
@@ -46,6 +49,7 @@ public class MyoHandler : MonoBehaviour
                 updateReference = true;
 
                 ExtendUnlockAndNotifyUserAction(thalmicMyo);
+                MyoReset();
             }
         }
         if (Input.GetKeyDown ("r")) {
@@ -153,5 +157,11 @@ public class MyoHandler : MonoBehaviour
         }
 
         myo.NotifyUserAction ();
+    }
+
+    protected virtual void MyoReset()
+    {
+        var handler = OnMyoReset;
+        if (handler != null) handler();
     }
 }

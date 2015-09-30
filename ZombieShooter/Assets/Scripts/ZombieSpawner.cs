@@ -128,7 +128,7 @@ public class ZombieSpawner : MonoBehaviour {
     {
         Random rand = new Random();
         float angle = rand.Next(0,360);
-        float value = angle * (Mathf.PI / 180f);
+        float value = angle * Mathf.Deg2Rad;
         float xpos = Diameter * Mathf.Cos(value);
         float zpos = Diameter * Mathf.Sin(value);
         SpawnPoint.position = new Vector3(xpos,0.5f,zpos);
