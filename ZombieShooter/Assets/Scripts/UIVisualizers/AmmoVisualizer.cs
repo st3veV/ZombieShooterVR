@@ -17,6 +17,7 @@ public class AmmoVisualizer : MonoBehaviour
     // Use this for initialization
 	void Start () {
         GunInput.OnWeaponChange += GunInput_OnWeaponChange;
+        GunInput.TriggerWeaponChange();
 	}
 
     void GunInput_OnWeaponChange(IWeapon weapon)

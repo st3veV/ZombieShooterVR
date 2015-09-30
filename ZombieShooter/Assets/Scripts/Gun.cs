@@ -154,6 +154,14 @@ public class Gun : MonoBehaviour {
         get { return _shellsInMagazine; }
     }
 
+    public void TriggerWeaponChange()
+    {
+        if (_currentWeapon != null)
+        {
+            OnOnWeaponChange(_currentWeapon);
+        }
+    }
+
     protected virtual void OnOnWeaponChange(IWeapon obj)
     {
         var handler = OnWeaponChange;
