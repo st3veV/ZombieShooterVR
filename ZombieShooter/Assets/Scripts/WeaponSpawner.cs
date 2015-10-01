@@ -15,7 +15,9 @@ public class WeaponSpawner : MonoBehaviour {
     private List<GameObject> targetPool;
 
     public WeaponDatabase WeaponDatabase;
-    private WeaponManager weaponManager;
+    public WeaponManager weaponManager;
+
+    public ForceSpawn ForceSpawn;
 
 	void Start ()
 	{
@@ -67,22 +69,31 @@ public class WeaponSpawner : MonoBehaviour {
         targetPosition.y = 0;
         target.transform.position = targetPosition;
         target.transform.LookAt(PlayerLocation);
-        
-        //select the weapon
-        int index = (int)(WeaponDatabase.Weapons.Count * Random.value);
 
-        IWeapon newWeapon = weaponManager.GetWeapon(WeaponDatabase.Weapons[index]);
-
-        IPickable pickable = new Pickable();
-        if (Random.value > .7)
+        IPickable pickable;
+        if (ForceSpawn != null)
         {
-            //spawn weapon
-            pickable.SetItem(newWeapon);
+            pickable = ForceSpawn;
+            ForceSpawn = null;
         }
-        //spawn ammo
-        ModularAmmo ammo = new ModularAmmo();
-        ammo.SetValues(newWeapon.BulletType, (int) (Random.value*2 + 1)*newWeapon.MagazineSize);
-        pickable.SetItem(ammo);
+        else
+        {
+            //select the weapon
+            int index = (int) (WeaponDatabase.Weapons.Count*Random.value);
+
+            IWeapon newWeapon = weaponManager.GetWeapon(WeaponDatabase.Weapons[index]);
+
+            pickable = new Pickable();
+            if (Random.value > .7)
+            {
+                //spawn weapon
+                pickable.SetItem(newWeapon);
+            }
+            //spawn ammo
+            ModularAmmo ammo = new ModularAmmo();
+            ammo.SetValues(newWeapon.BulletType, (int) (Random.value*2 + 1)*newWeapon.MagazineSize);
+            pickable.SetItem(ammo);
+        }
 
         PickupHolder pickupHolder = target.GetComponent<PickupHolder>();
         pickupHolder.Pickable = pickable;
@@ -131,7 +142,7 @@ public class WeaponSpawner : MonoBehaviour {
 	}
 }
 
-class WeaponManager
+public class WeaponManager
 {
     private Dictionary<Weapon, IWeapon> weapons;
 
@@ -167,4 +178,30 @@ class ModularAmmo : IAmmo
     }
 
     public int Amount { get; set; }
+}
+
+public class ForceSpawn:IPickable
+{
+    private IAmmo _ammo;
+    private IWeapon _weapon;
+
+    public IAmmo Ammo
+    {
+        get { return _ammo; }
+    }
+
+    public IWeapon Weapon
+    {
+        get { return _weapon; }
+    }
+
+    public void SetItem(IAmmo ammo)
+    {
+        _ammo = ammo;
+    }
+
+    public void SetItem(IWeapon weapon)
+    {
+        _weapon = weapon;
+    }
 }

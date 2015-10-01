@@ -9,6 +9,8 @@ public class Gun : MonoBehaviour {
     public event Action OnWeaponKick;
     public event Action<IWeapon> OnWeaponChange;
 
+    public bool FiringEnabled;
+
     private bool _isFiring = false;
     private InternalTimer _timer;
     private IWeapon _currentWeapon;
@@ -88,7 +90,7 @@ public class Gun : MonoBehaviour {
 
     public void StartShooting()
     {
-        if (_isFiring == false)
+        if (FiringEnabled && _isFiring == false)
         {
             _isFiring = true;
             _timer.Set(0);
@@ -97,7 +99,7 @@ public class Gun : MonoBehaviour {
 
     public void StopShooting()
     {
-        if (_isFiring)
+        if (FiringEnabled && _isFiring)
         {
             _isFiring = false;
             Kick();
