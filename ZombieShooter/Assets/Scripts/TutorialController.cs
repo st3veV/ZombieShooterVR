@@ -8,6 +8,7 @@ public class TutorialController : MonoBehaviour {
     public Gun UserGun;
     public ZombieSpawner ZombieSpawner;
     public WeaponSpawner WeaponSpawner;
+    public Transform PlayerTransform;
 
     public List<GameObject> TutorialInstructions;
     public GameObject TutorialInstructionReoad;
@@ -15,6 +16,9 @@ public class TutorialController : MonoBehaviour {
 
     private LifetimeComponent _targetLifetime;
     private bool _checkingAmmo;
+    private int _oldShellsInMagazine;
+    private float _reloadDistance;
+    private Transform helperTransform;
 
     // Use this for initialization
 	void Start () {
@@ -32,6 +36,15 @@ public class TutorialController : MonoBehaviour {
         forceSpawn.SetItem(ammo);
         forceSpawn.SetItem(weapon);
 	    WeaponSpawner.ForceSpawn = forceSpawn;
+
+	    _oldShellsInMagazine = UserGun.ShellsInMagazine;
+
+	    _reloadDistance = TutorialInstructionReoad.transform.position.z;
+
+        GameObject Helper = new GameObject("helper");
+        Helper.transform.SetParent(transform);
+        helperTransform = Helper.transform;
+
 	}
 
     private void HideTutorialInstructions()
@@ -106,7 +119,7 @@ public class TutorialController : MonoBehaviour {
     void MyoHandler_OnMyoReset()
     {
         MyoHandler.OnMyoReset -= MyoHandler_OnMyoReset;
-        _checkingAmmo = false;
+        //_checkingAmmo = false;
         TutorialStep2();
     }
 
@@ -118,9 +131,22 @@ public class TutorialController : MonoBehaviour {
 
 
     void Update () {
-	    if (_checkingAmmo)
-	    {
-	        TutorialInstructionReoad.SetActive(UserGun.ShellsInMagazine == 0);
+        if (_checkingAmmo)
+        {
+            if (UserGun.ShellsInMagazine > _oldShellsInMagazine)
+            {
+                _checkingAmmo = false;
+            }
+            _oldShellsInMagazine = UserGun.ShellsInMagazine;
+            if (UserGun.ShellsInMagazine == 0)
+            {
+                TutorialInstructionReoad.SetActive(true);
+                TutorialInstructionReoad.transform.position = transform.position + _reloadDistance * PlayerTransform.forward;
+            }
+            else
+            {
+                TutorialInstructionReoad.SetActive(false);
+            }
 	    }
 	}
 }
