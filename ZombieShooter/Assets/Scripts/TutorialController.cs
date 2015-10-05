@@ -39,7 +39,7 @@ public class TutorialController : MonoBehaviour {
 
 	    _oldShellsInMagazine = UserGun.ShellsInMagazine;
 
-	    _reloadDistance = TutorialInstructionReoad.transform.position.z;
+	    _reloadDistance = Vector3.Distance(PlayerTransform.position, TutorialInstructionReoad.transform.position);
 
         GameObject Helper = new GameObject("helper");
         Helper.transform.SetParent(transform);
@@ -142,6 +142,9 @@ public class TutorialController : MonoBehaviour {
             {
                 TutorialInstructionReoad.SetActive(true);
                 TutorialInstructionReoad.transform.position = transform.position + _reloadDistance * PlayerTransform.forward;
+                TutorialInstructionReoad.transform.LookAt(PlayerTransform);
+                Vector3 eulerAngles = TutorialInstructionReoad.transform.localRotation.eulerAngles;
+                TutorialInstructionReoad.transform.localRotation = Quaternion.Euler(eulerAngles.x, eulerAngles.y + 180, eulerAngles.z);
             }
             else
             {
