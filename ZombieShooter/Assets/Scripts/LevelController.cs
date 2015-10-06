@@ -1,28 +1,53 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿using System;
+using System.Collections.Generic;
+using UnityEngine;
 
-public class LevelController : MonoBehaviour {
+public class LevelController : MonoBehaviour
+{
 
-    public LifetimeComponent UserLifetime;
+    public event Action OnSceneLoaded;
 
-	// Use this for initialization
-	void Start () {
-        UserLifetime.OnDie += UserLifetime_OnDie;
-        UserLifetime.OnDamage += UserLifetime_OnDamage;
-	}
+    private AsyncOperation loadAsync;
 
-    void UserLifetime_OnDamage(float damage)
+    public void LoadScene(Scene scene)
     {
-        Debug.Log("Boom, you just got hit!! (this much: "+damage+")");
+        //Application.LoadLevelAdditive((int) scene);
+        loadAsync = Application.LoadLevelAdditiveAsync((int) scene);
     }
 
-    void UserLifetime_OnDie(LifetimeComponent lifetimeComponent)
+    public void UnloadScene()
     {
-        //Debug.Log("You just died :(");
+        GameObject container = GameObject.Find("Container");
+        Destroy(container);
     }
-	
-	// Update is called once per frame
-	void Update () {
-	
-	}
+
+    void Update()
+    {
+        if (loadAsync != null)
+        {
+            if(loadAsync.isDone)
+            {
+                Debug.Log("Scene loaded");
+                OnOnSceneLoaded();
+                loadAsync = null;
+            }
+            else
+            {
+                Debug.Log("Loading scene: " + loadAsync.progress);
+            }
+        }
+    }
+
+    protected virtual void OnOnSceneLoaded()
+    {
+        var handler = OnSceneLoaded;
+        if (handler != null) handler();
+    }
+}
+
+public enum Scene
+{
+    Tutorial = 1,
+    Game = 2,
+    GameOver = 3
 }

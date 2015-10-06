@@ -18,7 +18,7 @@ public class ZombieSpawner : MonoBehaviour {
     public event Action<GameObject> OnZombieSpawned;
 
     private InternalTimer _timer;
-    public float SpawnInterval = 5f;
+    public float SpawnInterval = BalancingData.ZOMBIE_SPAWN_INTERVAL_INITIAL;
 
     public bool IsSpawning = true;
 
@@ -50,10 +50,6 @@ public class ZombieSpawner : MonoBehaviour {
 	void Update () {
         if (IsSpawning)
         {
-            /*
-            timer -= Time.deltaTime;
-            if (timer <= 0)
-                */
             if(_timer.Update())
             {
                 _timer.Reset();
@@ -131,6 +127,11 @@ public class ZombieSpawner : MonoBehaviour {
         float value = angle * Mathf.Deg2Rad;
         float xpos = Diameter * Mathf.Cos(value);
         float zpos = Diameter * Mathf.Sin(value);
-        SpawnPoint.position = new Vector3(xpos,0.5f,zpos);
+        SpawnPoint.position = new Vector3(xpos, 0.5f, zpos);
+    }
+
+    public void Reset()
+    {
+        SpawnInterval = BalancingData.ZOMBIE_SPAWN_INTERVAL_INITIAL;
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class TutorialController : MonoBehaviour {
@@ -10,36 +11,63 @@ public class TutorialController : MonoBehaviour {
     public WeaponSpawner WeaponSpawner;
     public Transform PlayerTransform;
 
+    public GameObject ZombieSpawnPoint;
+
     public List<GameObject> TutorialInstructions;
     public GameObject TutorialInstructionReoad;
 
+    public event Action OnTutorialComplete;
 
     private LifetimeComponent _targetLifetime;
     private bool _checkingAmmo;
     private int _oldShellsInMagazine;
     private float _reloadDistance;
 
-    // Use this for initialization
-	void Start () {
-        TutorialTarget.SetActive(false);
-	    _targetLifetime = TutorialTarget.GetComponent<LifetimeComponent>();
-        HideTutorialInstructions();
-	    TutorialStep1();
-	    TutorialInstructionReoad.SetActive(false);
-	    UserGun.FiringEnabled = false;
-
-	    ForceSpawn forceSpawn = new ForceSpawn();
-	    IWeapon weapon = WeaponSpawner.weaponManager.GetWeapon(WeaponDatabase.Instance.Weapons[1]);
-        ModularAmmo ammo = new ModularAmmo();
-        ammo.SetValues(weapon.BulletType, 100);
-        forceSpawn.SetItem(ammo);
-        forceSpawn.SetItem(weapon);
-	    WeaponSpawner.ForceSpawn = forceSpawn;
-
-	    _oldShellsInMagazine = UserGun.ShellsInMagazine;
-
-	    _reloadDistance = Vector3.Distance(PlayerTransform.position, TutorialInstructionReoad.transform.position);
+	void Start ()
+	{
+	    AssignReferences();
 	}
+
+    private void AssignReferences()
+    {
+        MyoHandler = GameObject.Find("Hand").GetComponent<MyoHandler>();
+        GameObject gunGo = GameObject.Find("Gun");
+        UserGun = gunGo.GetComponent<Gun>();
+        PlayerTransform = gunGo.transform;
+        ZombieSpawner = GameObject.Find("ZombieSpawner").GetComponent<ZombieSpawner>();
+        WeaponSpawner = GameObject.Find("WeaponSpawner").GetComponent<WeaponSpawner>();
+
+        ZombieSpawnPoint = GameObject.Find("ZombieSpawnPoint");
+
+        Initialize();
+    }
+
+    public void Initialize()
+    {
+        TutorialTarget.SetActive(false);
+        _targetLifetime = TutorialTarget.GetComponent<LifetimeComponent>();
+        HideTutorialInstructions();
+        TutorialStep1();
+        TutorialInstructionReoad.SetActive(false);
+        UserGun.FiringEnabled = false;
+
+        ForceSpawn forceSpawn = new ForceSpawn();
+        IWeapon weapon = WeaponSpawner.weaponManager.GetWeapon(WeaponDatabase.Instance.Weapons[1]);
+        /*
+        ModularAmmo ammo = new ModularAmmo();
+        ammo.SetValues(weapon.BulletType, weapon.AvailableAmmo);
+        */
+        //forceSpawn.SetItem(ammo);
+        forceSpawn.SetItem(weapon);
+        WeaponSpawner.ForceSpawn = forceSpawn;
+
+        _oldShellsInMagazine = UserGun.ShellsInMagazine;
+
+        _reloadDistance = Vector3.Distance(PlayerTransform.position, TutorialInstructionReoad.transform.position);
+
+        Vector3 oldPos = ZombieSpawnPoint.transform.position;
+        ZombieSpawnPoint.transform.position = new Vector3(oldPos.x, oldPos.y, -oldPos.z);
+    }
 
     private void HideTutorialInstructions()
     {
@@ -102,6 +130,7 @@ public class TutorialController : MonoBehaviour {
     private void EndTutorial()
     {
         //Shoot to start the game
+        Debug.Log("Tutorial step - End tutorial");
         HideTutorialInstructions();
         TutorialInstructions[TutorialInstructions.Count - 1].SetActive(true); // last instruction
         _targetLifetime.Reset();
@@ -114,6 +143,8 @@ public class TutorialController : MonoBehaviour {
         _targetLifetime.OnDie -= _targetLifetime_OnDie;
         TutorialTarget.SetActive(false);
         //switch scenes
+        Debug.Log("let's enter the game");
+        OnOnTutorialComplete();
     }
 
     void UserGun_OnWeaponChange(IWeapon obj)
@@ -124,7 +155,6 @@ public class TutorialController : MonoBehaviour {
 
     void WeaponSpawner_OnWeaponTargetSpawned(GameObject obj)
     {
-        Debug.Log("Weapon spawned");
         WeaponSpawner.OnWeaponTargetSpawned -= WeaponSpawner_OnWeaponTargetSpawned;
         LifetimeComponent ammoTargetLifetime = obj.GetComponent<LifetimeComponent>();
         ammoTargetLifetime.OnDie += ammoTargetLifetime_OnDie;
@@ -132,7 +162,6 @@ public class TutorialController : MonoBehaviour {
 
     void ammoTargetLifetime_OnDie(LifetimeComponent obj)
     {
-        Debug.Log("Weapon picked");
         obj.OnDie -= ammoTargetLifetime_OnDie;
         obj.gameObject.SetActive(false);
         TutorialStep5();
@@ -188,4 +217,10 @@ public class TutorialController : MonoBehaviour {
             }
 	    }
 	}
+
+    protected virtual void OnOnTutorialComplete()
+    {
+        var handler = OnTutorialComplete;
+        if (handler != null) handler();
+    }
 }
