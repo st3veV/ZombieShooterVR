@@ -169,6 +169,7 @@ public class TutorialController : MonoBehaviour {
 
     void ZombieSpawner_OnZombieSpawned(GameObject obj)
     {
+        ZombieSpawner.OnZombieSpawned -= ZombieSpawner_OnZombieSpawned;
         ZombieSpawner.IsSpawning = false;
         LifetimeComponent zombieLifetime = obj.GetComponent<LifetimeComponent>();
         zombieLifetime.OnDie += zombieLifetime_OnDie;

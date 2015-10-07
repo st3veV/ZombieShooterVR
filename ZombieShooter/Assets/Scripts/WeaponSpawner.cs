@@ -140,6 +140,11 @@ public class WeaponSpawner : MonoBehaviour {
 	void Update () {
 	
 	}
+
+    public void Reset()
+    {
+        targetPool.Clear();
+    }
 }
 
 public class WeaponManager

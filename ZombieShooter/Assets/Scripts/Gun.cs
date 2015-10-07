@@ -169,4 +169,9 @@ public class Gun : MonoBehaviour {
         var handler = OnWeaponChange;
         if (handler != null) handler(obj);
     }
+
+    public void Reset()
+    {
+        bulletPool.Clear();
+    }
 }

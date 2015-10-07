@@ -1,18 +1,46 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Collections;
 using UnityEngine;
 
 public class LevelController : MonoBehaviour
 {
-
     public event Action OnSceneLoaded;
 
     private AsyncOperation loadAsync;
+    public Scene SceneToLoad { get; set; }
+
+    public IEnumerator Start()
+    {
+        Scene scene = SceneToLoad;
+        loadAsync = Application.LoadLevelAsync((int) scene);
+        yield return loadAsync;
+
+        OnOnSceneLoaded();
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     public void LoadScene(Scene scene)
     {
         //Application.LoadLevelAdditive((int) scene);
-        loadAsync = Application.LoadLevelAdditiveAsync((int) scene);
+        //loadAsync = Application.LoadLevelAdditiveAsync((int) scene);
+        loadAsync = Application.LoadLevelAsync((int) scene);
+        
+
+        Debug.Log("Level loaded");
+        //Application.LoadLevel((int) scene);
+        //loadAsync.allowSceneActivation = true;
     }
 
     public void UnloadScene()
@@ -23,6 +51,7 @@ public class LevelController : MonoBehaviour
 
     void Update()
     {
+        /*
         if (loadAsync != null)
         {
             if(loadAsync.isDone)
@@ -36,6 +65,7 @@ public class LevelController : MonoBehaviour
                 Debug.Log("Loading scene: " + loadAsync.progress);
             }
         }
+         * */
     }
 
     protected virtual void OnOnSceneLoaded()
@@ -50,4 +80,21 @@ public enum Scene
     Tutorial = 1,
     Game = 2,
     GameOver = 3
+}
+
+
+public class TutorialSceneLoader : LevelController
+{
+    public TutorialSceneLoader()
+    {
+        SceneToLoad = Scene.Tutorial;
+    }
+}
+
+public class GameSceneLoader : LevelController
+{
+    public GameSceneLoader()
+    {
+        SceneToLoad = Scene.Game;
+    }
 }

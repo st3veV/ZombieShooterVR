@@ -25,6 +25,7 @@ public class ZombieSpawner : MonoBehaviour {
     private List<AICharacterControl> zombiePool;
 
 	void Start () {
+        Debug.Log("Start");
         if (SpawnPoint == null)
         {
             SpawnPoint = gameObject.transform;
@@ -132,6 +133,9 @@ public class ZombieSpawner : MonoBehaviour {
 
     public void Reset()
     {
+        Debug.Log("Reset");
+        zombiePool.Clear();
         SpawnInterval = BalancingData.ZOMBIE_SPAWN_INTERVAL_INITIAL;
+        _timer.Set(SpawnInterval * 1000);
     }
 }
