@@ -82,6 +82,7 @@ public class ZombieSpawner : MonoBehaviour {
         }
         clone.transform.position = SpawnPoint.position;
         clone.gameObject.SetActive(true);
+        clone.GetComponent<ZombieAudioController>().Spawn();
 
         zombieSpawned(clone.gameObject);
 
