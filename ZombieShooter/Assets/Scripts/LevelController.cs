@@ -9,66 +9,24 @@ public class LevelController : MonoBehaviour
     private AsyncOperation loadAsync;
     public Scene SceneToLoad { get; set; }
 
+    private bool loaded = false;
+
     public IEnumerator Start()
     {
         Scene scene = SceneToLoad;
         loadAsync = Application.LoadLevelAsync((int) scene);
         yield return loadAsync;
 
-        OnOnSceneLoaded();
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    public void LoadScene(Scene scene)
-    {
-        //Application.LoadLevelAdditive((int) scene);
-        //loadAsync = Application.LoadLevelAdditiveAsync((int) scene);
-        loadAsync = Application.LoadLevelAsync((int) scene);
-        
-
-        Debug.Log("Level loaded");
-        //Application.LoadLevel((int) scene);
-        //loadAsync.allowSceneActivation = true;
-    }
-
-    public void UnloadScene()
-    {
-        GameObject container = GameObject.Find("Container");
-        Destroy(container);
+        loaded = true;
     }
 
     void Update()
     {
-        /*
-        if (loadAsync != null)
-        {
-            if(loadAsync.isDone)
-            {
-                Debug.Log("Scene loaded");
-                OnOnSceneLoaded();
-                loadAsync = null;
-            }
-            else
-            {
-                Debug.Log("Loading scene: " + loadAsync.progress);
-            }
-        }
-         * */
+        if(loaded)
+            OnOnSceneLoaded();
     }
 
-    protected virtual void OnOnSceneLoaded()
+    protected void OnOnSceneLoaded()
     {
         var handler = OnSceneLoaded;
         if (handler != null) handler();

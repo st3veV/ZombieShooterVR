@@ -1,10 +1,13 @@
 ﻿using System;
 using UnityEngine;
 using System.Collections;
-
+using System.Collections.Generic;
+using Thalmic.Myo;
 using LockingPolicy = Thalmic.Myo.LockingPolicy;
 using Pose = Thalmic.Myo.Pose;
+using Quaternion = UnityEngine.Quaternion;
 using UnlockType = Thalmic.Myo.UnlockType;
+using Vector3 = UnityEngine.Vector3;
 using VibrationType = Thalmic.Myo.VibrationType;
 
 public class MyoHandler : MonoBehaviour
@@ -12,21 +15,24 @@ public class MyoHandler : MonoBehaviour
     public GameObject myo = null;
     private ThalmicMyo thalmicMyo;
 
-    public Cardboard cardboard;
-
     public GameObject gun;
     private Gun gunInternal;
+
+    public List<GameObject> HandSideOffsetUpdate = new List<GameObject>();
 
     private Quaternion _antiYaw = Quaternion.identity;
 
     private float _referenceRoll = 0.0f;
 
     private Pose _lastPose = Pose.Unknown;
+    private Arm _lastArm = Arm.Unknown;
     private bool _reloadLock = false;
+
+    private float _handPositionOffset = 0.4f;
 
     public event Action OnMyoReset;
 
-    void Start()
+    private void Start()
     {
         gunInternal = gun.GetComponent<Gun>();
         gunInternal.OnWeaponKick += gunInternal_OnWeaponKick;
@@ -38,9 +44,15 @@ public class MyoHandler : MonoBehaviour
         thalmicMyo.NotifyUserAction();
     }
 
-    // Update is called once per frame.
     void Update ()
     {
+        //move hand to the side to properly simulate hand position
+        if (thalmicMyo.arm != _lastArm)
+        {
+            _lastArm = thalmicMyo.arm;
+            UpdateHandOffsetPosition();
+        }
+
         bool updateReference = false;
         if (thalmicMyo.pose != _lastPose) {
             _lastPose = thalmicMyo.pose;
@@ -115,6 +127,23 @@ public class MyoHandler : MonoBehaviour
             }
         }
 
+    }
+
+    private void UpdateHandOffsetPosition()
+    {
+        foreach (GameObject o in HandSideOffsetUpdate)
+        {
+            Vector3 localPosition = o.transform.position;
+            if (thalmicMyo.arm == Arm.Right)
+            {
+                localPosition.Set(_handPositionOffset, localPosition.y, localPosition.z);
+            }
+            else if (thalmicMyo.arm == Arm.Left)
+            {
+                localPosition.Set(-_handPositionOffset, localPosition.y, localPosition.z);
+            }
+            o.transform.position = localPosition;
+        }
     }
 
 
