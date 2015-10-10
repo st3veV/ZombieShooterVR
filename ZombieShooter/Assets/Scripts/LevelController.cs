@@ -6,24 +6,25 @@ public class LevelController : MonoBehaviour
 {
     public event Action OnSceneLoaded;
 
-    private AsyncOperation loadAsync;
     public Scene SceneToLoad { get; set; }
 
     private bool loaded = false;
 
-    public IEnumerator Start()
+    public void Start()
     {
         Scene scene = SceneToLoad;
-        loadAsync = Application.LoadLevelAsync((int) scene);
-        yield return loadAsync;
-
-        loaded = true;
+        Application.LoadLevel((int) scene);
     }
 
     void Update()
     {
         if(loaded)
             OnOnSceneLoaded();
+    }
+
+    void OnLevelWasLoaded()
+    {
+        loaded = true;
     }
 
     protected void OnOnSceneLoaded()
