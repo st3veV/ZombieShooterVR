@@ -14,7 +14,7 @@ public class UnityPlayerProxyActivity extends Activity
 	{
 		super.onCreate(savedInstanceState);
 
-		Intent intent = new Intent(this, UnityPlayerActivity.class);
+		Intent intent = new Intent(this, eu.stepanvyterna.games.zombieshooter.UnityPlayerActivity.class);
 		intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
 		Bundle extras = getIntent().getExtras();
 		if (extras != null)

@@ -27,7 +27,7 @@ public class UnityPlayerActivity extends Activity
 		if (mUnityPlayer.getSettings().getBoolean("hide_status_bar", true))
 		{
 			getWindow ().setFlags (WindowManager.LayoutParams.FLAG_FULLSCREEN,
-					WindowManager.LayoutParams.FLAG_FULLSCREEN);
+			                       WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		}
 
 		setContentView(mUnityPlayer);
