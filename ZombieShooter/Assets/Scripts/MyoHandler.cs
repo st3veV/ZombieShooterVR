@@ -1,14 +1,9 @@
 ﻿using System;
-using UnityEngine;
-using System.Collections;
 using System.Collections.Generic;
 using Thalmic.Myo;
-using LockingPolicy = Thalmic.Myo.LockingPolicy;
-using Pose = Thalmic.Myo.Pose;
+using UnityEngine;
 using Quaternion = UnityEngine.Quaternion;
-using UnlockType = Thalmic.Myo.UnlockType;
 using Vector3 = UnityEngine.Vector3;
-using VibrationType = Thalmic.Myo.VibrationType;
 
 public class MyoHandler : MonoBehaviour
 {
@@ -92,7 +87,7 @@ public class MyoHandler : MonoBehaviour
 
         transform.rotation = _antiYaw * antiRoll * Quaternion.LookRotation (myo.transform.forward);
 
-        if (thalmicMyo.xDirection == Thalmic.Myo.XDirection.TowardWrist) {
+        if (thalmicMyo.xDirection == XDirection.TowardWrist) {
             transform.rotation = new Quaternion(transform.localRotation.x,
                                                 -transform.localRotation.y,
                                                 transform.localRotation.z,

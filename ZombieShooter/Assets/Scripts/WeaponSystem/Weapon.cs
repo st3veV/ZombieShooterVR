@@ -4,26 +4,16 @@ using UnityEngine;
 [Serializable]
 public class Weapon
 {
-    [SerializeField]
-    private int _bulletType;
-    [SerializeField]
-    private int _magazineSize;
-    [SerializeField]
-    private float _cooldownDelay;
-    [SerializeField]
-    private float _damage;
-    [SerializeField]
-    private string _name;
-    [SerializeField]
-    private int _availableAmmo;
-    [SerializeField]
-    private GameObject _weaponModel;
-    [SerializeField]
-    private AudioClip _shootSound;
-    [SerializeField]
-    private AudioClip _reloadSound;
-    [SerializeField]
-    private AudioClip _klickSound;
+    [SerializeField] private int _bulletType;
+    [SerializeField] private int _magazineSize;
+    [SerializeField] private float _cooldownDelay;
+    [SerializeField] private float _damage;
+    [SerializeField] private string _name;
+    [SerializeField] private int _availableAmmo;
+    [SerializeField] private GameObject _weaponModel;
+    [SerializeField] private AudioClip _shootSound;
+    [SerializeField] private AudioClip _reloadSound;
+    [SerializeField] private AudioClip _klickSound;
 
 
     public void SetValues(string name, float damage, float cooldownDelay, int magazineSize, int bulletType,

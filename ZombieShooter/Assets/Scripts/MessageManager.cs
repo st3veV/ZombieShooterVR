@@ -1,10 +1,7 @@
-﻿using UnityEngine;
-using System.Collections;
-
-using Pose = Thalmic.Myo.Pose;
+﻿using Thalmic.Myo;
+using UnityEngine;
 using MyoQaternion = Thalmic.Myo.Quaternion;
-using Arm = Thalmic.Myo.Arm;
-using XDirection = Thalmic.Myo.XDirection;
+using Vector3 = UnityEngine.Vector3;
 
 public class MessageManager : MonoBehaviour
 {
@@ -128,7 +125,7 @@ public class MessageManager : MonoBehaviour
         }
     }
 
-    internal void Unlock(Thalmic.Myo.UnlockType type)
+    internal void Unlock(UnlockType type)
     {
 #if UNITY_ANDROID
         android.Call<int>("myoUnlock", type.ToString());
@@ -149,7 +146,7 @@ public class MessageManager : MonoBehaviour
 #endif 
     }
 
-    internal void Vibrate(Thalmic.Myo.VibrationType type)
+    internal void Vibrate(VibrationType type)
     {
 #if UNITY_ANDROID
         android.Call<int>("myoVibrate", type.ToString());

@@ -1,7 +1,6 @@
 ﻿using System;
-using UnityEngine;
-using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -24,7 +23,7 @@ public class WeaponDatabase : ScriptableObject {
 #endif
                 if (_instance == null)
                 {
-                    _instance = ScriptableObject.CreateInstance<WeaponDatabase>();
+                    _instance = CreateInstance<WeaponDatabase>();
 #if UNITY_EDITOR
                     AssetDatabase.CreateAsset(_instance, databasePath);
                     AssetDatabase.SaveAssets();
