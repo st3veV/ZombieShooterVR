@@ -9,6 +9,9 @@ public interface IWeapon
     string Name { get; }
     int AvailableAmmo { get; set; }
     GameObject WeaponModel { get; }
+    AudioClip ShootSound { get; }
+    AudioClip ReloadSound { get; }
+    AudioClip KlickSound { get; }
 }
 
 public interface IAmmo

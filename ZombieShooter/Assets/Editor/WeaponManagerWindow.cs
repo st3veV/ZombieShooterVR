@@ -108,6 +108,9 @@ public class WeaponManagerWindow : EditorWindow {
         int bulletType = weapon == null ? 0 : weapon.BulletType;
         int initialAmmo = weapon == null ? 10 : weapon.AvailableAmmo;
         GameObject weaponModel = weapon == null ? null : weapon.WeaponModel;
+        AudioClip shootSound = weapon == null ? null : weapon.ShootSound;
+        AudioClip reloadSound = weapon == null ? null : weapon.ReloadSound;
+        AudioClip klickSound = weapon == null ? null : weapon.KlickSound;
         
         GUILayout.BeginHorizontal();
         GUILayout.Label("Name");
@@ -144,6 +147,18 @@ public class WeaponManagerWindow : EditorWindow {
         GUILayout.EndHorizontal();
 
         GUILayout.BeginHorizontal();
+        shootSound = EditorGUILayout.ObjectField("Shoot sound", shootSound, typeof (AudioClip), false) as AudioClip;
+        GUILayout.EndHorizontal();
+
+        GUILayout.BeginHorizontal();
+        reloadSound = EditorGUILayout.ObjectField("Reload sound", reloadSound, typeof (AudioClip), false) as AudioClip;
+        GUILayout.EndHorizontal();
+
+        GUILayout.BeginHorizontal();
+        klickSound = EditorGUILayout.ObjectField("Klick sound", klickSound, typeof(AudioClip), false) as AudioClip;
+        GUILayout.EndHorizontal();
+
+        GUILayout.BeginHorizontal();
         delete = GUILayout.Button("Delete");
         save = GUILayout.Button("Save");
         GUILayout.EndHorizontal();
@@ -152,7 +167,8 @@ public class WeaponManagerWindow : EditorWindow {
         {
             weapon = new Weapon();
         }
-        weapon.SetValues(weaponName, damage, cooldownDelay, magazineSize, bulletType, initialAmmo, weaponModel);
+        weapon.SetValues(weaponName, damage, cooldownDelay, magazineSize, bulletType, initialAmmo, weaponModel,
+            shootSound, reloadSound, klickSound);
 
         return weapon;
     }

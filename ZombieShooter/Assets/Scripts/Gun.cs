@@ -7,6 +7,9 @@ public class Gun : MonoBehaviour {
     public Rigidbody Bullet;
 
     public event Action OnWeaponKick;
+    public event Action OnWeaponFire;
+    public event Action OnWeaponKlick;
+    public event Action OnWeaponReload;
     public event Action<IWeapon> OnWeaponChange;
 
     public bool FiringEnabled;
@@ -52,13 +55,13 @@ public class Gun : MonoBehaviour {
 
     private void Klick()
     {
-        //Debug.Log("Klick!");
+        WeaponKlick();
     }
 
     public void Fire()
     {
         Kick();
-        //Debug.Log("Fire!");
+        WeaponFire();
         Rigidbody clone;
         Bullet bulletClone;
         if (bulletPool.Count > 0)
@@ -120,6 +123,7 @@ public class Gun : MonoBehaviour {
             _shellsInMagazine = _currentWeapon.AvailableAmmo;
             _currentWeapon.AvailableAmmo = 0;
         }
+        WeaponReload();
     }
 
     protected virtual void Kick()
@@ -173,5 +177,23 @@ public class Gun : MonoBehaviour {
     public void Reset()
     {
         bulletPool.Clear();
+    }
+
+    protected virtual void WeaponKlick()
+    {
+        var handler = OnWeaponKlick;
+        if (handler != null) handler();
+    }
+
+    protected virtual void WeaponReload()
+    {
+        var handler = OnWeaponReload;
+        if (handler != null) handler();
+    }
+
+    protected virtual void WeaponFire()
+    {
+        var handler = OnWeaponFire;
+        if (handler != null) handler();
     }
 }

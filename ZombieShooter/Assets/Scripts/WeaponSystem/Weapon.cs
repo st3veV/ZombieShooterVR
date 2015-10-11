@@ -18,9 +18,16 @@ public class Weapon
     private int _availableAmmo;
     [SerializeField]
     private GameObject _weaponModel;
+    [SerializeField]
+    private AudioClip _shootSound;
+    [SerializeField]
+    private AudioClip _reloadSound;
+    [SerializeField]
+    private AudioClip _klickSound;
 
-    
-    public void SetValues(string name, float damage, float cooldownDelay, int magazineSize, int bulletType, int initialAmmo, GameObject weaponModel)
+
+    public void SetValues(string name, float damage, float cooldownDelay, int magazineSize, int bulletType,
+        int initialAmmo, GameObject weaponModel, AudioClip shootSound, AudioClip reloadSound, AudioClip klickSound)
     {
         _name = name;
         _damage = damage;
@@ -29,6 +36,9 @@ public class Weapon
         _bulletType = bulletType;
         _availableAmmo = initialAmmo;
         _weaponModel = weaponModel;
+        _shootSound = shootSound;
+        _reloadSound = reloadSound;
+        _klickSound = klickSound;
     }
 
     public int BulletType
@@ -64,6 +74,20 @@ public class Weapon
     public GameObject WeaponModel
     {
         get { return _weaponModel; }
+    }
+
+    public AudioClip ShootSound
+    {
+        get { return _shootSound; }
+    }
+
+    public AudioClip ReloadSound
+    {
+        get { return _reloadSound; }
+    }
+
+    public AudioClip KlickSound {
+        get { return _klickSound; }
     }
 }
 
@@ -112,5 +136,20 @@ public class PlayerWeapon : IWeapon
     public GameObject WeaponModel
     {
         get { return _realWeapon.WeaponModel; }
+    }
+
+    public AudioClip ShootSound
+    {
+        get { return _realWeapon.ShootSound; }
+    }
+
+    public AudioClip ReloadSound
+    {
+        get { return _realWeapon.ReloadSound; }
+    }
+
+    public AudioClip KlickSound
+    {
+        get { return _realWeapon.KlickSound; }
     }
 }
