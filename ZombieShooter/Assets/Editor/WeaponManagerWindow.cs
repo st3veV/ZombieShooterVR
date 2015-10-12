@@ -1,6 +1,5 @@
-﻿using UnityEngine;
-using System.Collections;
-using UnityEditor;
+﻿using UnityEditor;
+using UnityEngine;
 
 public class WeaponManagerWindow : EditorWindow {
 
@@ -9,7 +8,7 @@ public class WeaponManagerWindow : EditorWindow {
     [MenuItem("ZombieShooter/Weapons")]
     public static void Init()
     {
-        WeaponManagerWindow window = EditorWindow.GetWindow<WeaponManagerWindow>();
+        WeaponManagerWindow window = GetWindow<WeaponManagerWindow>();
         window.Database = WeaponDatabase.Instance;
         window.Show();
     }

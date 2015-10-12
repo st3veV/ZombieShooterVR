@@ -4,24 +4,23 @@ using UnityEngine;
 public class Radar : MonoBehaviour
 {
 
-    public GameObject EnemyAvatarPrefab;
     public GameObject LookAtGameObject;
     public GameObject ControlRotationGameObject;
     public ZombieSpawner ZombieSpawner;
     public WeaponSpawner WeaponSpawner;
 
-    private Transform helperTransform;
-    private float radarRadius = 10.0f;
+    private Transform _helperTransform;
+    private float _radarRadius = 15.0f;
 
-    private GameObject[] trackedObjects;
-    private Dictionary<GameObject, GameObject> trackedAvatars;
-    private Dictionary<GameObject, Transform> avatarParents;
+    private GameObject[] _trackedObjects;
+    private Dictionary<GameObject, GameObject> _trackedAvatars;
+    private Dictionary<GameObject, Transform> _avatarParents;
 
 	// Use this for initialization
 	void Start () {
-        GameObject Helper = new GameObject("helper");
-        Helper.transform.SetParent(transform);
-	    helperTransform = Helper.transform;
+        GameObject helper = new GameObject("helper");
+        helper.transform.SetParent(transform);
+	    _helperTransform = helper.transform;
 
         if(ZombieSpawner != null)
         {
@@ -33,9 +32,9 @@ public class Radar : MonoBehaviour
             WeaponSpawner.OnWeaponTargetSpawned += WeaponSpawner_OnWeaponTargetSpawned;
         }
 
-        trackedObjects = new GameObject[0];
-        trackedAvatars = new Dictionary<GameObject, GameObject>();
-        avatarParents = new Dictionary<GameObject, Transform>();
+        _trackedObjects = new GameObject[0];
+        _trackedAvatars = new Dictionary<GameObject, GameObject>();
+        _avatarParents = new Dictionary<GameObject, Transform>();
 	}
 
     private void WeaponSpawner_OnWeaponTargetSpawned(GameObject weaponTarget)
@@ -43,11 +42,11 @@ public class Radar : MonoBehaviour
         LifetimeComponent weaponTargetLife = weaponTarget.GetComponent<LifetimeComponent>();
         weaponTargetLife.OnDie += weaponTargetLife_OnDie;
 
-        if(!trackedAvatars.ContainsKey(weaponTarget))
+        if(!_trackedAvatars.ContainsKey(weaponTarget))
         {
             Transform avatarParent = weaponTarget.transform.FindChild("Container");
-            trackedAvatars.Add(weaponTarget, avatarParent.FindChild("TargetAvatar").gameObject);
-            avatarParents.Add(weaponTarget, avatarParent);
+            _trackedAvatars.Add(weaponTarget, avatarParent.FindChild("TargetAvatar").gameObject);
+            _avatarParents.Add(weaponTarget, avatarParent);
         }
         UpdateTrackedObjectsSet();
     }
@@ -63,10 +62,10 @@ public class Radar : MonoBehaviour
     {
         LifetimeComponent zombieLife = zombie.GetComponent<LifetimeComponent>();
         zombieLife.OnDie += zombieLife_OnDie;
-        if (!trackedAvatars.ContainsKey(zombie))
+        if (!_trackedAvatars.ContainsKey(zombie))
         {
-            trackedAvatars.Add(zombie, zombie.transform.FindChild("EnemyAvatar").gameObject);
-            avatarParents.Add(zombie, zombie.transform);
+            _trackedAvatars.Add(zombie, zombie.transform.FindChild("EnemyAvatar").gameObject);
+            _avatarParents.Add(zombie, zombie.transform);
         }
         UpdateTrackedObjectsSet();
     }
@@ -83,10 +82,10 @@ public class Radar : MonoBehaviour
 	{
         //update camera transform
 	    Vector3 eulerAngles = LookAtGameObject.transform.rotation.eulerAngles;
-	    helperTransform.rotation = Quaternion.Euler(0, eulerAngles.y - 180, 0);
-	    ControlRotationGameObject.transform.rotation = helperTransform.rotation;
+	    _helperTransform.rotation = Quaternion.Euler(0, eulerAngles.y - 180, 0);
+	    ControlRotationGameObject.transform.rotation = _helperTransform.rotation;
 
-        if (trackedObjects.Length > 0)
+        if (_trackedObjects.Length > 0)
         {
             UpdateTrackedObjects();
         }
@@ -95,24 +94,24 @@ public class Radar : MonoBehaviour
 
     private void resetAvatar(LifetimeComponent obj)
     {
-        if (trackedAvatars.ContainsKey(obj.gameObject))
+        if (_trackedAvatars.ContainsKey(obj.gameObject))
         {
-            Transform avatarParent = avatarParents[obj.gameObject];
-            GameObject avatar = trackedAvatars[obj.gameObject];
+            Transform avatarParent = _avatarParents[obj.gameObject];
+            GameObject avatar = _trackedAvatars[obj.gameObject];
             avatar.transform.SetParent(avatarParent);
-            trackedAvatars.Remove(obj.gameObject);
-            avatarParents.Remove(obj.gameObject);
+            _trackedAvatars.Remove(obj.gameObject);
+            _avatarParents.Remove(obj.gameObject);
         }
     }
 
     private void UpdateTrackedObjectsSet()
     {
         List<GameObject> tObjs = new List<GameObject>();
-        foreach(GameObject o in trackedAvatars.Keys)
+        foreach(GameObject o in _trackedAvatars.Keys)
         {
             tObjs.Add(o);
         }
-        trackedObjects = tObjs.ToArray();
+        _trackedObjects = tObjs.ToArray();
     }
 
     private void UpdateTrackedObjects()
@@ -122,14 +121,14 @@ public class Radar : MonoBehaviour
         Vector3 position;
         bool needsAvatar = false;
         Transform avatarParent;
-        foreach (GameObject o in trackedObjects)
+        foreach (GameObject o in _trackedObjects)
         {
             //Find proper position for avatar
-            if (Vector3.Distance(o.transform.position, transform.position) > radarRadius)
+            if (Vector3.Distance(o.transform.position, transform.position) > _radarRadius)
             {
                 needsAvatar = true;
-                helperTransform.LookAt(o.transform);
-                position = transform.position + radarRadius*helperTransform.forward;
+                _helperTransform.LookAt(o.transform);
+                position = transform.position + _radarRadius*_helperTransform.forward;
             }
             else
             {
@@ -138,8 +137,8 @@ public class Radar : MonoBehaviour
             }
 
             //get or create avatar and move it to position
-            avatar = trackedAvatars[o];
-            avatarParent = avatarParents[o];
+            avatar = _trackedAvatars[o];
+            avatarParent = _avatarParents[o];
             if (needsAvatar && avatar != null)
             {
                 avatar.transform.SetParent(o.transform.parent);
