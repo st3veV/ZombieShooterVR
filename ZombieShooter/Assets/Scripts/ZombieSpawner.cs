@@ -137,6 +137,7 @@ public class ZombieSpawner : MonoBehaviour {
         Debug.Log("Reset");
         zombiePool.Clear();
         SpawnInterval = BalancingData.ZOMBIE_SPAWN_INTERVAL_INITIAL;
+        IsSpawning = true;
         _timer.Set(SpawnInterval * 1000);
     }
 }

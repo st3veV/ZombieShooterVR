@@ -94,13 +94,21 @@ public class Radar : MonoBehaviour
 
     private void resetAvatar(LifetimeComponent obj)
     {
-        if (_trackedAvatars.ContainsKey(obj.gameObject))
+        resetAvatar(obj.gameObject);
+    }
+
+    private void resetAvatar(GameObject obj)
+    {
+        if (_trackedAvatars.ContainsKey(obj))
         {
-            Transform avatarParent = _avatarParents[obj.gameObject];
-            GameObject avatar = _trackedAvatars[obj.gameObject];
-            avatar.transform.SetParent(avatarParent);
-            _trackedAvatars.Remove(obj.gameObject);
-            _avatarParents.Remove(obj.gameObject);
+            Transform avatarParent = _avatarParents[obj];
+            GameObject avatar = _trackedAvatars[obj];
+            if (avatar != null)
+            {
+                avatar.transform.SetParent(avatarParent);
+            }
+            _trackedAvatars.Remove(obj);
+            _avatarParents.Remove(obj);
         }
     }
 
@@ -121,8 +129,15 @@ public class Radar : MonoBehaviour
         Vector3 position;
         bool needsAvatar = false;
         Transform avatarParent;
+        List<GameObject> destroyedObjects = new List<GameObject>();
         foreach (GameObject o in _trackedObjects)
         {
+            if (o == null)
+            {
+                destroyedObjects.Add(o);
+                continue;
+            }
+
             //Find proper position for avatar
             if (Vector3.Distance(o.transform.position, transform.position) > _radarRadius)
             {
@@ -149,5 +164,14 @@ public class Radar : MonoBehaviour
                 avatar.transform.SetParent(avatarParent);
             }
         }
+        if (destroyedObjects.Count > 0)
+        {
+            foreach (GameObject destroyedObject in destroyedObjects)
+            {
+                resetAvatar(destroyedObject);
+            }
+            UpdateTrackedObjectsSet();
+        }
     }
+
 }

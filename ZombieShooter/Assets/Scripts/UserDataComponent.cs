@@ -50,4 +50,9 @@ public class UserData
     {
         Score += amount;
     }
+
+    public void ResetScore()
+    {
+        Score = 0;
+    }
 }

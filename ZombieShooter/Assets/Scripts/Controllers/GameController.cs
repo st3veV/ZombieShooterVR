@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 public class GameController : MonoBehaviour
 {
@@ -6,6 +7,9 @@ public class GameController : MonoBehaviour
     public ZombieSpawner ZombieSpawner;
     public WeaponSpawner WeaponSpawner;
     public Gun UserGun;
+    public LifetimeComponent UserLifetime;
+
+    public event Action OnGameEnded;
 
 	void Start ()
 	{
@@ -17,6 +21,7 @@ public class GameController : MonoBehaviour
         ZombieSpawner = GameObject.Find("ZombieSpawner").GetComponent<ZombieSpawner>();
         WeaponSpawner = GameObject.Find("WeaponSpawner").GetComponent<WeaponSpawner>();
         UserGun = GameObject.Find("Gun").GetComponent<Gun>();
+        UserLifetime = GameObject.Find("UserData").GetComponent<LifetimeComponent>();
 
         Initialize();
     }
@@ -29,9 +34,20 @@ public class GameController : MonoBehaviour
         WeaponSpawner.Reset();
 
         UserGun.Reset();
+
+        UserLifetime.Reset();
+        UserLifetime.OnDie += UserLifetime_OnDie;
     }
 
-    void Update () {
-	
-	}
+    void UserLifetime_OnDie(LifetimeComponent obj)
+    {
+        UserLifetime.OnDie -= UserLifetime_OnDie;
+        OnOnGameEnded();
+    }
+
+    protected virtual void OnOnGameEnded()
+    {
+        var handler = OnGameEnded;
+        if (handler != null) handler();
+    }
 }

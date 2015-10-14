@@ -3,9 +3,9 @@ using UnityEngine;
 
 public class Controller : MonoBehaviour {
 
-    public LifetimeComponent UserLifetime;
     private TutorialController TutorialController;
     private GameController GameController;
+    private GameOverController GameOverController;
 
     public List<GameObject> DontDestroyGameObjects;
 
@@ -15,11 +15,8 @@ public class Controller : MonoBehaviour {
 	{
 	    SetDontDestroys();
 
-
-        UserLifetime.OnDie += UserLifetime_OnDie;
-        UserLifetime.OnDamage += UserLifetime_OnDamage;
-
 	    StartTutorial();
+	    //StartGame();
 	}
 
     private void SetDontDestroys()
@@ -51,6 +48,15 @@ public class Controller : MonoBehaviour {
     void TutorialController_OnTutorialComplete()
     {
         Debug.Log("Tutorial complete, loading");
+        TutorialController.OnTutorialComplete -= TutorialController_OnTutorialComplete;
+        TutorialController = null;
+        StartGame();
+    }
+
+    private void StartGame()
+    {
+        Debug.Log("Starting game");
+        UserData.Instance.ResetScore();
         loader = new GameObject("loader");
         DontDestroyOnLoad(loader);
         GameSceneLoader gameSceneLoader = loader.AddComponent<GameSceneLoader>();
@@ -62,16 +68,39 @@ public class Controller : MonoBehaviour {
         Destroy(loader);
         GameObject gController = GameObject.Find("GameController");
         GameController = gController.GetComponent<GameController>();
+        GameController.OnGameEnded += GameController_OnGameEnded;
     }
 
-
-    void UserLifetime_OnDamage(float damage)
+    void GameController_OnGameEnded()
     {
+        GameController.OnGameEnded -= GameController_OnGameEnded;
+        GameController = null;
+        GameOver();
     }
 
-    void UserLifetime_OnDie(LifetimeComponent lifetimeComponent)
+    private void GameOver()
     {
-        //LevelController.LoadScene(Scene.GameOver);
+        Debug.Log("Game over");
+        loader = new GameObject("loader");
+        DontDestroyOnLoad(loader);
+        GameOverSceneLoader gameOverSceneLoader = loader.AddComponent<GameOverSceneLoader>();
+        gameOverSceneLoader.OnSceneLoaded += gameOverSceneLoader_OnSceneLoaded;
     }
-	
+
+    void gameOverSceneLoader_OnSceneLoaded()
+    {
+        Destroy(loader);
+        GameObject goController = GameObject.Find("GameOverController");
+        GameOverController = goController.GetComponent<GameOverController>();
+        GameOverController.OnPlayAgain += GameOverController_OnPlayAgain;
+    }
+
+    void GameOverController_OnPlayAgain()
+    {
+        GameOverController.OnPlayAgain -= GameOverController_OnPlayAgain;
+        GameOverController = null;
+
+        StartGame();
+    }
+    
 }
