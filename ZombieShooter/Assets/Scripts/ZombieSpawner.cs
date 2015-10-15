@@ -22,7 +22,7 @@ public class ZombieSpawner : MonoBehaviour {
 
     public bool IsSpawning = true;
 
-    private List<AICharacterControl> zombiePool;
+    private Pool<AICharacterControl> zombiePool;
 
 	void Start () {
         Debug.Log("Start");
@@ -37,7 +37,8 @@ public class ZombieSpawner : MonoBehaviour {
         }
 
         AttactTarget.OnDie += AttactTarget_OnDie;
-	    zombiePool = new List<AICharacterControl>();
+	    
+        zombiePool = new Pool<AICharacterControl>();
         _timer = new InternalTimer();
 	    _timer.Set(SpawnInterval*1000);
 	}
@@ -62,12 +63,10 @@ public class ZombieSpawner : MonoBehaviour {
 
     public void SpawnZombie()
     {
-        AICharacterControl clone;
-
-        if (zombiePool.Count > 0)
+        AICharacterControl clone = zombiePool.Get();
+        
+        if (clone != null)
         {
-            clone = zombiePool[zombiePool.Count - 1];
-            zombiePool.Remove(clone);
             LifetimeComponent lifetimeComponent = clone.GetComponent<LifetimeComponent>();
             lifetimeComponent.Reset();
         }

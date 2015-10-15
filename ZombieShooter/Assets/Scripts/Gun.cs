@@ -19,14 +19,15 @@ public class Gun : MonoBehaviour {
     private IWeapon _currentWeapon;
     private int _shellsInMagazine;
 
-    private List<Rigidbody> bulletPool;
+    private Pool<Rigidbody> bulletPool;
 
     private GameObject _weaponContainer;
 
     // Use this for initialization
     void Awake ()
     {
-        bulletPool = new List<Rigidbody>();
+        bulletPool = new Pool<Rigidbody>();
+
         _timer = new InternalTimer();
 
         _weaponContainer = transform.FindChild("GunContainer").gameObject;
@@ -62,12 +63,10 @@ public class Gun : MonoBehaviour {
     {
         Kick();
         WeaponFire();
-        Rigidbody clone;
         Bullet bulletClone;
-        if (bulletPool.Count > 0)
+        Rigidbody clone = bulletPool.Get();
+        if (clone != null)
         {
-            clone = bulletPool[bulletPool.Count - 1];
-            bulletPool.Remove(clone);
             bulletClone = clone.GetComponent<Bullet>();
             clone.transform.position = transform.position;
             clone.transform.rotation = transform.rotation;

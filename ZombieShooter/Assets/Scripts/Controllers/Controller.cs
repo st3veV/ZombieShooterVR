@@ -93,14 +93,25 @@ public class Controller : MonoBehaviour {
         GameObject goController = GameObject.Find("GameOverController");
         GameOverController = goController.GetComponent<GameOverController>();
         GameOverController.OnPlayAgain += GameOverController_OnPlayAgain;
+        GameOverController.OnGoToTutorial += GameOverController_OnGoToTutorial;
+    }
+
+    void GameOverController_OnGoToTutorial()
+    {
+        RemoveGameOverListeners();
+        StartTutorial();
     }
 
     void GameOverController_OnPlayAgain()
     {
-        GameOverController.OnPlayAgain -= GameOverController_OnPlayAgain;
-        GameOverController = null;
-
+        RemoveGameOverListeners();
         StartGame();
     }
-    
+
+    void RemoveGameOverListeners()
+    {
+        GameOverController.OnPlayAgain -= GameOverController_OnPlayAgain;
+        GameOverController.OnGoToTutorial -= GameOverController_OnGoToTutorial;
+        GameOverController = null;
+    }
 }

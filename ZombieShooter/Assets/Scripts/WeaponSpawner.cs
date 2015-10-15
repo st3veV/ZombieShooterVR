@@ -12,7 +12,7 @@ public class WeaponSpawner : MonoBehaviour {
 
     public event Action<GameObject> OnWeaponTargetSpawned;
 
-    private List<GameObject> targetPool;
+    private Pool<GameObject> targetPool;
 
     public WeaponDatabase WeaponDatabase;
     public WeaponManager weaponManager;
@@ -37,8 +37,7 @@ public class WeaponSpawner : MonoBehaviour {
 	    modularAmmo.SetValues(weapon.BulletType, weapon.MagazineSize + 100);
 	    Inventory.PickAmmo(modularAmmo);
 
-
-        targetPool = new List<GameObject>();
+        targetPool = new Pool<GameObject>();
 	}
 
     private void ZombieSpawner_OnZombieSpawned(GameObject zombie)
@@ -55,16 +54,12 @@ public class WeaponSpawner : MonoBehaviour {
 
     public void SpawnAmmo(Transform sourceTransform)
     {
-        GameObject target;
-        if(targetPool.Count > 0)
-        {
-            target = targetPool[0];
-            targetPool.RemoveAt(0);
-        }
-        else
+        GameObject target = targetPool.Get();
+        if (target == null)
         {
             target = Instantiate(TargetPrefab);
         }
+
         Vector3 targetPosition = sourceTransform.position;
         targetPosition.y = 0;
         target.transform.position = targetPosition;
@@ -127,6 +122,7 @@ public class WeaponSpawner : MonoBehaviour {
         }
         pickupHolder.Clear();
         target.SetActive(false);
+
         targetPool.Add(target);
     }
 	
