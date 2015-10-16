@@ -11,6 +11,8 @@ public class Controller : MonoBehaviour {
 
     public GameObject loader;
 
+    public UserController UserController;
+
 	void Start ()
 	{
 	    SetDontDestroys();
@@ -33,16 +35,17 @@ public class Controller : MonoBehaviour {
         loader = new GameObject("loader");
         DontDestroyOnLoad(loader);
         TutorialSceneLoader tutorialSceneLoader = loader.AddComponent<TutorialSceneLoader>();
-        tutorialSceneLoader.OnSceneLoaded += OnTutorialSceneLoaded;
+        tutorialSceneLoader.OnSceneLoaded += tutorialSceneLoader_OnSceneLoaded;
     }
 
-    void OnTutorialSceneLoaded()
+    void tutorialSceneLoader_OnSceneLoaded()
     {
         Debug.Log("Tutorial scene loaded");
         Destroy(loader);
         GameObject tutController = GameObject.Find("TutorialController");
         TutorialController = tutController.GetComponent<TutorialController>();
         TutorialController.OnTutorialComplete += TutorialController_OnTutorialComplete;
+        ResetPlayer();
     }
 
     void TutorialController_OnTutorialComplete()
@@ -56,7 +59,6 @@ public class Controller : MonoBehaviour {
     private void StartGame()
     {
         Debug.Log("Starting game");
-        UserData.Instance.ResetScore();
         loader = new GameObject("loader");
         DontDestroyOnLoad(loader);
         GameSceneLoader gameSceneLoader = loader.AddComponent<GameSceneLoader>();
@@ -69,6 +71,7 @@ public class Controller : MonoBehaviour {
         GameObject gController = GameObject.Find("GameController");
         GameController = gController.GetComponent<GameController>();
         GameController.OnGameEnded += GameController_OnGameEnded;
+        ResetPlayer();
     }
 
     void GameController_OnGameEnded()
@@ -94,6 +97,7 @@ public class Controller : MonoBehaviour {
         GameOverController = goController.GetComponent<GameOverController>();
         GameOverController.OnPlayAgain += GameOverController_OnPlayAgain;
         GameOverController.OnGoToTutorial += GameOverController_OnGoToTutorial;
+        ResetPlayer();
     }
 
     void GameOverController_OnGoToTutorial()
@@ -106,6 +110,11 @@ public class Controller : MonoBehaviour {
     {
         RemoveGameOverListeners();
         StartGame();
+    }
+
+    private void ResetPlayer()
+    {
+        UserController.Reset();
     }
 
     void RemoveGameOverListeners()

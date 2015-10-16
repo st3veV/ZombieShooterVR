@@ -69,6 +69,11 @@ public class InventorySystem
         _currentWeaponIndex = index;
         UserGun.SetWeapon(_availableWeapons[_currentWeaponIndex]);
     }
+
+    public void Reset()
+    {
+        Init();
+    }
 }
 
 public class Inventory : MonoBehaviour
@@ -78,13 +83,13 @@ public class Inventory : MonoBehaviour
     private InventorySystem _inventory;
     private Pose _currentPose;
 
-    void Start()
+    private void Start()
     {
         Debug.Log(("inventory.start"));
         InitInventory();
     }
 
-    void Update()
+    private void Update()
     {
         if (_currentPose != Myo.pose)
         {
@@ -125,4 +130,24 @@ public class Inventory : MonoBehaviour
     }
 
 
+    public void Reset()
+    {
+        _inventory.Reset();
+        PickFirstWeapon();
+    }
+
+    private void PickFirstWeapon()
+    {
+        //init - selecting first weapon
+        Debug.Log("pick weapon");
+        IWeapon weapon = WeaponManager.Instance.GetWeapon(WeaponDatabase.Instance.Weapons[0]);
+        Debug.Log("selecting weapon: " + weapon.Name);
+        PickWeapon(weapon);
+
+        //adding enough bullets
+        var modularAmmo = new ModularAmmo();
+        modularAmmo.SetValues(weapon.BulletType, weapon.MagazineSize + 100);
+        PickAmmo(modularAmmo);
+
+    }
 }

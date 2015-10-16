@@ -52,7 +52,7 @@ public class TutorialController : MonoBehaviour {
         UserGun.FiringEnabled = false;
 
         ForceSpawn forceSpawn = new ForceSpawn();
-        IWeapon weapon = WeaponSpawner.weaponManager.GetWeapon(WeaponDatabase.Instance.Weapons[1]);
+        IWeapon weapon = WeaponSpawner.WeaponManager.GetWeapon(WeaponDatabase.Instance.Weapons[1]);
         /*
         ModularAmmo ammo = new ModularAmmo();
         ammo.SetValues(weapon.BulletType, weapon.AvailableAmmo);
@@ -65,8 +65,8 @@ public class TutorialController : MonoBehaviour {
 
         _reloadDistance = Vector3.Distance(PlayerTransform.position, TutorialInstructionReoad.transform.position);
 
-        Vector3 oldPos = ZombieSpawnPoint.transform.position;
-        ZombieSpawnPoint.transform.position = new Vector3(oldPos.x, oldPos.y, -oldPos.z);
+        //Vector3 oldPos = ZombieSpawnPoint.transform.position;
+        ZombieSpawnPoint.transform.position = new Vector3(0, 1, -30);
     }
 
     private void HideTutorialInstructions()

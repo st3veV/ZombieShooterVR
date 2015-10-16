@@ -15,7 +15,7 @@ public class WeaponSpawner : MonoBehaviour {
     private Pool<GameObject> targetPool;
 
     public WeaponDatabase WeaponDatabase;
-    public WeaponManager weaponManager;
+    public WeaponManager WeaponManager;
 
     public ForceSpawn ForceSpawn;
 
@@ -25,17 +25,9 @@ public class WeaponSpawner : MonoBehaviour {
 	    WeaponDatabase = WeaponDatabase.Instance;
         ZombieSpawner.OnZombieSpawned += ZombieSpawner_OnZombieSpawned;
 
-        weaponManager = new WeaponManager();
-        //init - selecting first weapon
-        Debug.Log("pick weapon");
-	    IWeapon weapon = weaponManager.GetWeapon(WeaponDatabase.Weapons[0]);
-        Debug.Log("selecting weapon: " + weapon.Name);
-	    Inventory.PickWeapon(weapon);
-
-        //adding enough bullets
-	    var modularAmmo = new ModularAmmo();
-	    modularAmmo.SetValues(weapon.BulletType, weapon.MagazineSize + 100);
-	    Inventory.PickAmmo(modularAmmo);
+        WeaponManager = WeaponManager.Instance;
+        
+        Inventory.Reset();
 
         targetPool = new Pool<GameObject>();
 	}
@@ -76,7 +68,7 @@ public class WeaponSpawner : MonoBehaviour {
             //select the weapon
             int index = (int) (WeaponDatabase.Weapons.Count*Random.value);
 
-            IWeapon newWeapon = weaponManager.GetWeapon(WeaponDatabase.Weapons[index]);
+            IWeapon newWeapon = WeaponManager.GetWeapon(WeaponDatabase.Weapons[index]);
 
             pickable = new Pickable();
             if (Random.value > .7)
@@ -145,6 +137,19 @@ public class WeaponSpawner : MonoBehaviour {
 
 public class WeaponManager
 {
+    private static WeaponManager _instance;
+    public static WeaponManager Instance
+    {
+        get
+        {
+            if (_instance == null)
+            {
+                _instance = new WeaponManager();
+            }
+            return _instance;
+        }
+    }
+
     private Dictionary<Weapon, IWeapon> weapons;
 
     public WeaponManager()

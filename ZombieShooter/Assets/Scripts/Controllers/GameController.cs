@@ -32,10 +32,6 @@ public class GameController : MonoBehaviour
         ZombieSpawner.IsSpawning = true;
 
         WeaponSpawner.Reset();
-
-        UserGun.Reset();
-
-        UserLifetime.Reset();
         UserLifetime.OnDie += UserLifetime_OnDie;
     }
 

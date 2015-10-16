@@ -33,8 +33,10 @@ public class HealthVisualizer : MonoBehaviour
 
     private void ObjectToMonitor_OnDie(LifetimeComponent lifetimeComponent)
     {
+        /*
         RemoveListeners();
         ObjectToMonitor = null;
+        */
     }
 
     private void RemoveListeners()
