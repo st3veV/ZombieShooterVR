@@ -4,8 +4,6 @@ using UnityEngine;
 
 public class Gun : MonoBehaviour {
 
-    public Rigidbody Bullet;
-
     public event Action OnWeaponKick;
     public event Action OnWeaponFire;
     public event Action OnWeaponKlick;
@@ -19,15 +17,11 @@ public class Gun : MonoBehaviour {
     private IWeapon _currentWeapon;
     private int _shellsInMagazine;
 
-    private Pool<Rigidbody> bulletPool;
-
     private GameObject _weaponContainer;
 
     // Use this for initialization
     void Awake ()
     {
-        bulletPool = new Pool<Rigidbody>();
-
         _timer = new InternalTimer();
 
         _weaponContainer = transform.FindChild("GunContainer").gameObject;
@@ -63,31 +57,19 @@ public class Gun : MonoBehaviour {
     {
         Kick();
         WeaponFire();
-        Bullet bulletClone;
-        Rigidbody clone = bulletPool.Get();
-        if (clone != null)
+        RaycastHit hit;
+        if (Physics.Raycast(transform.position, transform.forward, out hit))
         {
-            bulletClone = clone.GetComponent<Bullet>();
-            clone.transform.position = transform.position;
-            clone.transform.rotation = transform.rotation;
-            bulletClone.Reset();
-            clone.velocity = new Vector3(0,0,0);
-            clone.gameObject.SetActive(true);
+            Collider target = hit.collider;
+            float distance = hit.distance;
+            Vector3 location = hit.point;
+            GameObject targetGo = target.gameObject;
+            LifetimeComponent targetLifetime = targetGo.GetComponent<LifetimeComponent>();
+            if (targetLifetime != null)
+            {
+                targetLifetime.ReceiveDamage(_currentWeapon.Damage);
+            }
         }
-        else
-        {
-            clone = Instantiate(Bullet, transform.position, transform.rotation) as Rigidbody;
-            bulletClone = clone.GetComponent<Bullet>();
-            bulletClone.OnBulletDie += OnBulletDie;
-        }
-        bulletClone.SetDamage(_currentWeapon.Damage);
-        clone.AddForce(clone.transform.forward * 1500);
-    }
-
-    private void OnBulletDie(Bullet bullet)
-    {
-        bullet.gameObject.SetActive(false);
-        bulletPool.Add(bullet.gameObject.GetComponent<Rigidbody>());
     }
 
     public void StartShooting()
@@ -175,7 +157,6 @@ public class Gun : MonoBehaviour {
 
     public void Reset()
     {
-        bulletPool.Clear();
     }
 
     protected virtual void WeaponKlick()
