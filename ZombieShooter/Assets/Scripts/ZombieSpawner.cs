@@ -98,7 +98,7 @@ public class ZombieSpawner : MonoBehaviour {
     private void Zombie_OnDie(LifetimeComponent lifetimeComponent)
     {
         //dispose zombie
-        DisposeZombie(lifetimeComponent.gameObject);
+        lifetimeComponent.gameObject.GetComponent<ThirdPersonCharacter>().Die(DisposeZombie);
 
         //deal with score
         UserData.IncreaseScore(BalancingData.SCORE_FOR_ZOMBIE);

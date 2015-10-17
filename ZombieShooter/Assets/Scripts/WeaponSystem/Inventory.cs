@@ -132,6 +132,7 @@ public class Inventory : MonoBehaviour
 
     public void Reset()
     {
+        InitInventory();
         _inventory.Reset();
         PickFirstWeapon();
     }

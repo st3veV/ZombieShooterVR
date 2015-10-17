@@ -10,6 +10,8 @@ public class Gun : MonoBehaviour {
     public event Action OnWeaponReload;
     public event Action<IWeapon> OnWeaponChange;
 
+    public GameObject ParticleBurst;
+
     public bool FiringEnabled;
 
     private bool _isFiring = false;
@@ -46,6 +48,23 @@ public class Gun : MonoBehaviour {
                 _timer.Set(_currentWeapon.CooldownDelay);
             }
         }
+        if (runningSystems.Count > 0)
+        {
+            List<ParticleSystem> toRemove = new List<ParticleSystem>();
+            foreach (ParticleSystem system in runningSystems)
+            {
+                if (system == null || !system.isPlaying)
+                {
+                    toRemove.Add(system);
+                }
+            }
+            foreach (ParticleSystem system in toRemove)
+            {
+                runningSystems.Remove(system);
+                if(system != null)
+                    particlePool.Add(system.gameObject);
+            }
+        }
     }
 
     private void Klick()
@@ -63,13 +82,36 @@ public class Gun : MonoBehaviour {
             Collider target = hit.collider;
             float distance = hit.distance;
             Vector3 location = hit.point;
+            
             GameObject targetGo = target.gameObject;
+
+            if (targetGo.tag != "Enemy")
+            {
+                SpawnParticles(location);
+            }
+
             LifetimeComponent targetLifetime = targetGo.GetComponent<LifetimeComponent>();
             if (targetLifetime != null)
             {
                 targetLifetime.ReceiveDamage(_currentWeapon.Damage);
             }
         }
+    }
+
+    private List<ParticleSystem> runningSystems = new List<ParticleSystem>();
+    private Pool<GameObject> particlePool = new Pool<GameObject>();
+    private void SpawnParticles(Vector3 location)
+    {
+        GameObject burst = particlePool.Get();
+        if (!burst)
+        {
+            burst = Instantiate(ParticleBurst);
+        }
+        burst.transform.position = location;
+        ParticleSystem system = burst.GetComponent<ParticleSystem>();
+        runningSystems.Add(system);
+        system.Play();
+        burst.SetActive(true);
     }
 
     public void StartShooting()
