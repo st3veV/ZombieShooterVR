@@ -99,7 +99,7 @@ public class WeaponSpawner : MonoBehaviour {
 
     public void PickAmmo(GameObject target)
     {
-        Debug.Log("Weapon target picked");
+        //Debug.Log("Weapon target picked");
         PickupHolder pickupHolder = target.GetComponent<PickupHolder>();
         if (pickupHolder.Pickable != null)
         {

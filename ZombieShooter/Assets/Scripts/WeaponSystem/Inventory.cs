@@ -65,7 +65,7 @@ public class InventorySystem
 
     private void SetWeapon(int index)
     {
-        Debug.Log("Setting weapon: " + index);
+        //Debug.Log("Setting weapon: " + index);
         _currentWeaponIndex = index;
         UserGun.SetWeapon(_availableWeapons[_currentWeaponIndex]);
     }
@@ -85,7 +85,7 @@ public class Inventory : MonoBehaviour
 
     private void Start()
     {
-        Debug.Log(("inventory.start"));
+        //Debug.Log(("inventory.start"));
         InitInventory();
     }
 
@@ -109,14 +109,14 @@ public class Inventory : MonoBehaviour
     public void PickWeapon(IWeapon weapon)
     {
         InitInventory();
-        Debug.Log("Picked weapon: " + weapon.Name);
+        //Debug.Log("Picked weapon: " + weapon.Name);
         _inventory.AddWeapon(weapon);
     }
 
     public void PickAmmo(IAmmo ammo)
     {
         InitInventory();
-        Debug.Log("Picked ammo: " + ammo.Type + " (" + ammo.Amount + ")");
+        //Debug.Log("Picked ammo: " + ammo.Type + " (" + ammo.Amount + ")");
         _inventory.AddAmmo(ammo);
     }
 
@@ -140,9 +140,9 @@ public class Inventory : MonoBehaviour
     private void PickFirstWeapon()
     {
         //init - selecting first weapon
-        Debug.Log("pick weapon");
+        //Debug.Log("pick weapon");
         IWeapon weapon = WeaponManager.Instance.GetWeapon(WeaponDatabase.Instance.Weapons[0]);
-        Debug.Log("selecting weapon: " + weapon.Name);
+        //Debug.Log("selecting weapon: " + weapon.Name);
         PickWeapon(weapon);
 
         //adding enough bullets
