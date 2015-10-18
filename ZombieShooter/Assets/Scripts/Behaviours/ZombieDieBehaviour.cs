@@ -1,6 +1,5 @@
 ﻿using System;
 using UnityEngine;
-using UnityStandardAssets.Characters.ThirdPerson;
 
 public class ZombieDieBehaviour : StateMachineBehaviour
 {

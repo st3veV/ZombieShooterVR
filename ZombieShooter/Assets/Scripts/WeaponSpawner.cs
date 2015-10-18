@@ -86,6 +86,7 @@ public class WeaponSpawner : MonoBehaviour {
         pickupHolder.Pickable = pickable;
 
         LifetimeComponent targetLife = target.GetComponent<LifetimeComponent>();
+        targetLife.Reset();
         targetLife.OnDie += targetLife_OnDie;
 
         target.SetActive(true);
@@ -94,6 +95,7 @@ public class WeaponSpawner : MonoBehaviour {
 
     private void targetLife_OnDie(LifetimeComponent obj)
     {
+        obj.OnDie -= targetLife_OnDie;
         PickAmmo(obj.gameObject);
     }
 

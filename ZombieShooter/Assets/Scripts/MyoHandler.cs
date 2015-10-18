@@ -23,7 +23,7 @@ public class MyoHandler : MonoBehaviour
     private Arm _lastArm = Arm.Unknown;
     private bool _reloadLock = false;
 
-    private float _handPositionOffset = 0.4f;
+    private float _handPositionOffset = 0.3f;
 
     public event Action OnMyoReset;
 

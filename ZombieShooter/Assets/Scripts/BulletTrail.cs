@@ -34,10 +34,10 @@ public class BulletTrail : MonoBehaviour
     {
         if (_animate)
         {
-            if (_currentStep < AnimLength)
+            if (_currentStep < _distance)
             {
                 float x0 = Mathf.Lerp(0, _distance, _currentStep);
-                _currentStep += AnimLength/3;
+                _currentStep += _distance/3;
                 float x1 = Mathf.Lerp(0, _distance, _currentStep);
 
                 Vector3 origin = _origin;
