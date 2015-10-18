@@ -11,6 +11,7 @@ public class Gun : MonoBehaviour {
     public event Action<IWeapon> OnWeaponChange;
 
     public GameObject ParticleBurst;
+    public GameObject BulletTrail;
 
     public bool FiringEnabled;
 
@@ -20,6 +21,9 @@ public class Gun : MonoBehaviour {
     private int _shellsInMagazine;
 
     private GameObject _weaponContainer;
+
+    private Color HitGround = new Color(0xDF, 0xD6, 0xB6, 0xFF);
+    private Color HitEnemy = new Color(0x68, 0x00, 0x00, 0xFF);
 
     // Use this for initialization
     void Awake ()
@@ -48,10 +52,10 @@ public class Gun : MonoBehaviour {
                 _timer.Set(_currentWeapon.CooldownDelay);
             }
         }
-        if (runningSystems.Count > 0)
+        if (_runningSystems.Count > 0)
         {
             List<ParticleSystem> toRemove = new List<ParticleSystem>();
-            foreach (ParticleSystem system in runningSystems)
+            foreach (ParticleSystem system in _runningSystems)
             {
                 if (system == null || !system.isPlaying)
                 {
@@ -60,9 +64,12 @@ public class Gun : MonoBehaviour {
             }
             foreach (ParticleSystem system in toRemove)
             {
-                runningSystems.Remove(system);
-                if(system != null)
-                    particlePool.Add(system.gameObject);
+                _runningSystems.Remove(system);
+                if (system != null)
+                {
+                    system.gameObject.SetActive(false);
+                    _particlePool.Add(system.gameObject);
+                }
             }
         }
     }
@@ -85,10 +92,8 @@ public class Gun : MonoBehaviour {
             
             GameObject targetGo = target.gameObject;
 
-            if (targetGo.tag != "Enemy")
-            {
-                SpawnParticles(location);
-            }
+            SpawnParticles(location, targetGo.tag != "Enemy" ? HitGround : HitEnemy);
+            SpawnBulletTrail(location, distance);
 
             LifetimeComponent targetLifetime = targetGo.GetComponent<LifetimeComponent>();
             if (targetLifetime != null)
@@ -98,20 +103,44 @@ public class Gun : MonoBehaviour {
         }
     }
 
-    private List<ParticleSystem> runningSystems = new List<ParticleSystem>();
-    private Pool<GameObject> particlePool = new Pool<GameObject>();
-    private void SpawnParticles(Vector3 location)
+    private readonly Pool<GameObject> _bulletTrailPool = new Pool<GameObject>();
+
+    private void SpawnBulletTrail(Vector3 location, float distance)
     {
-        GameObject burst = particlePool.Get();
+        GameObject trail = _bulletTrailPool.Get();
+        if (trail == null)
+        {
+            trail = Instantiate(BulletTrail);
+        }
+        //trail.transform.position = transform.position;
+        //trail.transform.rotation = transform.rotation;
+        BulletTrail bulletTrail = trail.GetComponent<BulletTrail>();
+        bulletTrail.SetTarget(transform.position, location);
+        bulletTrail.OnDone = OnBulletTrailDone;
+        trail.SetActive(true);
+    }
+
+    private void OnBulletTrailDone(GameObject trail)
+    {
+        trail.SetActive(false);
+        _bulletTrailPool.Add(trail);
+    }
+
+    private readonly List<ParticleSystem> _runningSystems = new List<ParticleSystem>();
+    private readonly Pool<GameObject> _particlePool = new Pool<GameObject>();
+    private void SpawnParticles(Vector3 location, Color color)
+    {
+        GameObject burst = _particlePool.Get();
         if (!burst)
         {
             burst = Instantiate(ParticleBurst);
         }
         burst.transform.position = location;
         ParticleSystem system = burst.GetComponent<ParticleSystem>();
-        runningSystems.Add(system);
-        system.Play();
+        system.startColor = color;
+        _runningSystems.Add(system);
         burst.SetActive(true);
+        system.Play();
     }
 
     public void StartShooting()
