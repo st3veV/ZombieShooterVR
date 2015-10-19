@@ -112,8 +112,6 @@ public class Gun : MonoBehaviour {
         {
             trail = Instantiate(BulletTrail);
         }
-        //trail.transform.position = transform.position;
-        //trail.transform.rotation = transform.rotation;
         BulletTrail bulletTrail = trail.GetComponent<BulletTrail>();
         bulletTrail.SetTarget(transform.position, location);
         bulletTrail.OnDone = OnBulletTrailDone;

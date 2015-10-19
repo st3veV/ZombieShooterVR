@@ -38,8 +38,8 @@ public class GameController : MonoBehaviour
     void UserLifetime_OnDie(LifetimeComponent obj)
     {
         UserLifetime.OnDie -= UserLifetime_OnDie;
-        ZombieSpawner.IsSpawning = false;
         ZombieSpawner.Reset();
+        ZombieSpawner.IsSpawning = false;
         OnOnGameEnded();
     }
 
