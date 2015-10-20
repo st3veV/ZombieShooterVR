@@ -22,8 +22,10 @@ public class Gun : MonoBehaviour {
 
     private GameObject _weaponContainer;
 
-    private Color HitGround = new Color(0xDF, 0xD6, 0xB6, 0xFF);
-    private Color HitEnemy = new Color(0x68, 0x00, 0x00, 0xFF);
+    private readonly Color _hitGroundColor = new Color(0xDF, 0xD6, 0xB6, 0xFF);
+    private readonly Color _hitEnemyColor = new Color(0x68, 0x00, 0x00, 0xFF);
+
+    private const float MaxBulletVisualRange = 20f;
 
     // Use this for initialization
     void Awake ()
@@ -87,13 +89,12 @@ public class Gun : MonoBehaviour {
         if (Physics.Raycast(transform.position, transform.forward, out hit))
         {
             Collider target = hit.collider;
-            float distance = hit.distance;
             Vector3 location = hit.point;
-            
+
             GameObject targetGo = target.gameObject;
 
-            SpawnParticles(location, targetGo.tag != "Enemy" ? HitGround : HitEnemy);
-            SpawnBulletTrail(location, distance);
+            SpawnParticles(location, targetGo.tag != "Enemy" ? _hitGroundColor : _hitEnemyColor);
+            SpawnBulletTrail(location);
 
             LifetimeComponent targetLifetime = targetGo.GetComponent<LifetimeComponent>();
             if (targetLifetime != null)
@@ -101,11 +102,16 @@ public class Gun : MonoBehaviour {
                 targetLifetime.ReceiveDamage(_currentWeapon.Damage);
             }
         }
+        else
+        {
+            Vector3 target = transform.position + transform.forward * MaxBulletVisualRange;
+            SpawnBulletTrail(target);
+        }
     }
 
     private readonly Pool<GameObject> _bulletTrailPool = new Pool<GameObject>();
 
-    private void SpawnBulletTrail(Vector3 location, float distance)
+    private void SpawnBulletTrail(Vector3 location)
     {
         GameObject trail = _bulletTrailPool.Get();
         if (trail == null)
@@ -120,6 +126,7 @@ public class Gun : MonoBehaviour {
 
     private void OnBulletTrailDone(GameObject trail)
     {
+        trail.GetComponent<BulletTrail>().OnDone = null;
         trail.SetActive(false);
         _bulletTrailPool.Add(trail);
     }
