@@ -110,6 +110,7 @@ public class WeaponManagerWindow : EditorWindow {
         AudioClip shootSound = weapon == null ? null : weapon.ShootSound;
         AudioClip reloadSound = weapon == null ? null : weapon.ReloadSound;
         AudioClip klickSound = weapon == null ? null : weapon.KlickSound;
+        Texture bulletImage = weapon == null ? null : weapon.BulletImage;
         
         GUILayout.BeginHorizontal();
         GUILayout.Label("Name");
@@ -158,6 +159,10 @@ public class WeaponManagerWindow : EditorWindow {
         GUILayout.EndHorizontal();
 
         GUILayout.BeginHorizontal();
+        bulletImage = EditorGUILayout.ObjectField("Bullte image", bulletImage, typeof (Texture), false) as Texture;
+        GUILayout.EndHorizontal();
+
+        GUILayout.BeginHorizontal();
         delete = GUILayout.Button("Delete");
         save = GUILayout.Button("Save");
         GUILayout.EndHorizontal();
@@ -167,7 +172,7 @@ public class WeaponManagerWindow : EditorWindow {
             weapon = new Weapon();
         }
         weapon.SetValues(weaponName, damage, cooldownDelay, magazineSize, bulletType, initialAmmo, weaponModel,
-            shootSound, reloadSound, klickSound);
+            shootSound, reloadSound, klickSound, bulletImage);
 
         return weapon;
     }
