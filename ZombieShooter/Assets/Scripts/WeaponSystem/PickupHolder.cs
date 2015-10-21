@@ -5,6 +5,8 @@ public class PickupHolder : MonoBehaviour
 {
     public IPickable Pickable;
 
+    public MeshRenderer PickableVisualizer;
+
     private LifetimeComponent _lifetime;
     private InternalTimer timer;
 
@@ -17,15 +19,31 @@ public class PickupHolder : MonoBehaviour
     {
         Debug.Log("started");
         _lifetime = GetComponent<LifetimeComponent>();
-        timer = timer ?? new InternalTimer();
-        timer.Set(5000);
+        AssertTimer();
+        timer.Reset();
     }
 
     void Update()
     {
         if (timer.Update())
         {
-            _lifetime.ReceiveDamage(100);
+            //_lifetime.ReceiveDamage(100);
+        }
+    }
+
+    public void Activate()
+    {
+        AssertTimer();
+        timer.Reset();
+        PickableVisualizer.material.mainTexture = Pickable.Weapon.BulletImage;
+    }
+
+    private void AssertTimer()
+    {
+        if (timer == null)
+        {
+            timer = new InternalTimer();
+            timer.Set(BalancingData.WEAPON_TARGET_AUTOMATIC_PICKUP_DELAY * 1000);
         }
     }
 
