@@ -76,7 +76,7 @@ public class ZombieSpawner : MonoBehaviour {
             lifetimeComponent.Autodestroy = false;
             lifetimeComponent.OnDie += Zombie_OnDie;
             clone.OnPositionReached += clone_OnPositionReached;
-            clone.target = ZombieTarget;
+            clone.Target = ZombieTarget;
         }
         clone.transform.position = SpawnPoint.position;
         clone.gameObject.SetActive(true);
@@ -110,8 +110,13 @@ public class ZombieSpawner : MonoBehaviour {
 
     private void clone_OnPositionReached(GameObject obj)
     {
-        DisposeZombie(obj);
+        gameObject.GetComponent<ThirdPersonCharacter>().Attack(AttackAndDispose);
+    }
+
+    private void AttackAndDispose(GameObject go)
+    {
         AttactTarget.ReceiveDamage(ZombieDamage);
+        DisposeZombie(go);
     }
 
     private void DisposeZombie(GameObject go)

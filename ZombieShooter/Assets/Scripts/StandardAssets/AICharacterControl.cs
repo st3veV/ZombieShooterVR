@@ -7,9 +7,9 @@ namespace UnityStandardAssets.Characters.ThirdPerson
     [RequireComponent(typeof (ThirdPersonCharacter))]
     public class AICharacterControl : MonoBehaviour
     {
-        public NavMeshAgent agent { get; private set; } // the navmesh agent required for the path finding
-        public ThirdPersonCharacter character { get; private set; } // the character we are controlling
-        public Transform target; // target to aim for
+        public NavMeshAgent Agent { get; private set; } // the navmesh agent required for the path finding
+        public ThirdPersonCharacter Character { get; private set; } // the character we are controlling
+        public Transform Target; // target to aim for
 
         public event Action<GameObject> OnPositionReached;
 
@@ -17,26 +17,26 @@ namespace UnityStandardAssets.Characters.ThirdPerson
         private void Start()
         {
             // get the components on the object we need ( should not be null due to require component so no need to check )
-            agent = GetComponentInChildren<NavMeshAgent>();
-            character = GetComponent<ThirdPersonCharacter>();
+            Agent = GetComponentInChildren<NavMeshAgent>();
+            Character = GetComponent<ThirdPersonCharacter>();
 
-	        agent.updateRotation = false;
-	        agent.updatePosition = true;
+	        Agent.updateRotation = false;
+	        Agent.updatePosition = true;
         }
 
 
         // Update is called once per frame
         private void Update()
         {
-            if (target != null)
+            if (Target != null)
             {
-                agent.SetDestination(target.position);
+                Agent.SetDestination(Target.position);
 
                 // use the values to move the character
-                character.Move(agent.desiredVelocity, false, false);
+                Character.Move(Agent.desiredVelocity, false, false);
 
                 // check position reached
-                if(IsWithinBoundaries(character.transform.position,target.position,1f))
+                if(IsWithinBoundaries(Character.transform.position,Target.position,1f))
                 {
                     if (OnPositionReached != null)
                     {
@@ -47,7 +47,7 @@ namespace UnityStandardAssets.Characters.ThirdPerson
             else
             {
                 // We still need to call the character's move function, but we send zeroed input as the move param.
-                character.Move(Vector3.zero, false, false);
+                Character.Move(Vector3.zero, false, false);
             }
 
         }
@@ -59,7 +59,7 @@ namespace UnityStandardAssets.Characters.ThirdPerson
 
         public void SetTarget(Transform target)
         {
-            this.target = target;
+            this.Target = target;
         }
     }
 }
