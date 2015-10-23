@@ -47,12 +47,12 @@ public class WeaponSpawner : MonoBehaviour {
     public void SpawnAmmo(Transform sourceTransform)
     {
         GameObject target = targetPool.Get();
-        LifetimeComponent targetLife;
+        LifetimeComponent targetLife = null;
         if (target == null)
         {
             target = Instantiate(TargetPrefab);
             targetLife = target.GetComponent<LifetimeComponent>();
-            targetLife.LifetimeDamage = 1000;
+            targetLife.LifetimeDamage = BalancingData.WEAPON_TARGET_HEALTH;
         }
 
         Vector3 targetPosition = sourceTransform.position;
@@ -88,9 +88,13 @@ public class WeaponSpawner : MonoBehaviour {
         PickupHolder pickupHolder = target.GetComponent<PickupHolder>();
         pickupHolder.Pickable = pickable;
         pickupHolder.Activate();
-        
-        targetLife = target.GetComponent<LifetimeComponent>();
-        targetLife.Reset();
+
+        if (targetLife == null)
+        {
+            targetLife = target.GetComponent<LifetimeComponent>();
+            targetLife.Reset();
+        }
+
         targetLife.OnDie += targetLife_OnDie;
 
         target.SetActive(true);

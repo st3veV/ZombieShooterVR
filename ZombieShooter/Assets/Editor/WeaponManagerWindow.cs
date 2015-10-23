@@ -159,8 +159,9 @@ public class WeaponManagerWindow : EditorWindow {
         GUILayout.EndHorizontal();
 
         GUILayout.BeginHorizontal();
-        bulletImage = EditorGUILayout.ObjectField("Bullte image", bulletImage, typeof (Texture), false) as Texture;
+        bulletImage = EditorGUILayout.ObjectField("Bullet image", bulletImage, typeof (Texture), false) as Texture;
         GUILayout.EndHorizontal();
+        
 
         GUILayout.BeginHorizontal();
         delete = GUILayout.Button("Delete");

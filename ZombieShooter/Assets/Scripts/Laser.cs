@@ -48,7 +48,7 @@ public class Laser : MonoBehaviour
         {
             if (!hit[i].collider.isTrigger)
             {
-                _length = hit[i].distance + 2.0f;
+                _length = hit[i].distance;
                 return;
             }
             i++;

@@ -27,7 +27,7 @@ public class PickupHolder : MonoBehaviour
     {
         if (timer.Update())
         {
-            //_lifetime.ReceiveDamage(100);
+            _lifetime.ReceiveDamage(BalancingData.WEAPON_TARGET_HEALTH);
         }
     }
 
@@ -35,7 +35,7 @@ public class PickupHolder : MonoBehaviour
     {
         AssertTimer();
         timer.Reset();
-        PickableVisualizer.material.mainTexture = Pickable.Weapon.BulletImage;
+        //PickableVisualizer.material.mainTexture = Pickable.Weapon.BulletImage;
     }
 
     private void AssertTimer()

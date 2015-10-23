@@ -7,4 +7,5 @@
     public static float ZOMBIE_SPAWN_INTERVAL_MINIMUM = 2.0f;
     public static float ZOMBIE_SPAWN_INTERVAL_INITIAL = 5f;
     public static float WEAPON_TARGET_AUTOMATIC_PICKUP_DELAY = 5f;
+    public static float WEAPON_TARGET_HEALTH = 100;
 }
