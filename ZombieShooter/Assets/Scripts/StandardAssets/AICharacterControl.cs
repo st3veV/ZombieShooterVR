@@ -11,6 +11,8 @@ namespace UnityStandardAssets.Characters.ThirdPerson
         public ThirdPersonCharacter Character { get; private set; } // the character we are controlling
         public Transform Target; // target to aim for
 
+        public bool IsMoving = true;
+
         public event Action<GameObject> OnPositionReached;
 
         // Use this for initialization
@@ -28,7 +30,7 @@ namespace UnityStandardAssets.Characters.ThirdPerson
         // Update is called once per frame
         private void Update()
         {
-            if (Target != null)
+            if (IsMoving && Target != null)
             {
                 Agent.SetDestination(Target.position);
 
@@ -36,8 +38,9 @@ namespace UnityStandardAssets.Characters.ThirdPerson
                 Character.Move(Agent.desiredVelocity, false, false);
 
                 // check position reached
-                if(IsWithinBoundaries(Character.transform.position,Target.position,1f))
+                if (IsWithinBoundaries(Character.transform.position, Target.position, 1.5f))
                 {
+                    IsMoving = false;
                     if (OnPositionReached != null)
                     {
                         OnPositionReached(gameObject);
@@ -49,7 +52,6 @@ namespace UnityStandardAssets.Characters.ThirdPerson
                 // We still need to call the character's move function, but we send zeroed input as the move param.
                 Character.Move(Vector3.zero, false, false);
             }
-
         }
 
         private bool IsWithinBoundaries(Vector3 obj, Vector3 target, float boundarySize)
@@ -60,6 +62,7 @@ namespace UnityStandardAssets.Characters.ThirdPerson
         public void SetTarget(Transform target)
         {
             this.Target = target;
+            IsMoving = true;
         }
     }
 }

@@ -15,11 +15,12 @@ public class ZombieAttackBehaviour : StateMachineBehaviour {
     // OnStateUpdate is called on each Update frame between OnStateEnter and OnStateExit callbacks
     override public void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
-        //
+        /*
         if (!animator.IsInTransition(0))
         {
             ExitCallback();
         }
+        */
     }
 
     // OnStateExit is called when a transition ends and the state machine finishes evaluating this state
