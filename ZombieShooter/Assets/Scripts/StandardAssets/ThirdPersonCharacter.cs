@@ -207,6 +207,8 @@ namespace UnityStandardAssets.Characters.ThirdPerson
 
 	    private Action<GameObject> _disposeAction;
         private ZombieDieBehaviour _dieBehaviour;
+	    private ZombieAttackBehaviour _attackBehaviour;
+
 	    public void Die(Action<GameObject> disposeAction)
 	    {
 	        _disposeAction = disposeAction;
@@ -222,5 +224,21 @@ namespace UnityStandardAssets.Characters.ThirdPerson
 	        _dieBehaviour = null;
 	        _disposeAction(gameObject);
 	    }
-	}
+
+	    public void Attack(Action<GameObject> disposeAction)
+	    {
+	        _disposeAction = disposeAction;
+            m_Animator.SetTrigger("Attack");
+	        _attackBehaviour = m_Animator.GetBehaviour<ZombieAttackBehaviour>();
+	        _attackBehaviour.ExitCallback = OnAttackComplete;
+	    }
+
+	    private void OnAttackComplete()
+	    {
+            m_Animator.ResetTrigger("Attack");
+            _attackBehaviour.ExitCallback = null;
+            _attackBehaviour = null;
+            _disposeAction(gameObject);
+        }
+    }
 }

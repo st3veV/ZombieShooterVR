@@ -9,7 +9,8 @@ public class AmmoVisualizer : MonoBehaviour
     public Text TotalGunAmmoOutput;
     public GameObject ReloadingIndicatorOutput;
     public Slider SliderOutput;
-
+    public RawImage BulletImageOutput;
+    [Space]
     public Gun GunInput;
     private IWeapon _currentWeapon;
 
@@ -25,6 +26,8 @@ public class AmmoVisualizer : MonoBehaviour
         SliderOutput.minValue = 0;
         SliderOutput.maxValue = _currentWeapon.MagazineSize;
         WeaponNameOutput.text = _currentWeapon.Name;
+        BulletImageOutput.texture = _currentWeapon.BulletImage;
+        BulletImageOutput.SetNativeSize();
     }
 	
 	// Update is called once per frame

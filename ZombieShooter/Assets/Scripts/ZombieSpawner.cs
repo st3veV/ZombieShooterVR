@@ -76,8 +76,8 @@ public class ZombieSpawner : MonoBehaviour {
             lifetimeComponent.Autodestroy = false;
             lifetimeComponent.OnDie += Zombie_OnDie;
             clone.OnPositionReached += clone_OnPositionReached;
-            clone.target = ZombieTarget;
         }
+        clone.SetTarget(ZombieTarget);
         clone.transform.position = SpawnPoint.position;
         clone.gameObject.SetActive(true);
         clone.GetComponent<ZombieAudioController>().Spawn();
@@ -110,8 +110,13 @@ public class ZombieSpawner : MonoBehaviour {
 
     private void clone_OnPositionReached(GameObject obj)
     {
-        DisposeZombie(obj);
+        obj.GetComponent<ThirdPersonCharacter>().Attack(AttackAndDispose);
+    }
+
+    private void AttackAndDispose(GameObject go)
+    {
         AttactTarget.ReceiveDamage(ZombieDamage);
+        DisposeZombie(go);
     }
 
     private void DisposeZombie(GameObject go)
