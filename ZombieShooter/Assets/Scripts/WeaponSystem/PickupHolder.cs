@@ -35,7 +35,23 @@ public class PickupHolder : MonoBehaviour
     {
         AssertTimer();
         timer.Reset();
-        //PickableVisualizer.material.mainTexture = Pickable.Weapon.BulletImage;
+
+        Texture decal = Pickable.Weapon.BulletImage;
+
+        PickableVisualizer.material.mainTexture = decal;
+        
+        Vector3 scale = PickableVisualizer.transform.localScale;
+        float ratio = (float)decal.width / decal.height;
+        
+        scale.y = scale.x / ratio;
+        scale.x = scale.y * ratio;
+        if (scale.x != scale.y * ratio)
+        {
+            scale.x = scale.y * ratio;
+        }
+        scale.Normalize();
+        PickableVisualizer.transform.localScale = scale;
+        
     }
 
     private void AssertTimer()
@@ -58,14 +74,31 @@ public interface IPickable
     IAmmo Ammo { get; }
     IWeapon Weapon { get; }
 
-    void SetItem(IAmmo ammo);
-    void SetItem(IWeapon weapon);
+    void SetWeapon(IWeapon weapon);
+    void SetAmmo(IAmmo ammo);
+
+    bool ContainsWeapon { get; set; }
+    bool ContainsAmmo { get; set; }
 }
 
 public class Pickable : IPickable
 {
     private IAmmo _ammo;
     private IWeapon _weapon;
+
+    public void SetWeapon(IWeapon weapon)
+    {
+        _weapon = weapon;
+    }
+
+    public void SetAmmo(IAmmo ammo)
+    {
+        _ammo = ammo;
+    }
+
+    public bool ContainsWeapon { get; set; }
+
+    public bool ContainsAmmo { get; set; }
 
     public IAmmo Ammo
     {
@@ -76,15 +109,6 @@ public class Pickable : IPickable
     {
         get { return _weapon; }
     }
-
-    public void SetItem(IAmmo ammo)
-    {
-        _ammo = ammo;
-    }
-
-    public void SetItem(IWeapon weapon)
-    {
-        _weapon = weapon;
-    }
+    
 
 }

@@ -58,7 +58,9 @@ public class TutorialController : MonoBehaviour {
         ammo.SetValues(weapon.BulletType, weapon.AvailableAmmo);
         */
         //forceSpawn.SetItem(ammo);
-        forceSpawn.SetItem(weapon);
+        forceSpawn.SetWeapon(weapon);
+        forceSpawn.ContainsWeapon = true;
+        forceSpawn.ContainsAmmo = false;
         WeaponSpawner.ForceSpawn = forceSpawn;
 
         _oldShellsInMagazine = UserGun.ShellsInMagazine;

@@ -74,15 +74,14 @@ public class WeaponSpawner : MonoBehaviour {
             IWeapon newWeapon = WeaponManager.GetWeapon(WeaponDatabase.Weapons[index]);
 
             pickable = new Pickable();
-            if (Random.value > .7)
-            {
-                //spawn weapon
-                pickable.SetItem(newWeapon);
-            }
+            pickable.SetWeapon(newWeapon);
+            pickable.ContainsWeapon = Random.value > .7;
             //spawn ammo
             ModularAmmo ammo = new ModularAmmo();
-            ammo.SetValues(newWeapon.BulletType, (int) (Random.value*2 + 1)*newWeapon.MagazineSize);
-            pickable.SetItem(ammo);
+            ammo.SetValues(newWeapon.BulletType, ((int) (Random.value*2 + 1))*newWeapon.MagazineSize);
+            pickable.SetAmmo(ammo);
+            pickable.ContainsAmmo = true;
+
         }
 
         PickupHolder pickupHolder = target.GetComponent<PickupHolder>();
@@ -116,11 +115,11 @@ public class WeaponSpawner : MonoBehaviour {
         PickupHolder pickupHolder = target.GetComponent<PickupHolder>();
         if (pickupHolder.Pickable != null)
         {
-            if (pickupHolder.Pickable.Weapon != null)
+            if (pickupHolder.Pickable.ContainsWeapon)
             {
                 Inventory.PickWeapon(pickupHolder.Pickable.Weapon);
             }
-            if (pickupHolder.Pickable.Ammo != null)
+            if (pickupHolder.Pickable.ContainsAmmo)
             {
                 Inventory.PickAmmo(pickupHolder.Pickable.Ammo);
             }
@@ -198,6 +197,20 @@ class ModularAmmo : IAmmo
 
 public class ForceSpawn:IPickable
 {
+    public void SetWeapon(IWeapon weapon)
+    {
+        _weapon = weapon;
+    }
+
+    public void SetAmmo(IAmmo ammo)
+    {
+        _ammo = ammo;
+    }
+
+    public bool ContainsWeapon { get; set; }
+
+    public bool ContainsAmmo { get; set; }
+
     private IAmmo _ammo;
     private IWeapon _weapon;
 
@@ -210,14 +223,5 @@ public class ForceSpawn:IPickable
     {
         get { return _weapon; }
     }
-
-    public void SetItem(IAmmo ammo)
-    {
-        _ammo = ammo;
-    }
-
-    public void SetItem(IWeapon weapon)
-    {
-        _weapon = weapon;
-    }
+    
 }
