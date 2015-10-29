@@ -13,6 +13,7 @@ public interface IWeapon
     AudioClip ReloadSound { get; }
     AudioClip KlickSound { get; }
     Texture BulletImage { get; }
+    Texture WeaponImage { get; }
 }
 
 public interface IAmmo

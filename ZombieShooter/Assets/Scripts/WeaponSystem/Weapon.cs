@@ -15,10 +15,11 @@ public class Weapon
     [SerializeField] private AudioClip _reloadSound;
     [SerializeField] private AudioClip _klickSound;
     [SerializeField] private Texture _bulletImage;
+    [SerializeField] private Texture _weaponImage;
 
 
     public void SetValues(string name, float damage, float cooldownDelay, int magazineSize, int bulletType,
-        int initialAmmo, GameObject weaponModel, AudioClip shootSound, AudioClip reloadSound, AudioClip klickSound, Texture bulletImage)
+        int initialAmmo, GameObject weaponModel, AudioClip shootSound, AudioClip reloadSound, AudioClip klickSound, Texture bulletImage, Texture weaponImage)
     {
         _name = name;
         _damage = damage;
@@ -31,6 +32,7 @@ public class Weapon
         _reloadSound = reloadSound;
         _klickSound = klickSound;
         _bulletImage = bulletImage;
+        _weaponImage = weaponImage;
     }
 
     public int BulletType
@@ -86,6 +88,12 @@ public class Weapon
     {
         get { return _bulletImage; }
     }
+    
+    public Texture WeaponImage
+    {
+        get { return _weaponImage; }
+    }
+    
 }
 
 public class PlayerWeapon : IWeapon
@@ -153,5 +161,10 @@ public class PlayerWeapon : IWeapon
     public Texture BulletImage
     {
         get { return _realWeapon.BulletImage; }
+    }
+
+    public Texture WeaponImage
+    {
+        get { return _realWeapon.WeaponImage; }
     }
 }
