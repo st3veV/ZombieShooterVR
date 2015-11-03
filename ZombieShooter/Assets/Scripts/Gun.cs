@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Random = System.Random;
 
 public class Gun : MonoBehaviour {
 
@@ -27,13 +28,15 @@ public class Gun : MonoBehaviour {
 
     private const float MaxBulletVisualRange = 20f;
 
+    private Random _random;
     // Use this for initialization
     void Awake ()
     {
         _timer = new InternalTimer();
 
         _weaponContainer = transform.FindChild("GunContainer").gameObject;
-
+        
+        _random = new Random();
     }
 
     // Update is called once per frame
@@ -85,27 +88,41 @@ public class Gun : MonoBehaviour {
     {
         Kick();
         WeaponFire();
-        RaycastHit hit;
-        if (Physics.Raycast(transform.position, transform.forward, out hit))
+
+        for (int i = 0; i < _currentWeapon.NumBulletsPerShot; i++)
         {
-            Collider target = hit.collider;
-            Vector3 location = hit.point;
-
-            GameObject targetGo = target.gameObject;
-
-            SpawnParticles(location, targetGo.tag != "Enemy" ? _hitGroundColor : _hitEnemyColor);
-            SpawnBulletTrail(location);
-
-            LifetimeComponent targetLifetime = targetGo.GetComponent<LifetimeComponent>();
-            if (targetLifetime != null)
+            RaycastHit hit;
+            Vector3 direction = transform.forward;
+            if (_currentWeapon.BulletSpreadAngle > 0)
             {
-                targetLifetime.ReceiveDamage(_currentWeapon.Damage);
+                float spreadX = (float) _random.NextDouble()*_currentWeapon.BulletSpreadAngle;
+                float spreadY = (float) _random.NextDouble()*_currentWeapon.BulletSpreadAngle;
+
+                direction.x += spreadX;
+                direction.y += spreadY;
             }
-        }
-        else
-        {
-            Vector3 target = transform.position + transform.forward * MaxBulletVisualRange;
-            SpawnBulletTrail(target);
+
+            if (Physics.Raycast(transform.position, direction, out hit))
+            {
+                Collider target = hit.collider;
+                Vector3 location = hit.point;
+
+                GameObject targetGo = target.gameObject;
+
+                SpawnParticles(location, targetGo.tag != "Enemy" ? _hitGroundColor : _hitEnemyColor);
+                SpawnBulletTrail(location);
+
+                LifetimeComponent targetLifetime = targetGo.GetComponent<LifetimeComponent>();
+                if (targetLifetime != null)
+                {
+                    targetLifetime.ReceiveDamage(_currentWeapon.Damage);
+                }
+            }
+            else
+            {
+                Vector3 target = transform.position + direction * MaxBulletVisualRange;
+                SpawnBulletTrail(target);
+            }
         }
     }
 

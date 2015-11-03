@@ -52,15 +52,19 @@ public class TutorialController : MonoBehaviour {
         UserGun.FiringEnabled = false;
 
         ForceSpawn forceSpawn = new ForceSpawn();
-        IWeapon weapon = WeaponSpawner.WeaponManager.GetWeapon(WeaponDatabase.Instance.Weapons[1]);
-        /*
-        ModularAmmo ammo = new ModularAmmo();
-        ammo.SetValues(weapon.BulletType, weapon.AvailableAmmo);
-        */
+        IWeapon weapon = WeaponSpawner.WeaponManager.GetWeapon(WeaponDatabase.Instance.Weapons[3]);
+        
         //forceSpawn.SetItem(ammo);
         forceSpawn.SetWeapon(weapon);
         forceSpawn.ContainsWeapon = true;
         forceSpawn.ContainsAmmo = false;
+        //*
+        ModularAmmo ammo = new ModularAmmo();
+        ammo.SetValues(weapon.BulletType, 50);
+        forceSpawn.SetAmmo(ammo);
+        forceSpawn.ContainsAmmo = true;
+        //*/
+
         WeaponSpawner.ForceSpawn = forceSpawn;
 
         _oldShellsInMagazine = UserGun.ShellsInMagazine;

@@ -112,7 +112,10 @@ public class WeaponManagerWindow : EditorWindow {
         AudioClip klickSound = weapon == null ? null : weapon.KlickSound;
         Texture bulletImage = weapon == null ? null : weapon.BulletImage;
         Texture weaponImage = weapon == null ? null : weapon.WeaponImage;
-        
+
+        float spreadAngle = weapon == null ? 0 : weapon.BulletSpreadAngle;
+        int numBulletsPerShot = weapon == null ? 1 : weapon.NumBulletsPerShot;
+
         GUILayout.BeginHorizontal();
         GUILayout.Label("Name");
         weaponName = GUILayout.TextField(weaponName);
@@ -166,20 +169,30 @@ public class WeaponManagerWindow : EditorWindow {
         GUILayout.BeginHorizontal();
         weaponImage = EditorGUILayout.ObjectField("Weapon image", weaponImage, typeof (Texture), false) as Texture;
         GUILayout.EndHorizontal();
-        
 
+        EditorGUILayout.Space();
+        EditorGUILayout.LabelField("Shooting settings");
+
+        GUILayout.BeginHorizontal();
+        spreadAngle = EditorGUILayout.FloatField("Spread angle", spreadAngle);
+        GUILayout.EndHorizontal();
+
+        GUILayout.BeginHorizontal();
+        numBulletsPerShot = EditorGUILayout.IntField("Bullets per shot", numBulletsPerShot);
+        GUILayout.EndHorizontal();
+        
+        
         GUILayout.BeginHorizontal();
         delete = GUILayout.Button("Delete");
         save = GUILayout.Button("Save");
         GUILayout.EndHorizontal();
-
+        
         if (weapon == null)
         {
             weapon = new Weapon();
         }
         weapon.SetValues(weaponName, damage, cooldownDelay, magazineSize, bulletType, initialAmmo, weaponModel,
-            shootSound, reloadSound, klickSound, bulletImage, weaponImage);
-
+            shootSound, reloadSound, klickSound, bulletImage, weaponImage, spreadAngle, numBulletsPerShot);
         return weapon;
     }
 }

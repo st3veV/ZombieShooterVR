@@ -9,11 +9,16 @@ public interface IWeapon
     string Name { get; }
     int AvailableAmmo { get; set; }
     GameObject WeaponModel { get; }
+
     AudioClip ShootSound { get; }
     AudioClip ReloadSound { get; }
     AudioClip KlickSound { get; }
+
     Texture BulletImage { get; }
     Texture WeaponImage { get; }
+
+    float BulletSpreadAngle { get; }
+    int NumBulletsPerShot { get; }
 }
 
 public interface IAmmo
