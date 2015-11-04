@@ -19,16 +19,18 @@ public class InventorySystem
     public void AddWeapon(IWeapon weapon)
     {
         bool firstWeapon = _availableWeapons.Count == 0;
+        bool newWeapon = false;
         if (_availableWeapons.IndexOf(weapon) == -1)
         {
             _availableWeapons.Add(weapon);
+            newWeapon = true;
         }
 
         if (firstWeapon)
         {
             SetWeapon(0);
         }
-        else if (weapon.Damage > _availableWeapons[_currentWeaponIndex].Damage)
+        else if (newWeapon && weapon.Damage > _availableWeapons[_currentWeaponIndex].Damage)
         {
             SetWeapon(_availableWeapons.IndexOf(weapon));
         }
