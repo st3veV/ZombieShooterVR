@@ -9,7 +9,6 @@ public class BulletTrail : MonoBehaviour
 
     private Vector3 _destination;
     private float _distance;
-    private const float AnimLength = .1f;
     private float _currentStep = 0;
 
     public Action<GameObject> OnDone;

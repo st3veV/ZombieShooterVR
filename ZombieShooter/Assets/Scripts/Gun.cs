@@ -95,9 +95,11 @@ public class Gun : MonoBehaviour {
             Vector3 direction = transform.forward;
             if (_currentWeapon.BulletSpreadAngle > 0)
             {
-                float spreadX = (float) _random.NextDouble()*_currentWeapon.BulletSpreadAngle;
-                float spreadY = (float) _random.NextDouble()*_currentWeapon.BulletSpreadAngle;
-
+                float spreadX = (float) _random.NextDouble()*(_currentWeapon.BulletSpreadAngle) -
+                                (_currentWeapon.BulletSpreadAngle/2);
+                float spreadY = (float)_random.NextDouble() * (_currentWeapon.BulletSpreadAngle) -
+                                (_currentWeapon.BulletSpreadAngle / 2);
+                //Debug.Log(string.Format("sx: {0}, sy: {1}", spreadX, spreadY));
                 direction.x += spreadX;
                 direction.y += spreadY;
             }
