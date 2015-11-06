@@ -14,6 +14,8 @@ public class GameOverController : MonoBehaviour
     private LifetimeComponent _playAgainLifetime;
     private LifetimeComponent _gotoTutorialLifetime;
 
+    private Gun UserGun;
+
     public event Action OnPlayAgain;
     public event Action OnGoToTutorial;
 
@@ -25,6 +27,8 @@ public class GameOverController : MonoBehaviour
     private void AssignReferences()
     {
         UserData = UserData.Instance;
+
+        UserGun = GameObject.Find("Gun").GetComponent<Gun>();
 
         Initialize();
     }
@@ -38,6 +42,8 @@ public class GameOverController : MonoBehaviour
         _gotoTutorialLifetime.OnDie += _gotoTutorialLifetime_OnDie;
 
         ScoreOutput.text = string.Format("Score: {0}", UserData.Score);
+
+        UserGun.SetFlashlightEnabled(false);
     }
 
     void _gotoTutorialLifetime_OnDie(LifetimeComponent obj)

@@ -13,6 +13,7 @@ public class Gun : MonoBehaviour {
 
     public GameObject ParticleBurst;
     public GameObject BulletTrail;
+    public GameObject Flashlight;
 
     public bool FiringEnabled;
 
@@ -99,7 +100,7 @@ public class Gun : MonoBehaviour {
                                 (_currentWeapon.BulletSpreadAngle/2);
                 float spreadY = (float)_random.NextDouble() * (_currentWeapon.BulletSpreadAngle) -
                                 (_currentWeapon.BulletSpreadAngle / 2);
-                //Debug.Log(string.Format("sx: {0}, sy: {1}", spreadX, spreadY));
+
                 direction.x += spreadX;
                 direction.y += spreadY;
             }
@@ -201,13 +202,7 @@ public class Gun : MonoBehaviour {
         }
         WeaponReload();
     }
-
-    protected virtual void Kick()
-    {
-        var handler = OnWeaponKick;
-        if (handler != null) handler();
-    }
-
+    
     public void SetWeapon(IWeapon weapon)
     {
         _currentWeapon = weapon;
@@ -244,14 +239,27 @@ public class Gun : MonoBehaviour {
         }
     }
 
+    public void Reset()
+    {
+    }
+
+    public void SetFlashlightEnabled(bool isEnabled)
+    {
+        Flashlight.SetActive(isEnabled);
+    }
+
+    #region Event invocators
+
+    protected virtual void Kick()
+    {
+        var handler = OnWeaponKick;
+        if (handler != null) handler();
+    }
+
     protected virtual void OnOnWeaponChange(IWeapon obj)
     {
         var handler = OnWeaponChange;
         if (handler != null) handler(obj);
-    }
-
-    public void Reset()
-    {
     }
 
     protected virtual void WeaponKlick()
@@ -271,4 +279,6 @@ public class Gun : MonoBehaviour {
         var handler = OnWeaponFire;
         if (handler != null) handler();
     }
+
+    #endregion
 }

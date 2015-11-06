@@ -138,12 +138,14 @@ BaseVRDevice
     {
         if (vrMode)
         {
-            //GL.IssuePluginEvent(0);
-            GL.IssuePluginEvent(IntPtr.Zero, 0);
+            GL.IssuePluginEvent(0);
+            //GL.IssuePluginEvent(IntPtr.Zero, 0);
             GL.InvalidateState();
         }
         ProcessEvents();
     }
+
+
 
     public override void OnApplicationQuit()
     {

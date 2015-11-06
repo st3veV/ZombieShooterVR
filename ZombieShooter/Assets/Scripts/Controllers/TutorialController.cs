@@ -50,6 +50,7 @@ public class TutorialController : MonoBehaviour {
         TutorialStep1();
         TutorialInstructionReoad.SetActive(false);
         UserGun.FiringEnabled = false;
+        UserGun.SetFlashlightEnabled(false);
 
         ForceSpawn forceSpawn = new ForceSpawn();
         IWeapon weapon = WeaponSpawner.WeaponManager.GetWeapon(WeaponDatabase.Instance.Weapons[3]);

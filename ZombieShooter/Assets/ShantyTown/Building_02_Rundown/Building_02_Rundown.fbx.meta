@@ -12,7 +12,11 @@ labels:
 ModelImporter:
   serializedVersion: 18
   fileIDToRecycleName:
+    100000: //RootNode
+    400000: //RootNode
+    2300000: //RootNode
     2800000: __AssetImporterPreview
+    3300000: //RootNode
     4300000: Bldg_02_Cloth
     4300002: Bldg_02_Brick
     4300004: Bldg_02_Concrete
@@ -27,8 +31,10 @@ ModelImporter:
     4300022: Bldg_02_Wood1
     4300024: pPlane1
     4300026: polySurface8
+    6400000: //RootNode
+    11100000: //RootNode
   materials:
-    importMaterials: 1
+    importMaterials: 0
     materialName: 3
     materialSearch: 1
   animations:
@@ -83,8 +89,10 @@ ModelImporter:
     legStretch: .0500000007
     feetSpacing: 0
     rootMotionBoneName: 
+    hasTranslationDoF: 0
   lastHumanDescriptionAvatarSource: {instanceID: 0}
   animationType: 1
+  humanoidOversampling: 1
   additionalBone: 0
   userData: 
   assetBundleName: 
