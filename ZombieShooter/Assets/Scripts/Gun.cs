@@ -24,8 +24,8 @@ public class Gun : MonoBehaviour {
 
     private GameObject _weaponContainer;
 
-    private readonly Color _hitGroundColor = new Color(0xDF, 0xD6, 0xB6, 0xFF);
-    private readonly Color _hitEnemyColor = new Color(0x68, 0x00, 0x00, 0xFF);
+    private readonly Color _hitGroundColor = new Color(0xDF, 0xD6, 0xB6, 0x55);
+    private readonly Color _hitEnemyColor = new Color(0x68, 0x00, 0x00, 0x55);
 
     private const float MaxBulletVisualRange = 20f;
 

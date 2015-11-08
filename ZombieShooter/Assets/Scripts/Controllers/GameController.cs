@@ -32,6 +32,7 @@ public class GameController : MonoBehaviour
         ZombieSpawner.IsSpawning = true;
 
         UserGun.SetFlashlightEnabled(true);
+        UserGun.FiringEnabled = true;
 
         WeaponSpawner.Reset();
         UserLifetime.OnDie += UserLifetime_OnDie;
@@ -45,9 +46,13 @@ public class GameController : MonoBehaviour
         OnOnGameEnded();
     }
 
+    #region Event invocators
+
     protected virtual void OnOnGameEnded()
     {
         var handler = OnGameEnded;
         if (handler != null) handler();
     }
+
+    #endregion
 }
