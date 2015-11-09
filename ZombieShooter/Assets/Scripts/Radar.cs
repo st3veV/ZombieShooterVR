@@ -82,7 +82,7 @@ public class Radar : MonoBehaviour
 	{
         //update camera transform
 	    Vector3 eulerAngles = LookAtGameObject.transform.rotation.eulerAngles;
-	    _helperTransform.rotation = Quaternion.Euler(0, eulerAngles.y - 180, 0);
+	    _helperTransform.rotation = Quaternion.Euler(90, eulerAngles.y, 0);
 	    ControlRotationGameObject.transform.rotation = _helperTransform.rotation;
 
         if (_trackedObjects.Length > 0)
