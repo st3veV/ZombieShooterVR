@@ -88,6 +88,8 @@ public class Inventory : MonoBehaviour
     private void Start()
     {
         //Debug.Log(("inventory.start"));
+        Myo = ThalmicHub.instance.GetComponentInChildren<ThalmicMyo>();
+
         InitInventory();
     }
 

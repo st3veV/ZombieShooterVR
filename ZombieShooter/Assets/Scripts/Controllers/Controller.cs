@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Thalmic.Myo;
 using UnityEngine;
 
 public class Controller : MonoBehaviour {
@@ -16,9 +17,9 @@ public class Controller : MonoBehaviour {
 	void Start ()
 	{
 	    SetDontDestroys();
-
-	    StartTutorial();
-	    //StartGame();
+        
+        //StartTutorial();
+        //StartGame();
 	}
 
     private void SetDontDestroys()

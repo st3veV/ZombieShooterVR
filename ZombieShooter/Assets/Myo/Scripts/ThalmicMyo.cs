@@ -46,40 +46,25 @@ public class ThalmicMyo : MonoBehaviour {
 
     // Vibrate the Myo with the provided type of vibration, e.g. VibrationType.Short or VibrationType.Medium.
     public void Vibrate (VibrationType type) {
-        if (_myo == null)
-            messageManager.Vibrate(type);
-        else
-            _myo.Vibrate(type);
+        _myo.Vibrate (type);
     }
 
     // Cause the Myo to unlock with the provided type of unlock. e.g. UnlockType.Timed or UnlockType.Hold.
     public void Unlock (UnlockType type) {
-        if (_myo == null)
-            messageManager.Unlock(type);
-        else
-            _myo.Unlock(type);
+        _myo.Unlock (type);
     }
 
     // Cause the Myo to re-lock immediately.
     public void Lock () {
-        if (_myo == null)
-            messageManager.Lock();
-        else
-            _myo.Lock ();
+        _myo.Lock ();
     }
 
     /// Notify the Myo that a user action was recognized.
     public void NotifyUserAction () {
-        if (_myo == null)
-            messageManager.NotifyUserAction();
-        else
-            _myo.NotifyUserAction();
+        _myo.NotifyUserAction ();
     }
 
     void Start() {
-#if UNITY_ANDROID
-        messageManager.Init();
-#endif
     }
 
     void Update() {
@@ -153,7 +138,7 @@ public class ThalmicMyo : MonoBehaviour {
         }
     }
 
-    public Thalmic.Myo.Myo internalMyo {
+    public Thalmic.Myo.IMyo internalMyo {
         get { return _myo; }
         set {
             if (_myo != null) {
@@ -180,14 +165,6 @@ public class ThalmicMyo : MonoBehaviour {
         }
     }
 
-    public void SetQuaternion(Thalmic.Myo.Quaternion quaternion)
-    {
-        lock(_lock)
-        {
-            _myoQuaternion = quaternion;
-        }
-    }
-
     private Object _lock = new Object();
 
     private bool _myoArmSynced = false;
@@ -199,25 +176,5 @@ public class ThalmicMyo : MonoBehaviour {
     private Pose _myoPose = Pose.Unknown;
     private bool _myoUnlocked = false;
 
-    private Thalmic.Myo.Myo _myo;
-
-    public MessageManager messageManager;
-
-    internal void SetArm(Arm arm)
-    {
-        lock(_lock)
-        {
-            Debug.Log("Setting arm: " + arm.ToString());
-            _myoArm = arm;
-        }
-    }
-
-    internal void SetDirection(XDirection xDirection)
-    {
-        lock(_lock)
-        {
-            Debug.Log("Setting direction: " + xDirection.ToString());
-            _myoXDirection = xDirection;
-        }
-    }
+    private Thalmic.Myo.IMyo _myo;
 }

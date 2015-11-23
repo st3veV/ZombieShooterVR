@@ -7,20 +7,20 @@ namespace Thalmic.Myo
 {
     public class MyoEventArgs : EventArgs
     {
-        public MyoEventArgs(Myo myo, DateTime timestamp)
+        public MyoEventArgs(IMyo myo, DateTime timestamp)
         {
             this.Myo = myo;
             this.Timestamp = timestamp;
         }
 
-        public Myo Myo { get; private set; }
+        public IMyo Myo { get; private set; }
 
         public DateTime Timestamp { get; private set; }
     }
 
     public class ArmSyncedEventArgs : MyoEventArgs
     {
-        public ArmSyncedEventArgs(Myo myo, DateTime timestamp, Arm arm, XDirection xDirection)
+        public ArmSyncedEventArgs(IMyo myo, DateTime timestamp, Arm arm, XDirection xDirection)
             : base(myo, timestamp)
         {
             this.Arm = arm;
@@ -33,7 +33,7 @@ namespace Thalmic.Myo
 
     public class AccelerometerDataEventArgs : MyoEventArgs
     {
-        public AccelerometerDataEventArgs(Myo myo, DateTime timestamp, Vector3 accelerometer)
+        public AccelerometerDataEventArgs(IMyo myo, DateTime timestamp, Vector3 accelerometer)
             : base(myo, timestamp)
         {
             this.Accelerometer = accelerometer;
@@ -44,7 +44,7 @@ namespace Thalmic.Myo
 
     public class GyroscopeDataEventArgs : MyoEventArgs
     {
-        public GyroscopeDataEventArgs(Myo myo, DateTime timestamp, Vector3 gyroscope)
+        public GyroscopeDataEventArgs(IMyo myo, DateTime timestamp, Vector3 gyroscope)
             : base(myo, timestamp)
         {
             this.Gyroscope = gyroscope;
@@ -55,7 +55,7 @@ namespace Thalmic.Myo
 
     public class OrientationDataEventArgs : MyoEventArgs
     {
-        public OrientationDataEventArgs(Myo myo, DateTime timestamp, Quaternion orientation)
+        public OrientationDataEventArgs(IMyo myo, DateTime timestamp, Quaternion orientation)
             : base(myo, timestamp)
         {
             this.Orientation = orientation;
@@ -66,7 +66,7 @@ namespace Thalmic.Myo
 
     public class PoseEventArgs : MyoEventArgs
     {
-        public PoseEventArgs(Myo myo, DateTime timestamp, Pose pose)
+        public PoseEventArgs(IMyo myo, DateTime timestamp, Pose pose)
             : base(myo, timestamp)
         {
             this.Pose = pose;
@@ -77,7 +77,7 @@ namespace Thalmic.Myo
 
     public class RssiEventArgs : MyoEventArgs
     {
-        public RssiEventArgs(Myo myo, DateTime timestamp, sbyte rssi)
+        public RssiEventArgs(IMyo myo, DateTime timestamp, sbyte rssi)
             : base(myo, timestamp)
         {
             this.Rssi = rssi;

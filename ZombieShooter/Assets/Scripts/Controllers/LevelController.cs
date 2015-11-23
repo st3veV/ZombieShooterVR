@@ -35,10 +35,11 @@ public class LevelController : MonoBehaviour
 
 public enum Scene
 {
-    Init = 0,//loaded automatically and continues to Tutorial
-    Tutorial = 1,
-    Game = 2,
-    GameOver = 3
+    Setup = 0,
+    Init = 1,//loaded automatically and continues to Tutorial
+    Tutorial = 2,
+    Game = 3,
+    GameOver = 4
 }
 
 
@@ -63,5 +64,13 @@ public class GameOverSceneLoader : LevelController
     public GameOverSceneLoader()
     {
         SceneToLoad = Scene.GameOver;
+    }
+}
+
+public class InitSceneLoader : LevelController
+{
+    public InitSceneLoader()
+    {
+        SceneToLoad = Scene.Init;
     }
 }

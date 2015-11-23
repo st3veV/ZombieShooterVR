@@ -5,7 +5,8 @@ using UnityEditor;
 #endif
 
 using System.Collections.Generic;
-
+using Thalmic.Myo;
+using Thalmic.Myo.MyoAndroid;
 using LockingPolicy = Thalmic.Myo.LockingPolicy;
 
 // Allows access to one or more Myo armbands, which must be immediate children of the GameObject this script is attached
@@ -49,14 +50,7 @@ public class ThalmicHub : MonoBehaviour
             }
         }
 #if UNITY_ANDROID && !UNITY_EDITOR
-        AndroidJavaClass unityPlayerClass = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
-        var unityActivity = unityPlayerClass.GetStatic<AndroidJavaObject>("currentActivity");
-
-        // The Hub needs to be initialized on the Android UI thread.
-        unityActivity.Call("runOnUiThread", new AndroidJavaRunnable(() => {
-            createHub();
-        }));
-        return true; // Return true assuming the hub constructor will succeed. Debug.Log if it fails.
+        return true;
 #else
         return createHub();
 #endif
@@ -98,31 +92,51 @@ public class ThalmicHub : MonoBehaviour
             throw new UnityException (errorMessage);
 #endif
         }
-        
+
+#if !UNITY_ANDROID || UNITY_EDITOR
+        createHub();
+#endif
+    }
+    
+    public void Init()
+    {
 #if UNITY_ANDROID && !UNITY_EDITOR
-        /*
-        AndroidJavaClass unityPlayerClass = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
-        var unityActivity = unityPlayerClass.GetStatic<AndroidJavaObject>("currentActivity");
-        var applicationContext = unityActivity.Call<AndroidJavaObject>("getApplicationContext");
+        createAndroidListener();
+#endif
+    }
 
-        // Need to pass the Android Application Context to the Myo Android plugin before initializing the Hub.
-        AndroidJavaClass nativeEventsClass = new AndroidJavaClass("com.thalmic.myo.NativeEvents");
-        nativeEventsClass.CallStatic("setApplicationContext", applicationContext);
+    private GameObject _androidListener;
 
-        // The Hub needs to be initialized on the Android UI thread.
-        unityActivity.Call("runOnUiThread", new AndroidJavaRunnable(() => {
-            createHub ();
-        }));
-        */
+    private void createAndroidListener()
+    {
+        _androidListener = new GameObject("MyoAndroidListener");
+        
+        var androidMyoConnector = _androidListener.AddComponent<AndroidMyoConnector>();
+        androidMyoConnector.Init(applicationIdentifier,
+#if DEBUG 
+        true
 #else
-        createHub ();
+        false
+#endif
+        );
+        androidMyoConnector.MyoConnected += AndroidMyoConnector_MyoConnected;
+        androidMyoConnector.ShowScanActivity();
+    }
+
+    private void AndroidMyoConnector_MyoConnected(object sender, MyoEventArgs e)
+    {
+        var androidMyo = _androidListener.AddComponent<AndroidMyo>();
+        _myos[0].internalMyo = androidMyo;
+#if DEBUG
+        androidMyo.Init(true);
+#else
+        androidMyo.Init(false);
 #endif
     }
 
     private bool createHub () {
         try {
             _hub = new Thalmic.Myo.Hub (applicationIdentifier, hub_MyoPaired);
-
             _hub.SetLockingPolicy (lockingPolicy);
         } catch (System.Exception) {
             Debug.Log ("ThalmicHub failed to initialize.");

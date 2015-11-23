@@ -27,6 +27,7 @@ namespace Thalmic.Myo
                 Paired += OnPaired;
             }
 
+#if !UNITY_ANDROID || UNITY_EDITOR
             if (libmyo.init_hub(out _handle, applicationIdentifier, IntPtr.Zero) != libmyo.Result.Success)
             {
                 throw new InvalidOperationException("Unable to initialize Hub.");
@@ -34,6 +35,7 @@ namespace Thalmic.Myo
 
             // spawn the event thread
             StartEventThread();
+#endif
         }
 
         // Deterministic destructor
@@ -47,6 +49,7 @@ namespace Thalmic.Myo
         {
             if (!_disposed)
             {
+#if !UNITY_ANDROID || UNITY_EDITOR
                 StopEventThread();
 
                 if (disposing)
@@ -56,7 +59,7 @@ namespace Thalmic.Myo
 
                 // free unmanaged objects
                 libmyo.shutdown_hub(_handle, IntPtr.Zero);
-
+#endif
                 _disposed = true;
             }
         }
@@ -69,7 +72,9 @@ namespace Thalmic.Myo
 
         public void SetLockingPolicy(LockingPolicy lockingPolicy)
         {
+#if !UNITY_ANDROID || UNITY_EDITOR
             libmyo.set_locking_policy(_handle, (libmyo.LockingPolicy)lockingPolicy, IntPtr.Zero);
+#endif
         }
 
         public event EventHandler<MyoEventArgs> Paired;
@@ -89,22 +94,24 @@ namespace Thalmic.Myo
                 _eventThread.Join();
             }
         }
-
+        
         private void EventThreadFn()
         {
+#if !UNITY_ANDROID || UNITY_EDITOR
             while (!_eventThreadShutdown)
             {
                 GCHandle gch = GCHandle.Alloc(this);
 
                 libmyo.run(_handle, 1000, (libmyo.Handler)HandleEvent, (IntPtr)gch, IntPtr.Zero);
             }
+#endif
         }
 
         private static libmyo.HandlerResult HandleEvent(IntPtr userData, IntPtr evt)
         {
             GCHandle handle = (GCHandle)userData;
             Hub self = (Hub)handle.Target;
-
+#if !UNITY_ANDROID || UNITY_EDITOR
             var type = libmyo.event_get_type(evt);
             var timestamp = TIMESTAMP_EPOCH.AddMilliseconds(libmyo.event_get_timestamp(evt) / 1000);
             var myoHandle = libmyo.event_get_myo(evt);
@@ -125,7 +132,7 @@ namespace Thalmic.Myo
                     self._myos[myoHandle].HandleEvent(type, timestamp, evt);
                     break;
             }
-
+#endif
             return libmyo.HandlerResult.Continue;
         }
     }

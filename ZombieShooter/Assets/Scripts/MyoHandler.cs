@@ -31,7 +31,9 @@ public class MyoHandler : MonoBehaviour
     {
         gunInternal = gun.GetComponent<Gun>();
         gunInternal.OnWeaponKick += gunInternal_OnWeaponKick;
-        thalmicMyo = myo.GetComponent<ThalmicMyo>();
+        
+        thalmicMyo = ThalmicHub.instance.GetComponentInChildren<ThalmicMyo>();//myo.GetComponent<ThalmicMyo>();
+        myo = thalmicMyo.gameObject;
     }
 
     void gunInternal_OnWeaponKick()

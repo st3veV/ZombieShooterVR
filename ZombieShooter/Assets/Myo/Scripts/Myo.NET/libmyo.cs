@@ -10,22 +10,13 @@ namespace Thalmic.Myo
     {
 #if UNITY_STANDALONE || UNITY_EDITOR
         private const string MYO_DLL = "myo";
-#elif UNITY_ANDROID
-        private const string MYO_DLL = "myo-android";
 #elif WIN64
         private const string MYO_DLL = "myo64.dll";
 #elif WIN32
         private const string MYO_DLL = "myo32.dll";
 #endif
 
-        public enum Result
-        {
-            Success,
-            Error,
-            ErrorInvalidArgument,
-            ErrorRuntime
-        }
-
+#if UNITY_STANDALONE || UNITY_EDITOR || WIN64 || WIN32
         [DllImport(MYO_DLL,
                    EntryPoint = "libmyo_error_cstring",
                    CallingConvention = CallingConvention.Cdecl)]
@@ -51,23 +42,10 @@ namespace Thalmic.Myo
                    CallingConvention = CallingConvention.Cdecl)]
         public static extern Result shutdown_hub(IntPtr hub, IntPtr error);
 
-        public enum LockingPolicy
-        {
-            None,
-            Standard
-        }
-
         [DllImport(MYO_DLL,
                    EntryPoint = "libmyo_set_locking_policy",
                    CallingConvention = CallingConvention.Cdecl)]
         public static extern Result set_locking_policy(IntPtr hub, LockingPolicy lockingPolicy, IntPtr error);
-
-        public enum VibrationType
-        {
-            Short,
-            Medium,
-            Long
-        }
 
         [DllImport(MYO_DLL,
                    EntryPoint = "libmyo_vibrate",
@@ -79,23 +57,6 @@ namespace Thalmic.Myo
                    CallingConvention = CallingConvention.Cdecl)]
         public static extern void request_rssi(IntPtr myo, IntPtr error);
 
-        public enum PoseType
-        {
-            Rest = 0,
-            Fist = 1,
-            WaveIn = 2,
-            WaveOut = 3,
-            FingersSpread = 4,
-            DoubleTap = 5,
-            Unknown = 0xffff
-        }
-
-        public enum UnlockType
-        {
-            Timed = 0,
-            Hold = 1
-        }
-
         [DllImport(MYO_DLL,
                    EntryPoint = "libmyo_myo_unlock",
                    CallingConvention = CallingConvention.Cdecl)]
@@ -106,30 +67,10 @@ namespace Thalmic.Myo
                    CallingConvention = CallingConvention.Cdecl)]
         public static extern void myo_lock(IntPtr myo, IntPtr error);
 
-        public enum UserActionType
-        {
-            Single = 0
-        }
-
         [DllImport(MYO_DLL,
                    EntryPoint = "libmyo_myo_notify_user_action",
                    CallingConvention = CallingConvention.Cdecl)]
         public static extern void myo_notify_user_action(IntPtr myo, UserActionType type, IntPtr error);
-
-        public enum EventType
-        {
-            Paired,
-            Unpaired,
-            Connected,
-            Disconnected,
-            ArmSynced,
-            ArmUnsynced,
-            Orientation,
-            Pose,
-            Rssi,
-            Unlocked,
-            Locked
-        }
 
         [DllImport(MYO_DLL,
                    EntryPoint = "libmyo_event_get_type",
@@ -146,47 +87,20 @@ namespace Thalmic.Myo
                    CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr event_get_myo(IntPtr evt);
 
-        public enum VersionComponent
-        {
-            Major,
-            Minor,
-            Patch
-        }
-
         [DllImport(MYO_DLL,
                    EntryPoint = "libmyo_event_get_firmware_version",
                    CallingConvention = CallingConvention.Cdecl)]
         public static extern uint event_get_firmware_version(IntPtr evt, VersionComponent component);
-
-        public enum Arm {
-            Right,
-            Left,
-            Unknown
-        }
 
         [DllImport(MYO_DLL,
                    EntryPoint = "libmyo_event_get_arm",
                    CallingConvention = CallingConvention.Cdecl)]
         public static extern Arm event_get_arm(IntPtr evt);
 
-        public enum XDirection {
-            TowardWrist,
-            TowardElbow,
-            Unknown
-        }
-
         [DllImport(MYO_DLL,
                    EntryPoint = "libmyo_event_get_x_direction",
                    CallingConvention = CallingConvention.Cdecl)]
         public static extern XDirection event_get_x_direction(IntPtr evt);
-
-        public enum OrientationIndex
-        {
-            X = 0,
-            Y = 1,
-            Z = 2,
-            W = 3
-        }
 
         [DllImport(MYO_DLL,
                    EntryPoint = "libmyo_event_get_orientation",
@@ -213,12 +127,6 @@ namespace Thalmic.Myo
                    CallingConvention = CallingConvention.Cdecl)]
         public static extern sbyte event_get_rssi(IntPtr evt);
 
-        public enum HandlerResult
-        {
-            Continue,
-            Stop
-        }
-
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate HandlerResult Handler(IntPtr userData, IntPtr evt);
 
@@ -226,5 +134,99 @@ namespace Thalmic.Myo
                    EntryPoint = "libmyo_run",
                    CallingConvention = CallingConvention.Cdecl)]
         public static extern Result run(IntPtr hub, uint durationMs, Handler handler, IntPtr userData, IntPtr error);
+#endif
+
+        public enum Result
+        {
+            Success,
+            Error,
+            ErrorInvalidArgument,
+            ErrorRuntime
+        }
+
+        public enum LockingPolicy
+        {
+            None,
+            Standard
+        }
+
+        public enum VibrationType
+        {
+            Short,
+            Medium,
+            Long
+        }
+
+        public enum PoseType
+        {
+            Rest = 0,
+            Fist = 1,
+            WaveIn = 2,
+            WaveOut = 3,
+            FingersSpread = 4,
+            DoubleTap = 5,
+            Unknown = 0xffff
+        }
+
+        public enum UnlockType
+        {
+            Timed = 0,
+            Hold = 1
+        }
+
+        public enum UserActionType
+        {
+            Single = 0
+        }
+
+        public enum EventType
+        {
+            Paired,
+            Unpaired,
+            Connected,
+            Disconnected,
+            ArmSynced,
+            ArmUnsynced,
+            Orientation,
+            Pose,
+            Rssi,
+            Unlocked,
+            Locked
+        }
+
+        public enum Arm
+        {
+            Right,
+            Left,
+            Unknown
+        }
+
+        public enum VersionComponent
+        {
+            Major,
+            Minor,
+            Patch
+        }
+
+        public enum XDirection
+        {
+            TowardWrist,
+            TowardElbow,
+            Unknown
+        }
+
+        public enum OrientationIndex
+        {
+            X = 0,
+            Y = 1,
+            Z = 2,
+            W = 3
+        }
+
+        public enum HandlerResult
+        {
+            Continue,
+            Stop
+        }
     }
 }
