@@ -18,7 +18,7 @@ public class Controller : MonoBehaviour {
 	{
 	    SetDontDestroys();
         
-        //StartTutorial();
+        StartTutorial();
         //StartGame();
 	}
 
