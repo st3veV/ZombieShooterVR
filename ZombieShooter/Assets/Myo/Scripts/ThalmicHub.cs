@@ -110,7 +110,8 @@ public class ThalmicHub : MonoBehaviour
     private void createAndroidListener()
     {
         _androidListener = new GameObject("MyoAndroidListener");
-        
+        _androidListener.transform.SetParent(gameObject.transform);
+
         var androidMyoConnector = _androidListener.AddComponent<AndroidMyoConnector>();
         androidMyoConnector.Init(applicationIdentifier,
 #if DEBUG 
