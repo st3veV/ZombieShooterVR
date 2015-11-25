@@ -1,36 +1,48 @@
 ﻿using System;
 using UnityEngine;
 
-public class LevelController : MonoBehaviour
+public class LevelController : Singleton<LevelController>
 {
     public event Action OnSceneLoaded;
 
-    public Scene SceneToLoad { get; set; }
-
-    private bool loaded = false;
-
-    public void Start()
+    private enum LoadingState
     {
-        Scene scene = SceneToLoad;
-        Application.LoadLevel((int) scene);
+        Idle,
+        Loading,
+        Loaded
     }
 
+    private LoadingState _state = LoadingState.Idle;
+    
     void Update()
     {
-        if(loaded)
+        if (_state == LoadingState.Loaded)
+        {
             OnOnSceneLoaded();
+            _state = LoadingState.Idle;
+        }
+    }
+
+    public void LoadScene(Scene scene)
+    {
+        _state = LoadingState.Loading;
+        Application.LoadLevel((int)scene);
     }
 
     void OnLevelWasLoaded()
     {
-        loaded = true;
+        _state = LoadingState.Loaded;
     }
+
+    #region Event invocators
 
     protected void OnOnSceneLoaded()
     {
         var handler = OnSceneLoaded;
         if (handler != null) handler();
     }
+
+    #endregion
 }
 
 public enum Scene
@@ -40,37 +52,4 @@ public enum Scene
     Tutorial = 2,
     Game = 3,
     GameOver = 4
-}
-
-
-public class TutorialSceneLoader : LevelController
-{
-    public TutorialSceneLoader()
-    {
-        SceneToLoad = Scene.Tutorial;
-    }
-}
-
-public class GameSceneLoader : LevelController
-{
-    public GameSceneLoader()
-    {
-        SceneToLoad = Scene.Game;
-    }
-}
-
-public class GameOverSceneLoader : LevelController
-{
-    public GameOverSceneLoader()
-    {
-        SceneToLoad = Scene.GameOver;
-    }
-}
-
-public class InitSceneLoader : LevelController
-{
-    public InitSceneLoader()
-    {
-        SceneToLoad = Scene.Init;
-    }
 }

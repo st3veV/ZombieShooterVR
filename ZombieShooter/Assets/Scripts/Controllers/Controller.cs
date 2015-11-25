@@ -2,22 +2,29 @@
 using Thalmic.Myo;
 using UnityEngine;
 
-public class Controller : MonoBehaviour {
-
+public class Controller : Singleton<Controller>
+{
     private TutorialController TutorialController;
     private GameController GameController;
     private GameOverController GameOverController;
 
     public List<GameObject> DontDestroyGameObjects;
-
-    public GameObject loader;
+    
+    private LevelController levelController;
 
     public UserController UserController;
 
-	void Start ()
+    public Controller()
+    {
+        instance = this;
+    }
+
+    void Start ()
 	{
 	    SetDontDestroys();
-        
+
+        levelController = LevelController.Instance;
+
         StartTutorial();
         //StartGame();
 	}
@@ -33,16 +40,14 @@ public class Controller : MonoBehaviour {
     private void StartTutorial()
     {
         Debug.Log("Starting tutorial");
-        loader = new GameObject("loader");
-        DontDestroyOnLoad(loader);
-        TutorialSceneLoader tutorialSceneLoader = loader.AddComponent<TutorialSceneLoader>();
-        tutorialSceneLoader.OnSceneLoaded += tutorialSceneLoader_OnSceneLoaded;
+        levelController.OnSceneLoaded += tutorialSceneLoader_OnSceneLoaded;
+        levelController.LoadScene(Scene.Tutorial);
     }
 
     void tutorialSceneLoader_OnSceneLoaded()
     {
         Debug.Log("Tutorial scene loaded");
-        Destroy(loader);
+        levelController.OnSceneLoaded -= tutorialSceneLoader_OnSceneLoaded;
         GameObject tutController = GameObject.Find("TutorialController");
         TutorialController = tutController.GetComponent<TutorialController>();
         TutorialController.OnTutorialComplete += TutorialController_OnTutorialComplete;
@@ -60,15 +65,13 @@ public class Controller : MonoBehaviour {
     private void StartGame()
     {
         Debug.Log("Starting game");
-        loader = new GameObject("loader");
-        DontDestroyOnLoad(loader);
-        GameSceneLoader gameSceneLoader = loader.AddComponent<GameSceneLoader>();
-        gameSceneLoader.OnSceneLoaded += gameSceneLoader_OnSceneLoaded;
+        levelController.OnSceneLoaded += gameSceneLoader_OnSceneLoaded;
+        levelController.LoadScene(Scene.Game);
     }
 
     void gameSceneLoader_OnSceneLoaded()
     {
-        Destroy(loader);
+        levelController.OnSceneLoaded -= gameSceneLoader_OnSceneLoaded;
         GameObject gController = GameObject.Find("GameController");
         GameController = gController.GetComponent<GameController>();
         GameController.OnGameEnded += GameController_OnGameEnded;
@@ -85,15 +88,13 @@ public class Controller : MonoBehaviour {
     private void GameOver()
     {
         Debug.Log("Game over");
-        loader = new GameObject("loader");
-        DontDestroyOnLoad(loader);
-        GameOverSceneLoader gameOverSceneLoader = loader.AddComponent<GameOverSceneLoader>();
-        gameOverSceneLoader.OnSceneLoaded += gameOverSceneLoader_OnSceneLoaded;
+        levelController.OnSceneLoaded += gameOverSceneLoader_OnSceneLoaded;
+        levelController.LoadScene(Scene.GameOver);
     }
 
     void gameOverSceneLoader_OnSceneLoaded()
     {
-        Destroy(loader);
+        levelController.OnSceneLoaded -= gameOverSceneLoader_OnSceneLoaded;
         GameObject goController = GameObject.Find("GameOverController");
         GameOverController = goController.GetComponent<GameOverController>();
         GameOverController.OnPlayAgain += GameOverController_OnPlayAgain;

@@ -104,9 +104,8 @@ namespace Controllers
         {
             StartingText.gameObject.SetActive(true);
             yield return new WaitForSeconds(5);
-            loader = new GameObject("loader");
-            DontDestroyOnLoad(loader);
-            loader.AddComponent<InitSceneLoader>();
+            LevelController levelController = LevelController.Instance;
+            levelController.LoadScene(Scene.Init);
         }
     }
 }
