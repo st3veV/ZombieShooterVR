@@ -13,6 +13,7 @@ namespace Controllers
 
         public Text HeadingText;
         public Text ConnectText;
+        public Button ConnectButton;
         public Button StartButton;
         public Text InCardboardText;
         public Button InCardboardButton;
@@ -32,8 +33,8 @@ namespace Controllers
             }
             else
             {
-                ThalmicHub.instance.Init();
-                waitingForMyo = true;
+                ConnectButton.gameObject.SetActive(true);
+                ConnectButton.onClick.AddListener(OnConnectClick);
             }
         }
 
@@ -49,9 +50,17 @@ namespace Controllers
             }
         }
 
+        private void OnConnectClick()
+        {
+            ThalmicHub.instance.Init();
+            waitingForMyo = true;
+        }
+
         private void Synced()
         {
             Debug.Log("synced");
+            ConnectButton.onClick.RemoveAllListeners();
+            Destroy(ConnectButton.gameObject);
             ConnectText.color = Color.green;
             AddToCardboard();
         }
