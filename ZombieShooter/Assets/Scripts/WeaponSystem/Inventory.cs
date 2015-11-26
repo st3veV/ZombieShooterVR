@@ -81,23 +81,23 @@ public class InventorySystem
 public class Inventory : MonoBehaviour
 {
     public Gun UserGun;
-    public ThalmicMyo Myo;
     private InventorySystem _inventory;
     private Pose _currentPose;
+    private ThalmicMyo _myo;
 
     private void Start()
     {
         //Debug.Log(("inventory.start"));
-        Myo = ThalmicHub.instance.GetComponentInChildren<ThalmicMyo>();
+        _myo = ThalmicHub.instance.GetComponentInChildren<ThalmicMyo>();
 
         InitInventory();
     }
 
     private void Update()
     {
-        if (_currentPose != Myo.pose)
+        if (_currentPose != _myo.pose)
         {
-            _currentPose = Myo.pose;
+            _currentPose = _myo.pose;
             switch (_currentPose)
             {
                 case Pose.WaveIn:

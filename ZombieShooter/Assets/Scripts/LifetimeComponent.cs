@@ -4,20 +4,21 @@ using UnityEngine;
 public class LifetimeComponent : MonoBehaviour {
 
     public float LifetimeDamage = 100f;
-    private float OriginalHealth;
     public event Action<LifetimeComponent> OnDie;
     public event Action<float> OnDamage;
     public bool Autodestroy = true;
 
+    private float _originalHealth;
+
     public float CurrentHealthPercentage
     {
-        get { return LifetimeDamage/OriginalHealth; }
+        get { return LifetimeDamage/_originalHealth; }
     }
 
     // Use this for initialization
     void Start ()
     {
-        OriginalHealth = LifetimeDamage;
+        _originalHealth = LifetimeDamage;
     }
     
     // Update is called once per frame
@@ -46,6 +47,6 @@ public class LifetimeComponent : MonoBehaviour {
 
     public void Reset()
     {
-        LifetimeDamage = OriginalHealth;
+        LifetimeDamage = _originalHealth;
     }
 }

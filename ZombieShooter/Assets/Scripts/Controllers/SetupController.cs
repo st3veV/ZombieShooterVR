@@ -19,7 +19,6 @@ namespace Controllers
         public Button InCardboardButton;
         public Text StartingText;
         
-
         void Start()
         {
             StartButton.enabled = false;

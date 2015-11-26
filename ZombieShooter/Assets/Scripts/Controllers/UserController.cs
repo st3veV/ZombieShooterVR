@@ -8,7 +8,7 @@ public class UserController : MonoBehaviour
     public Gun UserGun;
 
 	void Start () {
-	
+	    
 	}
 	
 	void Update () {

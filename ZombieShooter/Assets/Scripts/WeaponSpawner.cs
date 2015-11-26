@@ -14,7 +14,7 @@ public class WeaponSpawner : MonoBehaviour {
 
     private Pool<GameObject> targetPool;
 
-    public WeaponDatabase WeaponDatabase;
+    private WeaponDatabase _weaponDatabase;
     public WeaponManager WeaponManager;
 
     public ForceSpawn ForceSpawn;
@@ -22,7 +22,7 @@ public class WeaponSpawner : MonoBehaviour {
 	void Start ()
 	{
 
-	    WeaponDatabase = WeaponDatabase.Instance;
+	    _weaponDatabase = WeaponDatabase.Instance;
         ZombieSpawner.OnZombieSpawned += ZombieSpawner_OnZombieSpawned;
 
         WeaponManager = WeaponManager.Instance;
@@ -69,9 +69,9 @@ public class WeaponSpawner : MonoBehaviour {
         else
         {
             //select the weapon
-            int index = (int) (WeaponDatabase.Weapons.Count*Random.value);
+            int index = (int) (_weaponDatabase.Weapons.Count*Random.value);
 
-            IWeapon newWeapon = WeaponManager.GetWeapon(WeaponDatabase.Weapons[index]);
+            IWeapon newWeapon = WeaponManager.GetWeapon(_weaponDatabase.Weapons[index]);
 
             pickable = new Pickable();
             pickable.SetWeapon(newWeapon);

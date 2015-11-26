@@ -130,8 +130,9 @@ public class Radar : MonoBehaviour
         bool needsAvatar = false;
         Transform avatarParent;
         List<GameObject> destroyedObjects = new List<GameObject>();
-        foreach (GameObject o in _trackedObjects)
+        for (int i = 0; i < _trackedObjects.Length; i++)
         {
+            GameObject o = _trackedObjects[i];
             if (o == null)
             {
                 destroyedObjects.Add(o);
@@ -166,8 +167,9 @@ public class Radar : MonoBehaviour
         }
         if (destroyedObjects.Count > 0)
         {
-            foreach (GameObject destroyedObject in destroyedObjects)
+            for (int i = 0; i < destroyedObjects.Count; i++)
             {
+                GameObject destroyedObject = destroyedObjects[i];
                 resetAvatar(destroyedObject);
             }
             UpdateTrackedObjectsSet();

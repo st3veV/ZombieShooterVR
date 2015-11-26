@@ -30,7 +30,7 @@ public class Gun : MonoBehaviour {
     private const float MaxBulletVisualRange = 20f;
 
     private Random _random;
-    // Use this for initialization
+
     void Awake ()
     {
         _timer = new InternalTimer();
@@ -39,8 +39,7 @@ public class Gun : MonoBehaviour {
         
         _random = new Random();
     }
-
-    // Update is called once per frame
+    
     void Update () {
         if (_isFiring)
         {
@@ -61,15 +60,17 @@ public class Gun : MonoBehaviour {
         if (_runningSystems.Count > 0)
         {
             List<ParticleSystem> toRemove = new List<ParticleSystem>();
-            foreach (ParticleSystem system in _runningSystems)
+            for (int i = 0; i < _runningSystems.Count; i++)
             {
+                ParticleSystem system = _runningSystems[i];
                 if (system == null || !system.isPlaying)
                 {
                     toRemove.Add(system);
                 }
             }
-            foreach (ParticleSystem system in toRemove)
+            for (int i = 0; i < toRemove.Count; i++)
             {
+                ParticleSystem system = toRemove[i];
                 _runningSystems.Remove(system);
                 if (system != null)
                 {

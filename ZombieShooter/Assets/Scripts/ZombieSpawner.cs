@@ -9,13 +9,13 @@ public class ZombieSpawner : MonoBehaviour {
     public Transform ZombieTarget;
     public Transform SpawnPoint;
     public LifetimeComponent AttactTarget;
-    public UserDataComponent UserData;
     
     public float Diameter = 0f;
     public float ZombieDamage = BalancingData.ZOMBIE_DAMAGE;
 
     public event Action<GameObject> OnZombieSpawned;
 
+    private UserData _userData;
     private InternalTimer _timer;
     public float SpawnInterval = BalancingData.ZOMBIE_SPAWN_INTERVAL_INITIAL;
 
@@ -25,6 +25,7 @@ public class ZombieSpawner : MonoBehaviour {
 
 	void Start () {
         Debug.Log("Start");
+	    _userData = UserData.Instance;
         if (SpawnPoint == null)
         {
             SpawnPoint = gameObject.transform;
@@ -100,7 +101,7 @@ public class ZombieSpawner : MonoBehaviour {
         lifetimeComponent.gameObject.GetComponent<ThirdPersonCharacter>().Die(DisposeZombie);
 
         //deal with score
-        UserData.IncreaseScore(BalancingData.SCORE_FOR_ZOMBIE);
+        _userData.IncreaseScore(BalancingData.SCORE_FOR_ZOMBIE);
         SpawnInterval -= BalancingData.ZOMBIE_SPAWN_INTERVAL_DECREASE;
         if (SpawnInterval < BalancingData.ZOMBIE_SPAWN_INTERVAL_MINIMUM)
         {

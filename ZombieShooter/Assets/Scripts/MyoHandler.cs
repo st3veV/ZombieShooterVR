@@ -7,11 +7,10 @@ using Vector3 = UnityEngine.Vector3;
 
 public class MyoHandler : MonoBehaviour
 {
-    public GameObject myo = null;
-    private ThalmicMyo thalmicMyo;
-
-    public GameObject gun;
-    private Gun gunInternal;
+    private GameObject _myo = null;
+    private ThalmicMyo _thalmicMyo;
+    
+    public Gun Gun;
 
     public List<GameObject> HandSideOffsetUpdate = new List<GameObject>();
 
@@ -29,36 +28,35 @@ public class MyoHandler : MonoBehaviour
 
     private void Start()
     {
-        gunInternal = gun.GetComponent<Gun>();
-        gunInternal.OnWeaponKick += gunInternal_OnWeaponKick;
+        Gun.OnWeaponKick += GunOnWeaponKick;
         
-        thalmicMyo = ThalmicHub.instance.GetComponentInChildren<ThalmicMyo>();//myo.GetComponent<ThalmicMyo>();
-        myo = thalmicMyo.gameObject;
+        _thalmicMyo = ThalmicHub.instance.GetComponentInChildren<ThalmicMyo>();//myo.GetComponent<ThalmicMyo>();
+        _myo = _thalmicMyo.gameObject;
     }
 
-    void gunInternal_OnWeaponKick()
+    void GunOnWeaponKick()
     {
-        thalmicMyo.NotifyUserAction();
+        _thalmicMyo.NotifyUserAction();
     }
 
     void Update ()
     {
         //move hand to the side to properly simulate hand position
-        if (thalmicMyo.arm != _lastArm)
+        if (_thalmicMyo.arm != _lastArm)
         {
-            _lastArm = thalmicMyo.arm;
+            _lastArm = _thalmicMyo.arm;
             UpdateHandOffsetPosition();
         }
 
         bool updateReference = false;
-        if (thalmicMyo.pose != _lastPose) {
-            _lastPose = thalmicMyo.pose;
+        if (_thalmicMyo.pose != _lastPose) {
+            _lastPose = _thalmicMyo.pose;
 
-            if (thalmicMyo.pose == Pose.FingersSpread) {
+            if (_thalmicMyo.pose == Pose.FingersSpread) {
             //if (thalmicMyo.pose == Pose.DoubleTap) {
                 updateReference = true;
 
-                ExtendUnlockAndNotifyUserAction(thalmicMyo);
+                ExtendUnlockAndNotifyUserAction(_thalmicMyo);
                 MyoReset();
             }
         }
@@ -68,28 +66,28 @@ public class MyoHandler : MonoBehaviour
 
         if (updateReference) {
             _antiYaw = Quaternion.FromToRotation (
-                new Vector3(myo.transform.forward.x, 0, myo.transform.forward.z),
+                new Vector3(_myo.transform.forward.x, 0, _myo.transform.forward.z),
                 new Vector3(0, 0, 1)
             );
              //cardboard.transform.forward.z
 
-            Vector3 referenceZeroRoll = computeZeroRollVector (myo.transform.forward);
-            _referenceRoll = rollFromZero (referenceZeroRoll, myo.transform.forward, myo.transform.up);
+            Vector3 referenceZeroRoll = computeZeroRollVector (_myo.transform.forward);
+            _referenceRoll = rollFromZero (referenceZeroRoll, _myo.transform.forward, _myo.transform.up);
 
-            thalmicMyo.NotifyUserAction();
-            thalmicMyo.NotifyUserAction();
+            _thalmicMyo.NotifyUserAction();
+            _thalmicMyo.NotifyUserAction();
         }
 
-        Vector3 zeroRoll = computeZeroRollVector (myo.transform.forward);
-        float roll = rollFromZero (zeroRoll, myo.transform.forward, myo.transform.up);
+        Vector3 zeroRoll = computeZeroRollVector (_myo.transform.forward);
+        float roll = rollFromZero (zeroRoll, _myo.transform.forward, _myo.transform.up);
 
         float relativeRoll = normalizeAngle (roll - _referenceRoll);
 
-        Quaternion antiRoll = Quaternion.AngleAxis (relativeRoll, myo.transform.forward);
+        Quaternion antiRoll = Quaternion.AngleAxis (relativeRoll, _myo.transform.forward);
 
-        transform.rotation = _antiYaw * antiRoll * Quaternion.LookRotation (myo.transform.forward);
+        transform.rotation = _antiYaw * antiRoll * Quaternion.LookRotation (_myo.transform.forward);
 
-        if (thalmicMyo.xDirection == XDirection.TowardWrist) {
+        if (_thalmicMyo.xDirection == XDirection.TowardWrist) {
             transform.rotation = new Quaternion(transform.localRotation.x,
                                                 -transform.localRotation.y,
                                                 transform.localRotation.z,
@@ -97,24 +95,24 @@ public class MyoHandler : MonoBehaviour
         }
 
 
-        if (thalmicMyo.pose == Pose.Rest)
+        if (_thalmicMyo.pose == Pose.Rest)
         {
-            gunInternal.StopShooting();
+            Gun.StopShooting();
         }
 
-        if (thalmicMyo.pose == Pose.Fist)
+        if (_thalmicMyo.pose == Pose.Fist)
         {
-            gunInternal.StartShooting();
+            Gun.StartShooting();
         }
 
-        if (gunInternal.ShellsInMagazine == 0 || thalmicMyo.pose == Pose.DoubleTap)
+        if (Gun.ShellsInMagazine == 0 || _thalmicMyo.pose == Pose.DoubleTap)
         {
-            if (thalmicMyo.transform.forward.y >= 0.9)
+            if (_thalmicMyo.transform.forward.y >= 0.9)
             {
                 if (!_reloadLock)
                 {
-                    gunInternal.Reload();
-                    thalmicMyo.NotifyUserAction();
+                    Gun.Reload();
+                    _thalmicMyo.NotifyUserAction();
                     _reloadLock = true;
                 }
             }
@@ -132,11 +130,11 @@ public class MyoHandler : MonoBehaviour
         foreach (GameObject o in HandSideOffsetUpdate)
         {
             Vector3 localPosition = o.transform.position;
-            if (thalmicMyo.arm == Arm.Right)
+            if (_thalmicMyo.arm == Arm.Right)
             {
                 localPosition.Set(_handPositionOffset, localPosition.y, localPosition.z);
             }
-            else if (thalmicMyo.arm == Arm.Left)
+            else if (_thalmicMyo.arm == Arm.Left)
             {
                 localPosition.Set(-_handPositionOffset, localPosition.y, localPosition.z);
             }
@@ -158,8 +156,8 @@ public class MyoHandler : MonoBehaviour
     Vector3 computeZeroRollVector (Vector3 forward)
     {
         Vector3 antigravity = Vector3.up;
-        Vector3 m = Vector3.Cross (myo.transform.forward, antigravity);
-        Vector3 roll = Vector3.Cross (m, myo.transform.forward);
+        Vector3 m = Vector3.Cross (_myo.transform.forward, antigravity);
+        Vector3 roll = Vector3.Cross (m, _myo.transform.forward);
 
         return roll.normalized;
     }

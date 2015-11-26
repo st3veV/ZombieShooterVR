@@ -4,17 +4,18 @@ using UnityEngine.UI;
 public class ScoreVisualizer : MonoBehaviour
 {
 
-    public UserDataComponent UserData;
+    private UserData _userData;
     public Text TextOutput;
 
 	// Use this for initialization
-	void Start () {
-	    
+	void Start ()
+	{
+	    _userData = UserData.Instance;
 	}
 	
 	// Update is called once per frame
 	void Update ()
 	{
-	    TextOutput.text = "" + UserData.Score;
+	    TextOutput.text = "" + _userData.Score;
 	}
 }
