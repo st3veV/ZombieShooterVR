@@ -47,8 +47,8 @@ public class Gun : MonoBehaviour {
             {
                 if (_shellsInMagazine > 0)
                 {
-                    Fire();
                     _shellsInMagazine--;
+                    Fire();
                 }
                 else
                 {

@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.UI;
 
 public class AmmoVisualizer : MonoBehaviour
@@ -18,6 +19,8 @@ public class AmmoVisualizer : MonoBehaviour
     // Use this for initialization
 	void Start () {
         GunInput.OnWeaponChange += GunInput_OnWeaponChange;
+	    GunInput.OnWeaponFire += UpdateUi;
+	    GunInput.OnWeaponReload += UpdateUi;
         GunInput.TriggerWeaponChange();
 	}
 
@@ -32,15 +35,18 @@ public class AmmoVisualizer : MonoBehaviour
         WeaponImageOutput.texture = _currentWeapon.WeaponImage;
         WeaponImageOutput.SetNativeSize();
         WeaponImageOutput.transform.localScale = new Vector3(.5f, .5f, .5f);
+
+        UpdateUi();
     }
-	
-	// Update is called once per frame
-	void Update ()
-	{
-	    AmmoCountOutput.text = GunInput.ShellsInMagazine + "";
+
+    private void UpdateUi()
+    {
+        AmmoCountOutput.text = GunInput.ShellsInMagazine + "";
         SliderOutput.value = GunInput.ShellsInMagazine;
-        TotalGunAmmoOutput.text = _currentWeapon.AvailableAmmo + "";
+        if(_currentWeapon != null)
+            TotalGunAmmoOutput.text = _currentWeapon.AvailableAmmo + "";
 
         ReloadingIndicatorOutput.SetActive(GunInput.ShellsInMagazine == 0);
-	}
+    }
+    
 }
