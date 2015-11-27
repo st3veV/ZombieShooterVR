@@ -8,6 +8,7 @@ namespace Controllers
         public LifetimeComponent Lifetime;
         public Gun Gun;
         public MyoHandler MyoHandler;
+        public Transform PlayerTransform;
 
         private void Awake()
         {
@@ -15,6 +16,7 @@ namespace Controllers
             GameObject player = Instantiate(Resources.Load("Prefabs/Player") as GameObject);
             player.name = "Player";
             player.transform.SetParent(gameObject.transform);
+            PlayerTransform = player.transform;
             Lifetime = player.GetComponent<LifetimeComponent>();
             Inventory = player.GetComponent<Inventory>();
             Gun = player.GetComponentInChildren<Gun>();

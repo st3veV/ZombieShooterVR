@@ -57,7 +57,7 @@ namespace Controllers
             _playerGun.SetFlashlightEnabled(false);
 
             ForceSpawn forceSpawn = new ForceSpawn();
-            IWeapon weapon = WeaponSpawner.WeaponManager.GetWeapon(WeaponDatabase.Instance.Weapons[3]);
+            IWeapon weapon = WeaponManager.Instance.GetWeapon(WeaponDatabase.Instance.Weapons[3]);
 
             //forceSpawn.SetItem(ammo);
             forceSpawn.SetWeapon(weapon);

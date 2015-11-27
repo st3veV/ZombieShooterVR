@@ -1,4 +1,5 @@
 ﻿using System;
+using Controllers;
 using UnityEngine;
 using UnityStandardAssets.Characters.ThirdPerson;
 using Random = System.Random;
@@ -6,9 +7,7 @@ using Random = System.Random;
 public class ZombieSpawner : MonoBehaviour {
 
     public AICharacterControl Zombie;
-    public Transform ZombieTarget;
     public Transform SpawnPoint;
-    public LifetimeComponent AttactTarget;
     
     public float Diameter = 0f;
     public float ZombieDamage = BalancingData.ZOMBIE_DAMAGE;
@@ -22,8 +21,10 @@ public class ZombieSpawner : MonoBehaviour {
     public bool IsSpawning = true;
 
     private Pool<AICharacterControl> zombiePool;
+    private LifetimeComponent _attactTarget;
+    private Transform _zombieTarget;
 
-	void Start () {
+    void Start () {
         Debug.Log("Start");
 	    _userData = UserData.Instance;
         if (SpawnPoint == null)
@@ -36,8 +37,12 @@ public class ZombieSpawner : MonoBehaviour {
             Diameter = distance;
         }
 
-        //AttactTarget.OnDie += AttactTarget_OnDie;
-	    
+        PlayerController playerController = PlayerController.Instance;
+        _attactTarget = playerController.Lifetime;
+        _attactTarget.OnDie += AttactTarget_OnDie;
+
+        _zombieTarget = playerController.PlayerTransform;
+
         zombiePool = new Pool<AICharacterControl>();
         _timer = new InternalTimer();
 	    _timer.Set(SpawnInterval*1000);
@@ -45,7 +50,7 @@ public class ZombieSpawner : MonoBehaviour {
 
     void AttactTarget_OnDie(LifetimeComponent lifetimeComponent)
     {
-        AttactTarget.OnDie -= AttactTarget_OnDie;
+        _attactTarget.OnDie -= AttactTarget_OnDie;
         IsSpawning = false;
     }
 	
@@ -78,7 +83,7 @@ public class ZombieSpawner : MonoBehaviour {
             lifetimeComponent.OnDie += Zombie_OnDie;
             clone.OnPositionReached += clone_OnPositionReached;
         }
-        clone.SetTarget(ZombieTarget);
+        clone.SetTarget(_zombieTarget);
         clone.transform.position = SpawnPoint.position;
         clone.gameObject.SetActive(true);
         clone.GetComponent<ZombieAudioController>().Spawn();
@@ -116,7 +121,7 @@ public class ZombieSpawner : MonoBehaviour {
 
     private void AttackAndDispose(GameObject go)
     {
-        AttactTarget.ReceiveDamage(ZombieDamage);
+        _attactTarget.ReceiveDamage(ZombieDamage);
         DisposeZombie(go);
     }
 

@@ -8,10 +8,11 @@ namespace Controllers
 
         public ZombieSpawner ZombieSpawner;
         public WeaponSpawner WeaponSpawner;
-        public Gun UserGun;
-        public LifetimeComponent UserLifetime;
 
         public event Action OnGameEnded;
+
+        private Gun _playerGun;
+        private LifetimeComponent _playerLifetime;
 
         private void Start()
         {
@@ -22,8 +23,10 @@ namespace Controllers
         {
             ZombieSpawner = GameObject.Find("ZombieSpawner").GetComponent<ZombieSpawner>();
             WeaponSpawner = GameObject.Find("WeaponSpawner").GetComponent<WeaponSpawner>();
-            UserGun = GameObject.Find("Gun").GetComponent<Gun>();
-            UserLifetime = GameObject.Find("UserData").GetComponent<LifetimeComponent>();
+
+            PlayerController playerController = PlayerController.Instance;
+            _playerGun = playerController.Gun;
+            _playerLifetime = playerController.Lifetime;
 
             Initialize();
         }
@@ -33,16 +36,16 @@ namespace Controllers
             ZombieSpawner.Reset();
             ZombieSpawner.IsSpawning = true;
 
-            UserGun.SetFlashlightEnabled(true);
-            UserGun.FiringEnabled = true;
+            _playerGun.SetFlashlightEnabled(true);
+            _playerGun.FiringEnabled = true;
 
             WeaponSpawner.Reset();
-            UserLifetime.OnDie += UserLifetime_OnDie;
+            _playerLifetime.OnDie += PlayerLifetime_OnDie;
         }
 
-        private void UserLifetime_OnDie(LifetimeComponent obj)
+        private void PlayerLifetime_OnDie(LifetimeComponent obj)
         {
-            UserLifetime.OnDie -= UserLifetime_OnDie;
+            _playerLifetime.OnDie -= PlayerLifetime_OnDie;
             ZombieSpawner.Reset();
             ZombieSpawner.IsSpawning = false;
             OnOnGameEnded();

@@ -1,33 +1,36 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using System;
+using Controllers;
 using Random = UnityEngine.Random;
 
 public class WeaponSpawner : MonoBehaviour {
 
     public ZombieSpawner ZombieSpawner;
     public GameObject TargetPrefab;
-    public Transform PlayerLocation;
-    public Inventory Inventory;
-
+    
     public event Action<GameObject> OnWeaponTargetSpawned;
 
     private Pool<GameObject> targetPool;
 
+    private PlayerController _playerController;
     private WeaponDatabase _weaponDatabase;
-    public WeaponManager WeaponManager;
+    private WeaponManager _weaponManager;
+    private Transform _playerLocation;
 
     public ForceSpawn ForceSpawn;
-
-	void Start ()
+    
+    void Start ()
 	{
+	    _playerController = PlayerController.Instance;
+        _playerLocation = _playerController.PlayerTransform;
 
 	    _weaponDatabase = WeaponDatabase.Instance;
         ZombieSpawner.OnZombieSpawned += ZombieSpawner_OnZombieSpawned;
 
-        WeaponManager = WeaponManager.Instance;
+        _weaponManager = WeaponManager.Instance;
         
-        //Inventory.Reset();
+        _playerController.Inventory.Reset();
 
         targetPool = new Pool<GameObject>();
 	}
@@ -58,7 +61,7 @@ public class WeaponSpawner : MonoBehaviour {
         Vector3 targetPosition = sourceTransform.position;
         targetPosition.y = 0;
         target.transform.position = targetPosition;
-        target.transform.LookAt(PlayerLocation);
+        target.transform.LookAt(_playerLocation);
 
         IPickable pickable;
         if (ForceSpawn != null)
@@ -71,7 +74,7 @@ public class WeaponSpawner : MonoBehaviour {
             //select the weapon
             int index = (int) (_weaponDatabase.Weapons.Count*Random.value);
 
-            IWeapon newWeapon = WeaponManager.GetWeapon(_weaponDatabase.Weapons[index]);
+            IWeapon newWeapon = _weaponManager.GetWeapon(_weaponDatabase.Weapons[index]);
 
             pickable = new Pickable();
             pickable.SetWeapon(newWeapon);
@@ -118,11 +121,11 @@ public class WeaponSpawner : MonoBehaviour {
         {
             if (pickable.ContainsWeapon)
             {
-                Inventory.PickWeapon(pickable.Weapon);
+                _playerController.Inventory.PickWeapon(pickable.Weapon);
             }
             if (pickable.ContainsAmmo)
             {
-                Inventory.PickAmmo(pickable.Ammo);
+                _playerController.Inventory.PickAmmo(pickable.Ammo);
             }
         }
         pickupHolder.Clear();
