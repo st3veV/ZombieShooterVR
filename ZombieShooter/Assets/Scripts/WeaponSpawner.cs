@@ -27,7 +27,7 @@ public class WeaponSpawner : MonoBehaviour {
 
         WeaponManager = WeaponManager.Instance;
         
-        Inventory.Reset();
+        //Inventory.Reset();
 
         targetPool = new Pool<GameObject>();
 	}

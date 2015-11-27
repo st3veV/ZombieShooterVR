@@ -36,7 +36,7 @@ public class ZombieSpawner : MonoBehaviour {
             Diameter = distance;
         }
 
-        AttactTarget.OnDie += AttactTarget_OnDie;
+        //AttactTarget.OnDie += AttactTarget_OnDie;
 	    
         zombiePool = new Pool<AICharacterControl>();
         _timer = new InternalTimer();

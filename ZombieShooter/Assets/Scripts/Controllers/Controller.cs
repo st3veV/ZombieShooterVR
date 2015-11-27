@@ -1,128 +1,111 @@
-﻿using System.Collections.Generic;
-using Thalmic.Myo;
-using UnityEngine;
+﻿using UnityEngine;
 
-public class Controller : Singleton<Controller>
+namespace Controllers
 {
-    private TutorialController TutorialController;
-    private GameController GameController;
-    private GameOverController GameOverController;
-
-    public List<GameObject> DontDestroyGameObjects;
-    
-    private LevelController levelController;
-
-    public UserController UserController;
-
-    public Controller()
+    public class Controller : Singleton<Controller>
     {
-        instance = this;
-    }
+        private TutorialController _tutorialController;
+        private GameController _gameController;
+        private GameOverController _gameOverController;
+        private LevelController _levelController;
+        private PlayerController _playerController;
 
-    void Start ()
-	{
-	    SetDontDestroys();
-
-        levelController = LevelController.Instance;
-
-        StartTutorial();
-        //StartGame();
-	}
-
-    private void SetDontDestroys()
-    {
-        foreach (GameObject dontDestroyGameObject in DontDestroyGameObjects)
+        private void Start()
         {
-            DontDestroyOnLoad(dontDestroyGameObject);
+            _playerController = PlayerController.Instance;
+            _levelController = LevelController.Instance;
+
+            StartTutorial();
+            //StartGame();
         }
-    }
 
-    private void StartTutorial()
-    {
-        Debug.Log("Starting tutorial");
-        levelController.OnSceneLoaded += tutorialSceneLoader_OnSceneLoaded;
-        levelController.LoadScene(Scene.Tutorial);
-    }
+        private void StartTutorial()
+        {
+            Debug.Log("Starting tutorial");
+            _levelController.OnSceneLoaded += tutorialSceneLoader_OnSceneLoaded;
+            _levelController.LoadScene(Scene.Tutorial);
+        }
 
-    void tutorialSceneLoader_OnSceneLoaded()
-    {
-        Debug.Log("Tutorial scene loaded");
-        levelController.OnSceneLoaded -= tutorialSceneLoader_OnSceneLoaded;
-        GameObject tutController = GameObject.Find("TutorialController");
-        TutorialController = tutController.GetComponent<TutorialController>();
-        TutorialController.OnTutorialComplete += TutorialController_OnTutorialComplete;
-        ResetPlayer();
-    }
+        private void tutorialSceneLoader_OnSceneLoaded()
+        {
+            Debug.Log("Tutorial scene loaded");
+            _levelController.OnSceneLoaded -= tutorialSceneLoader_OnSceneLoaded;
+            GameObject tutController = GameObject.Find("TutorialController");
+            _tutorialController = tutController.GetComponent<TutorialController>();
+            _tutorialController.OnTutorialComplete += TutorialController_OnTutorialComplete;
+            ResetPlayer();
+        }
 
-    void TutorialController_OnTutorialComplete()
-    {
-        Debug.Log("Tutorial complete, loading");
-        TutorialController.OnTutorialComplete -= TutorialController_OnTutorialComplete;
-        TutorialController = null;
-        StartGame();
-    }
+        private void TutorialController_OnTutorialComplete()
+        {
+            Debug.Log("Tutorial complete, loading");
+            _tutorialController.OnTutorialComplete -= TutorialController_OnTutorialComplete;
+            _tutorialController = null;
+            StartGame();
+        }
 
-    private void StartGame()
-    {
-        Debug.Log("Starting game");
-        levelController.OnSceneLoaded += gameSceneLoader_OnSceneLoaded;
-        levelController.LoadScene(Scene.Game);
-    }
+        private void StartGame()
+        {
+            Debug.Log("Starting game");
+            _levelController.OnSceneLoaded += gameSceneLoader_OnSceneLoaded;
+            _levelController.LoadScene(Scene.Game);
+        }
 
-    void gameSceneLoader_OnSceneLoaded()
-    {
-        levelController.OnSceneLoaded -= gameSceneLoader_OnSceneLoaded;
-        GameObject gController = GameObject.Find("GameController");
-        GameController = gController.GetComponent<GameController>();
-        GameController.OnGameEnded += GameController_OnGameEnded;
-        ResetPlayer();
-    }
+        private void gameSceneLoader_OnSceneLoaded()
+        {
+            _levelController.OnSceneLoaded -= gameSceneLoader_OnSceneLoaded;
+            GameObject gController = GameObject.Find("GameController");
+            _gameController = gController.GetComponent<GameController>();
+            _gameController.OnGameEnded += GameController_OnGameEnded;
+            ResetPlayer();
+        }
 
-    void GameController_OnGameEnded()
-    {
-        GameController.OnGameEnded -= GameController_OnGameEnded;
-        GameController = null;
-        GameOver();
-    }
+        private void GameController_OnGameEnded()
+        {
+            _gameController.OnGameEnded -= GameController_OnGameEnded;
+            _gameController = null;
+            GameOver();
+        }
 
-    private void GameOver()
-    {
-        Debug.Log("Game over");
-        levelController.OnSceneLoaded += gameOverSceneLoader_OnSceneLoaded;
-        levelController.LoadScene(Scene.GameOver);
-    }
+        private void GameOver()
+        {
+            Debug.Log("Game over");
+            _levelController.OnSceneLoaded += gameOverSceneLoader_OnSceneLoaded;
+            _levelController.LoadScene(Scene.GameOver);
+        }
 
-    void gameOverSceneLoader_OnSceneLoaded()
-    {
-        levelController.OnSceneLoaded -= gameOverSceneLoader_OnSceneLoaded;
-        GameObject goController = GameObject.Find("GameOverController");
-        GameOverController = goController.GetComponent<GameOverController>();
-        GameOverController.OnPlayAgain += GameOverController_OnPlayAgain;
-        GameOverController.OnGoToTutorial += GameOverController_OnGoToTutorial;
-        ResetPlayer();
-    }
+        private void gameOverSceneLoader_OnSceneLoaded()
+        {
+            _levelController.OnSceneLoaded -= gameOverSceneLoader_OnSceneLoaded;
+            GameObject goController = GameObject.Find("GameOverController");
+            _gameOverController = goController.GetComponent<GameOverController>();
+            _gameOverController.OnPlayAgain += GameOverController_OnPlayAgain;
+            _gameOverController.OnGoToTutorial += GameOverController_OnGoToTutorial;
+            ResetPlayer();
+        }
 
-    void GameOverController_OnGoToTutorial()
-    {
-        RemoveGameOverListeners();
-        StartTutorial();
-    }
+        private void GameOverController_OnGoToTutorial()
+        {
+            RemoveGameOverListeners();
+            StartTutorial();
+        }
 
-    void GameOverController_OnPlayAgain()
-    {
-        RemoveGameOverListeners();
-        StartGame();
-    }
+        private void GameOverController_OnPlayAgain()
+        {
+            RemoveGameOverListeners();
+            StartGame();
+        }
 
-    private void ResetPlayer()
-    {
-        UserController.Reset();
-    }
+        private void ResetPlayer()
+        {
+            _playerController.Reset();
+        }
 
-    void RemoveGameOverListeners()
-    {
-        GameOverController.OnPlayAgain -= GameOverController_OnPlayAgain;
-        GameOverController.OnGoToTutorial -= GameOverController_OnGoToTutorial;
-        GameOverController = null;
+        private void RemoveGameOverListeners()
+        {
+            _gameOverController.OnPlayAgain -= GameOverController_OnPlayAgain;
+            _gameOverController.OnGoToTutorial -= GameOverController_OnGoToTutorial;
+            _gameOverController = null;
+        }
     }
 }

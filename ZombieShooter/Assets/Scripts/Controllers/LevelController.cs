@@ -1,48 +1,51 @@
 ﻿using System;
 using UnityEngine;
 
-public class LevelController : Singleton<LevelController>
+namespace Controllers
 {
-    public event Action OnSceneLoaded;
-
-    private enum LoadingState
+    public class LevelController : Singleton<LevelController>
     {
-        Idle,
-        Loading,
-        Loaded
-    }
+        public event Action OnSceneLoaded;
 
-    private LoadingState _state = LoadingState.Idle;
-    
-    void Update()
-    {
-        if (_state == LoadingState.Loaded)
+        private enum LoadingState
         {
-            OnOnSceneLoaded();
-            _state = LoadingState.Idle;
+            Idle,
+            Loading,
+            Loaded
         }
+
+        private LoadingState _state = LoadingState.Idle;
+
+        private void Update()
+        {
+            if (_state == LoadingState.Loaded)
+            {
+                OnOnSceneLoaded();
+                _state = LoadingState.Idle;
+            }
+        }
+
+        public void LoadScene(Scene scene)
+        {
+            _state = LoadingState.Loading;
+            Application.LoadLevel((int) scene);
+        }
+
+        private void OnLevelWasLoaded()
+        {
+            _state = LoadingState.Loaded;
+        }
+
+        #region Event invocators
+
+        protected void OnOnSceneLoaded()
+        {
+            var handler = OnSceneLoaded;
+            if (handler != null) handler();
+        }
+
+        #endregion
     }
-
-    public void LoadScene(Scene scene)
-    {
-        _state = LoadingState.Loading;
-        Application.LoadLevel((int)scene);
-    }
-
-    void OnLevelWasLoaded()
-    {
-        _state = LoadingState.Loaded;
-    }
-
-    #region Event invocators
-
-    protected void OnOnSceneLoaded()
-    {
-        var handler = OnSceneLoaded;
-        if (handler != null) handler();
-    }
-
-    #endregion
 }
 
 public enum Scene
