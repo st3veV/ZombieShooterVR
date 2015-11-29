@@ -10,27 +10,27 @@ namespace Controllers
         public GameObject PlayAgainTarget;
         public GameObject GoToTutorialTarget;
 
-        public UserData UserData;
         public TextMesh ScoreOutput;
 
         private LifetimeComponent _playAgainLifetime;
         private LifetimeComponent _gotoTutorialLifetime;
 
-        private Gun UserGun;
+        private Gun _userGun;
+        private UserData _userData;
 
         public event Action OnPlayAgain;
         public event Action OnGoToTutorial;
 
         private void Start()
         {
+            Controller.Instance.SetGameOverController(this);
             AssignReferences();
         }
 
         private void AssignReferences()
         {
-            UserData = UserData.Instance;
-
-            UserGun = GameObject.Find("Gun").GetComponent<Gun>();
+            _userData = UserData.Instance;
+            _userGun = PlayerController.Instance.Gun;
 
             Initialize();
         }
@@ -43,9 +43,9 @@ namespace Controllers
             _gotoTutorialLifetime = GoToTutorialTarget.GetComponent<LifetimeComponent>();
             _gotoTutorialLifetime.OnDie += _gotoTutorialLifetime_OnDie;
 
-            ScoreOutput.text = string.Format("Score: {0}", UserData.Score);
+            ScoreOutput.text = string.Format("Score: {0}", _userData.Score);
 
-            UserGun.SetFlashlightEnabled(false);
+            _userGun.SetFlashlightEnabled(false);
         }
 
         private void _gotoTutorialLifetime_OnDie(LifetimeComponent obj)

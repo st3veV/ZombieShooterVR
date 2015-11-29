@@ -11,7 +11,7 @@ namespace Controllers
         void Start()
         {
             Controller c = Controller.Instance;
-
+            Debug.Log("Controller stated: " + c.name);
             SetDontDestroys();
 
         }

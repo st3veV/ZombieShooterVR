@@ -1,5 +1,6 @@
 ﻿using System;
 using Controllers;
+using Radar;
 using UnityEngine;
 using UnityStandardAssets.Characters.ThirdPerson;
 using Random = System.Random;
@@ -20,7 +21,7 @@ public class ZombieSpawner : MonoBehaviour {
 
     public bool IsSpawning = true;
 
-    private Pool<AICharacterControl> zombiePool;
+    private Pool<AICharacterControl> _zombiePool;
     private LifetimeComponent _attactTarget;
     private Transform _zombieTarget;
 
@@ -43,7 +44,7 @@ public class ZombieSpawner : MonoBehaviour {
 
         _zombieTarget = playerController.PlayerTransform;
 
-        zombiePool = new Pool<AICharacterControl>();
+        _zombiePool = new Pool<AICharacterControl>();
         _timer = new InternalTimer();
 	    _timer.Set(SpawnInterval*1000);
 	}
@@ -68,7 +69,7 @@ public class ZombieSpawner : MonoBehaviour {
 
     public void SpawnZombie()
     {
-        AICharacterControl clone = zombiePool.Get();
+        AICharacterControl clone = _zombiePool.Get();
         
         if (clone != null)
         {
@@ -88,20 +89,19 @@ public class ZombieSpawner : MonoBehaviour {
         clone.gameObject.SetActive(true);
         clone.GetComponent<ZombieAudioController>().Spawn();
 
+        var radarTrackable = clone.GetComponent<RadarTrackable>();
+        RadarController.Instance.AddTrackedObject(radarTrackable);
+
         zombieSpawned(clone.gameObject);
 
         ChoseNextPosition();
     }
 
-    private void zombieSpawned(GameObject zombie)
-    {
-        var handler = OnZombieSpawned;
-        if (handler != null)
-            handler(zombie);
-    }
-
     private void Zombie_OnDie(LifetimeComponent lifetimeComponent)
     {
+        var radarTrackable = lifetimeComponent.GetComponent<RadarTrackable>();
+        RadarController.Instance.RemoveTrackedObject(radarTrackable);
+
         //dispose zombie
         lifetimeComponent.gameObject.GetComponent<ThirdPersonCharacter>().Die(DisposeZombie);
 
@@ -116,6 +116,9 @@ public class ZombieSpawner : MonoBehaviour {
 
     private void clone_OnPositionReached(GameObject obj)
     {
+        var radarTrackable = obj.GetComponent<RadarTrackable>();
+        RadarController.Instance.RemoveTrackedObject(radarTrackable);
+
         obj.GetComponent<ThirdPersonCharacter>().Attack(AttackAndDispose);
     }
 
@@ -128,7 +131,7 @@ public class ZombieSpawner : MonoBehaviour {
     private void DisposeZombie(GameObject go)
     {
         go.SetActive(false);
-        zombiePool.Add(go.GetComponent<AICharacterControl>());
+        _zombiePool.Add(go.GetComponent<AICharacterControl>());
     }
 
     private void ChoseNextPosition()
@@ -144,9 +147,20 @@ public class ZombieSpawner : MonoBehaviour {
     public void Reset()
     {
         Debug.Log("Reset");
-        zombiePool.Clear();
+        _zombiePool.Clear();
         SpawnInterval = BalancingData.ZOMBIE_SPAWN_INTERVAL_INITIAL;
         IsSpawning = true;
         _timer.Set(SpawnInterval * 1000);
     }
+
+    #region Event invocators
+
+    private void zombieSpawned(GameObject zombie)
+    {
+        var handler = OnZombieSpawned;
+        if (handler != null)
+            handler(zombie);
+    }
+
+    #endregion
 }

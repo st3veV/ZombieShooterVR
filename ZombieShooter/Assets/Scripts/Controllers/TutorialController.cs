@@ -17,7 +17,7 @@ namespace Controllers
         public GameObject TutorialInstructionReoad;
 
         public event Action OnTutorialComplete;
-
+        
         private MyoHandler _myoHandler;
         private Gun _playerGun;
         private Transform _playerTransform;
@@ -28,13 +28,14 @@ namespace Controllers
 
         private void Start()
         {
+            Controller.Instance.SetTutorialController(this);
             AssignReferences();
         }
 
         private void AssignReferences()
         {
             PlayerController playerController = PlayerController.Instance;
-            _myoHandler = playerController.MyoHandler;//GameObject.Find("Hand").GetComponent<MyoHandler>();
+            _myoHandler = playerController.MyoHandler;
             _playerGun = playerController.Gun;
             _playerTransform = _playerGun.gameObject.transform;
 
@@ -42,7 +43,7 @@ namespace Controllers
             WeaponSpawner = GameObject.Find("WeaponSpawner").GetComponent<WeaponSpawner>();
 
             ZombieSpawnPoint = GameObject.Find("ZombieSpawnPoint");
-
+            
             Initialize();
         }
 

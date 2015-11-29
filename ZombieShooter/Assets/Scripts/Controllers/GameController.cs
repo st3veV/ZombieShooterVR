@@ -16,6 +16,7 @@ namespace Controllers
 
         private void Start()
         {
+            Controller.Instance.SetGameController(this);
             AssignReferences();
         }
 

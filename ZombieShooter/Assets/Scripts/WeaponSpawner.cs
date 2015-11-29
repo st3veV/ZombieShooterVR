@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System;
 using Controllers;
+using Radar;
 using Random = UnityEngine.Random;
 
 public class WeaponSpawner : MonoBehaviour {
@@ -11,7 +12,7 @@ public class WeaponSpawner : MonoBehaviour {
     
     public event Action<GameObject> OnWeaponTargetSpawned;
 
-    private Pool<GameObject> targetPool;
+    private Pool<GameObject> _targetPool;
 
     private PlayerController _playerController;
     private WeaponDatabase _weaponDatabase;
@@ -32,7 +33,7 @@ public class WeaponSpawner : MonoBehaviour {
         
         _playerController.Inventory.Reset();
 
-        targetPool = new Pool<GameObject>();
+        _targetPool = new Pool<GameObject>();
 	}
 
     private void ZombieSpawner_OnZombieSpawned(GameObject zombie)
@@ -49,7 +50,7 @@ public class WeaponSpawner : MonoBehaviour {
 
     public void SpawnAmmo(Transform sourceTransform)
     {
-        GameObject target = targetPool.Get();
+        GameObject target = _targetPool.Get();
         LifetimeComponent targetLife = null;
         if (target == null)
         {
@@ -97,6 +98,9 @@ public class WeaponSpawner : MonoBehaviour {
             targetLife.Reset();
         }
 
+        var radarTrackable = target.GetComponent<RadarTrackable>();
+        RadarController.Instance.AddTrackedObject(radarTrackable);
+
         targetLife.OnDie += targetLife_OnDie;
 
         target.SetActive(true);
@@ -105,11 +109,14 @@ public class WeaponSpawner : MonoBehaviour {
 
     private void targetLife_OnDie(LifetimeComponent obj)
     {
+        var radarTrackable = obj.GetComponent<RadarTrackable>();
+        RadarController.Instance.RemoveTrackedObject(radarTrackable);
+
         obj.OnDie -= targetLife_OnDie;
         PickAmmo(obj.gameObject);
 
         obj.gameObject.SetActive(false);
-        targetPool.Add(obj.gameObject);
+        _targetPool.Add(obj.gameObject);
     }
 
     public void PickAmmo(GameObject target)
@@ -131,6 +138,13 @@ public class WeaponSpawner : MonoBehaviour {
         pickupHolder.Clear();
     }
 	
+    public void Reset()
+    {
+        _targetPool.Clear();
+    }
+
+    #region Event invocators
+
     private void spawned(GameObject target)
     {
         var handler = OnWeaponTargetSpawned;
@@ -138,14 +152,7 @@ public class WeaponSpawner : MonoBehaviour {
             handler(target);
     }
 
-	void Update () {
-	
-	}
-
-    public void Reset()
-    {
-        targetPool.Clear();
-    }
+    #endregion
 }
 
 public class WeaponManager

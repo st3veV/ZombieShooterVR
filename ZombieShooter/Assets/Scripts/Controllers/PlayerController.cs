@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Radar;
+using UnityEngine;
 
 namespace Controllers
 {
@@ -13,7 +14,7 @@ namespace Controllers
         private void Awake()
         {
             Debug.Log("player controller awake");
-            GameObject player = Instantiate(Resources.Load("Prefabs/Player") as GameObject);
+            var player = Instantiate(Resources.Load("Prefabs/Player") as GameObject);
             player.name = "Player";
             player.transform.SetParent(gameObject.transform);
             PlayerTransform = player.transform;
@@ -21,18 +22,12 @@ namespace Controllers
             Inventory = player.GetComponent<Inventory>();
             Gun = player.GetComponentInChildren<Gun>();
             MyoHandler = player.GetComponentInChildren<MyoHandler>();
+
+            var radarController = RadarController.Instance;
+            var head = player.transform.FindChild("CardboardMain").FindChild("Head").gameObject;
+            radarController.SetCenterObject(head);
         }
-
-        private void Start()
-        {
-
-        }
-
-        private void Update()
-        {
-
-        }
-
+        
         public void Reset()
         {
             UserData.Instance.ResetScore();

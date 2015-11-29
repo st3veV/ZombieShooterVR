@@ -15,8 +15,8 @@ namespace Controllers
             _playerController = PlayerController.Instance;
             _levelController = LevelController.Instance;
 
-            StartTutorial();
-            //StartGame();
+            //StartTutorial();
+            StartGame();
         }
 
         private void StartTutorial()
@@ -30,10 +30,13 @@ namespace Controllers
         {
             Debug.Log("Tutorial scene loaded");
             _levelController.OnSceneLoaded -= tutorialSceneLoader_OnSceneLoaded;
-            GameObject tutController = GameObject.Find("TutorialController");
-            _tutorialController = tutController.GetComponent<TutorialController>();
-            _tutorialController.OnTutorialComplete += TutorialController_OnTutorialComplete;
             ResetPlayer();
+        }
+
+        public void SetTutorialController(TutorialController tutorialController)
+        {
+            _tutorialController = tutorialController;
+            _tutorialController.OnTutorialComplete += TutorialController_OnTutorialComplete;
         }
 
         private void TutorialController_OnTutorialComplete()
@@ -54,10 +57,13 @@ namespace Controllers
         private void gameSceneLoader_OnSceneLoaded()
         {
             _levelController.OnSceneLoaded -= gameSceneLoader_OnSceneLoaded;
-            GameObject gController = GameObject.Find("GameController");
-            _gameController = gController.GetComponent<GameController>();
-            _gameController.OnGameEnded += GameController_OnGameEnded;
             ResetPlayer();
+        }
+
+        public void SetGameController(GameController gameController)
+        {
+            _gameController = gameController;
+            _gameController.OnGameEnded += GameController_OnGameEnded;
         }
 
         private void GameController_OnGameEnded()
@@ -77,11 +83,14 @@ namespace Controllers
         private void gameOverSceneLoader_OnSceneLoaded()
         {
             _levelController.OnSceneLoaded -= gameOverSceneLoader_OnSceneLoaded;
-            GameObject goController = GameObject.Find("GameOverController");
-            _gameOverController = goController.GetComponent<GameOverController>();
+            ResetPlayer();
+        }
+
+        public void SetGameOverController(GameOverController gameOverController)
+        {
+            _gameOverController = gameOverController;
             _gameOverController.OnPlayAgain += GameOverController_OnPlayAgain;
             _gameOverController.OnGoToTutorial += GameOverController_OnGoToTutorial;
-            ResetPlayer();
         }
 
         private void GameOverController_OnGoToTutorial()
