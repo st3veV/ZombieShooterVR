@@ -8,7 +8,7 @@ public class PickupHolder : MonoBehaviour
     public MeshRenderer PickableVisualizer;
 
     private LifetimeComponent _lifetime;
-    private InternalTimer timer;
+    private InternalTimer _timer;
 
     void Awake()
     {
@@ -20,12 +20,12 @@ public class PickupHolder : MonoBehaviour
         Debug.Log("started");
         _lifetime = GetComponent<LifetimeComponent>();
         AssertTimer();
-        timer.Reset();
+        _timer.Reset();
     }
 
     void Update()
     {
-        if (timer.Update())
+        if (_timer.Update())
         {
             _lifetime.ReceiveDamage(BalancingData.WEAPON_TARGET_HEALTH);
         }
@@ -34,7 +34,7 @@ public class PickupHolder : MonoBehaviour
     public void Activate()
     {
         AssertTimer();
-        timer.Reset();
+        _timer.Reset();
 
         Texture decal = Pickable.Weapon.BulletImage;
 
@@ -56,10 +56,10 @@ public class PickupHolder : MonoBehaviour
 
     private void AssertTimer()
     {
-        if (timer == null)
+        if (_timer == null)
         {
-            timer = new InternalTimer();
-            timer.Set(BalancingData.WEAPON_TARGET_AUTOMATIC_PICKUP_DELAY * 1000);
+            _timer = new InternalTimer();
+            _timer.Set(BalancingData.WEAPON_TARGET_AUTOMATIC_PICKUP_DELAY * 1000);
         }
     }
 

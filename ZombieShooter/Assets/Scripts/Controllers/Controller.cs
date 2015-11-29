@@ -8,13 +8,11 @@ namespace Controllers
         private GameController _gameController;
         private GameOverController _gameOverController;
         private LevelController _levelController;
-        private PlayerController _playerController;
 
         private void Start()
         {
-            _playerController = PlayerController.Instance;
             _levelController = LevelController.Instance;
-
+            
             //StartTutorial();
             StartGame();
         }
@@ -107,7 +105,7 @@ namespace Controllers
 
         private void ResetPlayer()
         {
-            _playerController.Reset();
+            PlayerController.Instance.Reset();
         }
 
         private void RemoveGameOverListeners()

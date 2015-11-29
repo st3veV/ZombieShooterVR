@@ -1,18 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
 using UnityEngine;
-using Random = System.Random;
 
 public class Gun : MonoBehaviour {
-
     public event Action OnWeaponKick;
     public event Action OnWeaponFire;
+    public event Action<Vector3> OnWeaponFireTo;
     public event Action OnWeaponKlick;
     public event Action OnWeaponReload;
     public event Action<IWeapon> OnWeaponChange;
 
-    public GameObject ParticleBurst;
-    public GameObject BulletTrail;
     public GameObject Flashlight;
 
     public bool FiringEnabled;
@@ -24,20 +20,11 @@ public class Gun : MonoBehaviour {
 
     private GameObject _weaponContainer;
 
-    private readonly Color _hitGroundColor = new Color(0xDF, 0xD6, 0xB6, 0x55);
-    private readonly Color _hitEnemyColor = new Color(0x68, 0x00, 0x00, 0x55);
-
-    private const float MaxBulletVisualRange = 20f;
-
-    private Random _random;
-
     void Awake ()
     {
         _timer = new InternalTimer();
 
         _weaponContainer = transform.FindChild("GunContainer").gameObject;
-        
-        _random = new Random();
     }
     
     void Update () {
@@ -57,28 +44,6 @@ public class Gun : MonoBehaviour {
                 _timer.Set(_currentWeapon.CooldownDelay);
             }
         }
-        if (_runningSystems.Count > 0)
-        {
-            List<ParticleSystem> toRemove = new List<ParticleSystem>();
-            for (int i = 0; i < _runningSystems.Count; i++)
-            {
-                ParticleSystem system = _runningSystems[i];
-                if (system == null || !system.isPlaying)
-                {
-                    toRemove.Add(system);
-                }
-            }
-            for (int i = 0; i < toRemove.Count; i++)
-            {
-                ParticleSystem system = toRemove[i];
-                _runningSystems.Remove(system);
-                if (system != null)
-                {
-                    system.gameObject.SetActive(false);
-                    _particlePool.Add(system.gameObject);
-                }
-            }
-        }
     }
 
     private void Klick()
@@ -90,83 +55,7 @@ public class Gun : MonoBehaviour {
     {
         Kick();
         WeaponFire();
-
-        for (int i = 0; i < _currentWeapon.NumBulletsPerShot; i++)
-        {
-            RaycastHit hit;
-            Vector3 direction = transform.forward;
-            if (_currentWeapon.BulletSpreadAngle > 0)
-            {
-                float spreadX = (float) _random.NextDouble()*(_currentWeapon.BulletSpreadAngle) -
-                                (_currentWeapon.BulletSpreadAngle/2);
-                float spreadY = (float)_random.NextDouble() * (_currentWeapon.BulletSpreadAngle) -
-                                (_currentWeapon.BulletSpreadAngle / 2);
-
-                direction.x += spreadX;
-                direction.y += spreadY;
-            }
-
-            if (Physics.Raycast(transform.position, direction, out hit))
-            {
-                Collider target = hit.collider;
-                Vector3 location = hit.point;
-
-                GameObject targetGo = target.gameObject;
-
-                SpawnParticles(location, targetGo.tag != "Enemy" ? _hitGroundColor : _hitEnemyColor);
-                SpawnBulletTrail(location);
-
-                LifetimeComponent targetLifetime = targetGo.GetComponent<LifetimeComponent>();
-                if (targetLifetime != null)
-                {
-                    targetLifetime.ReceiveDamage(_currentWeapon.Damage);
-                }
-            }
-            else
-            {
-                Vector3 target = transform.position + direction * MaxBulletVisualRange;
-                SpawnBulletTrail(target);
-            }
-        }
-    }
-
-    private readonly Pool<GameObject> _bulletTrailPool = new Pool<GameObject>();
-
-    private void SpawnBulletTrail(Vector3 location)
-    {
-        GameObject trail = _bulletTrailPool.Get();
-        if (trail == null)
-        {
-            trail = Instantiate(BulletTrail);
-        }
-        BulletTrail bulletTrail = trail.GetComponent<BulletTrail>();
-        bulletTrail.SetTarget(transform.position, location);
-        bulletTrail.OnDone = OnBulletTrailDone;
-        trail.SetActive(true);
-    }
-
-    private void OnBulletTrailDone(GameObject trail)
-    {
-        trail.GetComponent<BulletTrail>().OnDone = null;
-        trail.SetActive(false);
-        _bulletTrailPool.Add(trail);
-    }
-
-    private readonly List<ParticleSystem> _runningSystems = new List<ParticleSystem>();
-    private readonly Pool<GameObject> _particlePool = new Pool<GameObject>();
-    private void SpawnParticles(Vector3 location, Color color)
-    {
-        GameObject burst = _particlePool.Get();
-        if (!burst)
-        {
-            burst = Instantiate(ParticleBurst);
-        }
-        burst.transform.position = location;
-        ParticleSystem system = burst.GetComponent<ParticleSystem>();
-        system.startColor = color;
-        _runningSystems.Add(system);
-        burst.SetActive(true);
-        system.Play();
+        WeaponFireTo(transform.forward);
     }
 
     public void StartShooting()
@@ -279,6 +168,12 @@ public class Gun : MonoBehaviour {
     {
         var handler = OnWeaponFire;
         if (handler != null) handler();
+    }
+
+    protected virtual void WeaponFireTo(Vector3 obj)
+    {
+        var handler = OnWeaponFireTo;
+        if (handler != null) handler(obj);
     }
 
     #endregion

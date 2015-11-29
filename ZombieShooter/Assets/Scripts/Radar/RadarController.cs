@@ -32,9 +32,9 @@ namespace Radar
             _centerGameObject = centerObject;
         }
 
-        private readonly List<IRadarTrackable> _tracked = new List<IRadarTrackable>();
+        private readonly List<RadarTrackable> _tracked = new List<RadarTrackable>();
 
-        public void AddTrackedObject(IRadarTrackable trackedObject)
+        public void AddTrackedObject(RadarTrackable trackedObject)
         {
             if (!_tracked.Contains(trackedObject))
             {
@@ -42,7 +42,7 @@ namespace Radar
             }
         }
 
-        public void RemoveTrackedObject(IRadarTrackable trackedObject)
+        public void RemoveTrackedObject(RadarTrackable trackedObject)
         {
             if (_tracked.Contains(trackedObject))
             {
@@ -60,9 +60,15 @@ namespace Radar
             transform.position = new Vector3(centerPosition.x, 0, centerPosition.z);
             
             //Update objects on radar
+            var deadTrackables = new List<RadarTrackable>();
             for (int i = 0; i < _tracked.Count; i++)
             {
                 var radarTrackable = _tracked[i];
+                if (radarTrackable == null)
+                {
+                    deadTrackables.Add(radarTrackable);
+                    continue;
+                }
                 var o = radarTrackable.Trackable;
                 Vector3 position;
                 //Find proper position for avatar
@@ -76,6 +82,14 @@ namespace Radar
                     position = o.transform.position;
                 }
                 radarTrackable.Avatar.transform.position = position;
+            }
+            if (deadTrackables.Count > 0)
+            {
+                for (int i = 0; i < deadTrackables.Count; i++)
+                {
+                    var deadTrackable = deadTrackables[i];
+                    _tracked.Remove(deadTrackable);
+                }
             }
         }
     }

@@ -1,4 +1,5 @@
 ﻿using Radar;
+using Shooting;
 using UnityEngine;
 
 namespace Controllers
@@ -26,6 +27,9 @@ namespace Controllers
             var radarController = RadarController.Instance;
             var head = player.transform.FindChild("CardboardMain").FindChild("Head").gameObject;
             radarController.SetCenterObject(head);
+
+            var shootingController = ShootingController.Instance;
+            shootingController.SetGun(Gun);
         }
         
         public void Reset()
