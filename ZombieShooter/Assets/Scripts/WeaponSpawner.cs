@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System;
 using Controllers;
 using Radar;
+using Utils;
 using Random = UnityEngine.Random;
 
 public class WeaponSpawner : MonoBehaviour {
@@ -33,7 +34,7 @@ public class WeaponSpawner : MonoBehaviour {
         
         _playerController.Inventory.Reset();
 
-        _targetPool = new Pool<GameObject>();
+        _targetPool = new Pool<GameObject>(CreateAmmo);
 	}
 
     private void ZombieSpawner_OnZombieSpawned(GameObject zombie)
@@ -50,15 +51,9 @@ public class WeaponSpawner : MonoBehaviour {
 
     public void SpawnAmmo(Transform sourceTransform)
     {
-        GameObject target = _targetPool.Get();
-        LifetimeComponent targetLife = null;
-        if (target == null)
-        {
-            target = Instantiate(TargetPrefab);
-            targetLife = target.GetComponent<LifetimeComponent>();
-            targetLife.LifetimeDamage = BalancingData.WEAPON_TARGET_HEALTH;
-        }
-
+        bool isNew;
+        GameObject target = _targetPool.Get(out isNew);
+        
         Vector3 targetPosition = sourceTransform.position;
         targetPosition.y = 0;
         target.transform.position = targetPosition;
@@ -75,13 +70,13 @@ public class WeaponSpawner : MonoBehaviour {
             //select the weapon
             int index = (int) (_weaponDatabase.Weapons.Count*Random.value);
 
-            IWeapon newWeapon = _weaponManager.GetWeapon(_weaponDatabase.Weapons[index]);
+            var newWeapon = _weaponManager.GetWeapon(_weaponDatabase.Weapons[index]);
 
             pickable = new Pickable();
             pickable.SetWeapon(newWeapon);
             pickable.ContainsWeapon = Random.value > .7;
             //spawn ammo
-            ModularAmmo ammo = new ModularAmmo();
+            var ammo = new ModularAmmo();
             ammo.SetValues(newWeapon.BulletType, ((int) (Random.value*2 + 1))*newWeapon.MagazineSize);
             pickable.SetAmmo(ammo);
             pickable.ContainsAmmo = true;
@@ -92,19 +87,26 @@ public class WeaponSpawner : MonoBehaviour {
         pickupHolder.Pickable = pickable;
         pickupHolder.Activate();
 
-        if (targetLife == null)
-        {
-            targetLife = target.GetComponent<LifetimeComponent>();
-            targetLife.Reset();
-        }
-
         var radarTrackable = target.GetComponent<RadarTrackable>();
         RadarController.Instance.AddTrackedObject(radarTrackable);
 
+        LifetimeComponent targetLife = target.GetComponent<LifetimeComponent>();
+        if (!isNew)
+        {
+            targetLife.Reset();
+        }
         targetLife.OnDie += targetLife_OnDie;
 
         target.SetActive(true);
         spawned(target);
+    }
+
+    private GameObject CreateAmmo()
+    {
+        var target = Instantiate(TargetPrefab);
+        var targetLife = target.GetComponent<LifetimeComponent>();
+        targetLife.LifetimeDamage = BalancingData.WEAPON_TARGET_HEALTH;
+        return target;
     }
 
     private void targetLife_OnDie(LifetimeComponent obj)
@@ -122,8 +124,8 @@ public class WeaponSpawner : MonoBehaviour {
     public void PickAmmo(GameObject target)
     {
         //Debug.Log("Weapon target picked");
-        PickupHolder pickupHolder = target.GetComponent<PickupHolder>();
-        IPickable pickable = pickupHolder.Pickable;
+        var pickupHolder = target.GetComponent<PickupHolder>();
+        var pickable = pickupHolder.Pickable;
         if (pickable != null)
         {
             if (pickable.ContainsWeapon)

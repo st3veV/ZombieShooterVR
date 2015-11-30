@@ -3,6 +3,7 @@ using Controllers;
 using Radar;
 using UnityEngine;
 using UnityStandardAssets.Characters.ThirdPerson;
+using Utils;
 using Random = System.Random;
 
 public class ZombieSpawner : MonoBehaviour {
@@ -44,7 +45,7 @@ public class ZombieSpawner : MonoBehaviour {
 
         _zombieTarget = playerController.PlayerTransform;
 
-        _zombiePool = new Pool<AICharacterControl>();
+        _zombiePool = new Pool<AICharacterControl>(CreateZombie);
         _timer = new InternalTimer();
 	    _timer.Set(SpawnInterval*1000);
 	}
@@ -69,21 +70,15 @@ public class ZombieSpawner : MonoBehaviour {
 
     public void SpawnZombie()
     {
-        AICharacterControl clone = _zombiePool.Get();
-        
-        if (clone != null)
+        bool isNew;
+        AICharacterControl clone = _zombiePool.Get(out isNew);
+
+        if (!isNew)
         {
             LifetimeComponent lifetimeComponent = clone.GetComponent<LifetimeComponent>();
             lifetimeComponent.Reset();
         }
-        else
-        {
-            clone = Instantiate(Zombie) as AICharacterControl;
-            LifetimeComponent lifetimeComponent = clone.GetComponent<LifetimeComponent>();
-            lifetimeComponent.Autodestroy = false;
-            lifetimeComponent.OnDie += Zombie_OnDie;
-            clone.OnPositionReached += clone_OnPositionReached;
-        }
+
         clone.SetTarget(_zombieTarget);
         clone.transform.position = SpawnPoint.position;
         clone.gameObject.SetActive(true);
@@ -95,6 +90,16 @@ public class ZombieSpawner : MonoBehaviour {
         zombieSpawned(clone.gameObject);
 
         ChoseNextPosition();
+    }
+
+    private AICharacterControl CreateZombie()
+    {
+        AICharacterControl clone = Instantiate(Zombie) as AICharacterControl;
+        LifetimeComponent lifetimeComponent = clone.GetComponent<LifetimeComponent>();
+        lifetimeComponent.Autodestroy = false;
+        lifetimeComponent.OnDie += Zombie_OnDie;
+        clone.OnPositionReached += clone_OnPositionReached;
+        return clone;
     }
 
     private void Zombie_OnDie(LifetimeComponent lifetimeComponent)

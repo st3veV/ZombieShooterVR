@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using Utils;
 using Random = System.Random;
 
 namespace Shooting
@@ -13,8 +14,8 @@ namespace Shooting
         private IWeapon _currentWeapon;
 
         private readonly List<ParticleSystem> _runningParticleSystems = new List<ParticleSystem>();
-        private readonly Pool<GameObject> _particlePool = new Pool<GameObject>();
-        private readonly Pool<GameObject> _bulletTrailPool = new Pool<GameObject>();
+        private Pool<GameObject> _particlePool;
+        private Pool<GameObject> _bulletTrailPool;
 
         private readonly Color _hitGroundColor = new Color(0xDF, 0xD6, 0xB6, 0x55);
         private readonly Color _hitEnemyColor = new Color(0x68, 0x00, 0x00, 0x55);
@@ -27,6 +28,9 @@ namespace Shooting
         {
             _particleBurst = Resources.Load("Prefabs/Shooting/DustParticles") as GameObject;
             _bulletTrail = Resources.Load("Prefabs/Shooting/BulletTrail") as GameObject;
+
+            _particlePool = new Pool<GameObject>(CreateParticles);
+            _bulletTrailPool = new Pool<GameObject>(CreateBulletTrail);
         }
 
         void Start()
@@ -115,14 +119,20 @@ namespace Shooting
         private void SpawnBulletTrail(Vector3 location)
         {
             GameObject trail = _bulletTrailPool.Get();
-            if (trail == null)
-            {
-                trail = Instantiate(_bulletTrail);
-            }
             BulletTrail bulletTrail = trail.GetComponent<BulletTrail>();
             bulletTrail.SetTarget(_gun.transform.position, location);
             bulletTrail.OnDone = OnBulletTrailDone;
             trail.SetActive(true);
+        }
+
+        private GameObject CreateBulletTrail()
+        {
+            return Instantiate(_bulletTrail);
+        }
+
+        private GameObject CreateParticles()
+        {
+            return Instantiate(_particleBurst);
         }
 
         private void OnBulletTrailDone(GameObject trail)
@@ -135,10 +145,6 @@ namespace Shooting
         private void SpawnParticles(Vector3 location, Color color)
         {
             GameObject burst = _particlePool.Get();
-            if (burst == null)
-            {
-                burst = Instantiate(_particleBurst);
-            }
             burst.transform.position = location;
             ParticleSystem system = burst.GetComponent<ParticleSystem>();
             system.startColor = color;

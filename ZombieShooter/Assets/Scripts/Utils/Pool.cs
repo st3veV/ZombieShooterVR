@@ -1,37 +1,60 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
-public class Pool<T>
+namespace Utils
 {
-    private readonly List<T> _objects;
-
-    public Pool()
+    public class Pool<T>
     {
-        _objects = new List<T>();
-    }
+        private readonly List<T> _objects;
+        private readonly Func<T> _createFunction;
 
-    public bool HasItems()
-    {
-        return _objects.Count > 0;
-    }
-
-    public T Get()
-    {
-        T clone = default(T);
-        while (clone == null && _objects.Count > 0)
+        public Pool()
         {
-            clone = _objects[_objects.Count - 1];
-            _objects.Remove(clone);
+            _objects = new List<T>();
         }
-        return clone;
-    }
 
-    public void Add(T obj)
-    {
-        _objects.Add(obj);
-    }
+        public Pool(Func<T> createFunc)
+        {
+            _createFunction = createFunc;
+            _objects = new List<T>();
+        }
 
-    public void Clear()
-    {
-        _objects.Clear();
+        public bool HasItems()
+        {
+            return _objects.Count > 0;
+        }
+
+        public T Get(out bool isNew)
+        {
+            T clone = default(T);
+            while (ObjUtil.IsNull(clone) && _objects.Count > 0)
+            {
+                clone = _objects[_objects.Count - 1];
+                _objects.Remove(clone);
+            }
+            isNew = false;
+            if (clone == null && _createFunction != null)
+            {
+                isNew = true;
+                clone = _createFunction();
+            }
+            return clone;
+        }
+
+        public T Get()
+        {
+            bool isNew;
+            return Get(out isNew);
+        }
+
+        public void Add(T obj)
+        {
+            _objects.Add(obj);
+        }
+
+        public void Clear()
+        {
+            _objects.Clear();
+        }
     }
 }

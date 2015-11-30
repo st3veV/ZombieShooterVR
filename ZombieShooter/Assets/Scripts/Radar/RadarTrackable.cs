@@ -1,5 +1,4 @@
-﻿using Radar;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Radar
 {
