@@ -11,6 +11,8 @@ namespace Radar
         private GameObject _centerGameObject;
         private GameObject _sightWedgeDisplay;
 
+        private readonly List<RadarTrackable> _trackedObjects = new List<RadarTrackable>();
+
         private void Awake()
         {
             Debug.Log("Radar controller awake");
@@ -32,21 +34,19 @@ namespace Radar
             _centerGameObject = centerObject;
         }
 
-        private readonly List<RadarTrackable> _tracked = new List<RadarTrackable>();
-
         public void AddTrackedObject(RadarTrackable trackedObject)
         {
-            if (!_tracked.Contains(trackedObject))
+            if (!_trackedObjects.Contains(trackedObject))
             {
-                _tracked.Add(trackedObject);
+                _trackedObjects.Add(trackedObject);
             }
         }
 
         public void RemoveTrackedObject(RadarTrackable trackedObject)
         {
-            if (_tracked.Contains(trackedObject))
+            if (_trackedObjects.Contains(trackedObject))
             {
-                _tracked.Remove(trackedObject);
+                _trackedObjects.Remove(trackedObject);
             }
         }
         
@@ -60,13 +60,13 @@ namespace Radar
             transform.position = new Vector3(centerPosition.x, 0, centerPosition.z);
             
             //Update objects on radar
-            var deadTrackables = new List<RadarTrackable>();
-            for (int i = 0; i < _tracked.Count; i++)
+            var deadIndices = new List<int>();
+            for (int i = 0; i < _trackedObjects.Count; i++)
             {
-                var radarTrackable = _tracked[i];
+                var radarTrackable = _trackedObjects[i];
                 if (radarTrackable == null)
                 {
-                    deadTrackables.Add(radarTrackable);
+                    deadIndices.Add(i);
                     continue;
                 }
                 var o = radarTrackable.Trackable;
@@ -83,12 +83,11 @@ namespace Radar
                 }
                 radarTrackable.Avatar.transform.position = position;
             }
-            if (deadTrackables.Count > 0)
+            if (deadIndices.Count > 0)
             {
-                for (int i = 0; i < deadTrackables.Count; i++)
+                for (int i = deadIndices.Count - 1; i >= 0; i--)
                 {
-                    var deadTrackable = deadTrackables[i];
-                    _tracked.Remove(deadTrackable);
+                    _trackedObjects.RemoveAt(deadIndices[i]);
                 }
             }
         }
