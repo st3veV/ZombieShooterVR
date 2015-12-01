@@ -5,11 +5,10 @@ namespace Controllers
 {
     public class GameController : MonoBehaviour
     {
-
-        public ZombieSpawner ZombieSpawner;
-        public WeaponSpawner WeaponSpawner;
-
         public event Action OnGameEnded;
+
+        private ZombieSpawner _zombieSpawner;
+        private WeaponSpawner _weaponSpawner;
 
         private Gun _playerGun;
         private LifetimeComponent _playerLifetime;
@@ -22,8 +21,9 @@ namespace Controllers
 
         private void AssignReferences()
         {
-            ZombieSpawner = GameObject.Find("ZombieSpawner").GetComponent<ZombieSpawner>();
-            WeaponSpawner = GameObject.Find("WeaponSpawner").GetComponent<WeaponSpawner>();
+            _zombieSpawner = ZombieSpawner.Create();
+            _weaponSpawner = WeaponSpawner.Create();
+            _weaponSpawner.ZombieSpawner = _zombieSpawner;
 
             PlayerController playerController = PlayerController.Instance;
             _playerGun = playerController.Gun;
@@ -34,21 +34,21 @@ namespace Controllers
 
         public void Initialize()
         {
-            ZombieSpawner.Reset();
-            ZombieSpawner.IsSpawning = true;
+            _zombieSpawner.Reset();
+            _zombieSpawner.IsSpawning = true;
 
             _playerGun.SetFlashlightEnabled(true);
             _playerGun.FiringEnabled = true;
 
-            WeaponSpawner.Reset();
+            _weaponSpawner.Reset();
             _playerLifetime.OnDie += PlayerLifetime_OnDie;
         }
 
         private void PlayerLifetime_OnDie(LifetimeComponent obj)
         {
             _playerLifetime.OnDie -= PlayerLifetime_OnDie;
-            ZombieSpawner.Reset();
-            ZombieSpawner.IsSpawning = false;
+            _zombieSpawner.Reset();
+            _zombieSpawner.IsSpawning = false;
             OnOnGameEnded();
         }
 

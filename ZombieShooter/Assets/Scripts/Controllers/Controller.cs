@@ -13,8 +13,8 @@ namespace Controllers
         {
             _levelController = LevelController.Instance;
             
-            //StartTutorial();
-            StartGame();
+            StartTutorial();
+            //StartGame();
         }
 
         private void StartTutorial()

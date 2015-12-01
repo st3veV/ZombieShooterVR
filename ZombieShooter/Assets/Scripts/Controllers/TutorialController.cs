@@ -8,16 +8,17 @@ namespace Controllers
     {
 
         public GameObject TutorialTarget;
-        public ZombieSpawner ZombieSpawner;
-        public WeaponSpawner WeaponSpawner;
-
+        
         public GameObject ZombieSpawnPoint;
 
         public List<GameObject> TutorialInstructions;
         public GameObject TutorialInstructionReoad;
 
         public event Action OnTutorialComplete;
-        
+
+        private ZombieSpawner _zombieSpawner;
+        private WeaponSpawner _weaponSpawner;
+
         private MyoHandler _myoHandler;
         private Gun _playerGun;
         private Transform _playerTransform;
@@ -39,8 +40,9 @@ namespace Controllers
             _playerGun = playerController.Gun;
             _playerTransform = _playerGun.gameObject.transform;
 
-            ZombieSpawner = GameObject.Find("ZombieSpawner").GetComponent<ZombieSpawner>();
-            WeaponSpawner = GameObject.Find("WeaponSpawner").GetComponent<WeaponSpawner>();
+            _zombieSpawner = ZombieSpawner.Create();
+            _weaponSpawner = WeaponSpawner.Create();
+            _weaponSpawner.ZombieSpawner = _zombieSpawner;
 
             ZombieSpawnPoint = GameObject.Find("ZombieSpawnPoint");
             
@@ -71,7 +73,7 @@ namespace Controllers
             forceSpawn.ContainsAmmo = true;
             //*/
 
-            WeaponSpawner.ForceSpawn = forceSpawn;
+            _weaponSpawner.ForceSpawn = forceSpawn;
 
             _oldShellsInMagazine = _playerGun.ShellsInMagazine;
 
@@ -117,9 +119,9 @@ namespace Controllers
             HideTutorialInstructions();
             TutorialInstructions[2].SetActive(true);
             TutorialInstructions[3].SetActive(true);
-            ZombieSpawner.IsSpawning = true;
-            ZombieSpawner.OnZombieSpawned += ZombieSpawner_OnZombieSpawned;
-            WeaponSpawner.OnWeaponTargetSpawned += WeaponSpawner_OnWeaponTargetSpawned;
+            _zombieSpawner.IsSpawning = true;
+            _zombieSpawner.OnZombieSpawned += ZombieSpawner_OnZombieSpawned;
+            _weaponSpawner.OnWeaponTargetSpawned += WeaponSpawner_OnWeaponTargetSpawned;
         }
 
         private void TutorialStep4()
@@ -167,7 +169,7 @@ namespace Controllers
 
         private void WeaponSpawner_OnWeaponTargetSpawned(GameObject obj)
         {
-            WeaponSpawner.OnWeaponTargetSpawned -= WeaponSpawner_OnWeaponTargetSpawned;
+            _weaponSpawner.OnWeaponTargetSpawned -= WeaponSpawner_OnWeaponTargetSpawned;
             LifetimeComponent ammoTargetLifetime = obj.GetComponent<LifetimeComponent>();
             ammoTargetLifetime.OnDie += ammoTargetLifetime_OnDie;
         }
@@ -181,8 +183,8 @@ namespace Controllers
 
         private void ZombieSpawner_OnZombieSpawned(GameObject obj)
         {
-            ZombieSpawner.OnZombieSpawned -= ZombieSpawner_OnZombieSpawned;
-            ZombieSpawner.IsSpawning = false;
+            _zombieSpawner.OnZombieSpawned -= ZombieSpawner_OnZombieSpawned;
+            _zombieSpawner.IsSpawning = false;
             LifetimeComponent zombieLifetime = obj.GetComponent<LifetimeComponent>();
             zombieLifetime.OnDie += zombieLifetime_OnDie;
         }

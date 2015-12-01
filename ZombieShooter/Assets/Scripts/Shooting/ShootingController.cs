@@ -5,7 +5,7 @@ using Random = System.Random;
 
 namespace Shooting
 {
-    class ShootingController : Singleton<ShootingController>
+    class ShootingController : AutoObject<ShootingController>
     {
         private GameObject _particleBurst;
         private GameObject _bulletTrail;
@@ -14,8 +14,8 @@ namespace Shooting
         private IWeapon _currentWeapon;
 
         private readonly List<ParticleSystem> _runningParticleSystems = new List<ParticleSystem>();
-        private Pool<GameObject> _particlePool;
-        private Pool<GameObject> _bulletTrailPool;
+        private GameObjectPool _particlePool;
+        private GameObjectPool _bulletTrailPool;
 
         private readonly Color _hitGroundColor = new Color(0xDF, 0xD6, 0xB6, 0x55);
         private readonly Color _hitEnemyColor = new Color(0x68, 0x00, 0x00, 0x55);
@@ -29,8 +29,8 @@ namespace Shooting
             _particleBurst = Resources.Load("Prefabs/Shooting/DustParticles") as GameObject;
             _bulletTrail = Resources.Load("Prefabs/Shooting/BulletTrail") as GameObject;
 
-            _particlePool = new Pool<GameObject>(CreateParticles);
-            _bulletTrailPool = new Pool<GameObject>(CreateBulletTrail);
+            _particlePool = new GameObjectPool(_particleBurst, gameObject);
+            _bulletTrailPool = new GameObjectPool(_bulletTrail, gameObject);
         }
 
         void Start()
@@ -124,17 +124,7 @@ namespace Shooting
             bulletTrail.OnDone = OnBulletTrailDone;
             trail.SetActive(true);
         }
-
-        private GameObject CreateBulletTrail()
-        {
-            return Instantiate(_bulletTrail);
-        }
-
-        private GameObject CreateParticles()
-        {
-            return Instantiate(_particleBurst);
-        }
-
+        
         private void OnBulletTrailDone(GameObject trail)
         {
             trail.GetComponent<BulletTrail>().OnDone = null;

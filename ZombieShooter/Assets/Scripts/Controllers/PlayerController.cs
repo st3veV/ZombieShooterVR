@@ -28,8 +28,9 @@ namespace Controllers
             var head = player.transform.FindChild("CardboardMain").FindChild("Head").gameObject;
             radarController.SetCenterObject(head);
 
-            var shootingController = ShootingController.Instance;
+            var shootingController = ShootingController.Create();
             shootingController.SetGun(Gun);
+            shootingController.transform.SetParent(transform);
         }
         
         public void Reset()

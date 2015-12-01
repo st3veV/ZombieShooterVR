@@ -6,9 +6,10 @@ using UnityStandardAssets.Characters.ThirdPerson;
 using Utils;
 using Random = System.Random;
 
-public class ZombieSpawner : MonoBehaviour {
+public class ZombieSpawner : AutoObject<ZombieSpawner>
+{
 
-    public AICharacterControl Zombie;
+    public GameObject Zombie;
     public Transform SpawnPoint;
     
     public float Diameter = 0f;
@@ -22,7 +23,7 @@ public class ZombieSpawner : MonoBehaviour {
 
     public bool IsSpawning = true;
 
-    private Pool<AICharacterControl> _zombiePool;
+    private GameObjectPool _zombiePool;
     private LifetimeComponent _attactTarget;
     private Transform _zombieTarget;
 
@@ -45,7 +46,7 @@ public class ZombieSpawner : MonoBehaviour {
 
         _zombieTarget = playerController.PlayerTransform;
 
-        _zombiePool = new Pool<AICharacterControl>(CreateZombie);
+        _zombiePool = new GameObjectPool(Zombie, gameObject);
         _timer = new InternalTimer();
 	    _timer.Set(SpawnInterval*1000);
 	}
@@ -71,15 +72,22 @@ public class ZombieSpawner : MonoBehaviour {
     public void SpawnZombie()
     {
         bool isNew;
-        AICharacterControl clone = _zombiePool.Get(out isNew);
+        GameObject clone = _zombiePool.Get(out isNew);
 
-        if (!isNew)
+        AICharacterControl characterControl = clone.GetComponent<AICharacterControl>();
+        LifetimeComponent lifetimeComponent = clone.GetComponent<LifetimeComponent>();
+        if (isNew)
         {
-            LifetimeComponent lifetimeComponent = clone.GetComponent<LifetimeComponent>();
+            lifetimeComponent.Autodestroy = false;
+        }
+        else
+        {
             lifetimeComponent.Reset();
         }
+        lifetimeComponent.OnDie += Zombie_OnDie;
+        characterControl.OnPositionReached += Zombie_OnPositionReached;
 
-        clone.SetTarget(_zombieTarget);
+        characterControl.SetTarget(_zombieTarget);
         clone.transform.position = SpawnPoint.position;
         clone.gameObject.SetActive(true);
         clone.GetComponent<ZombieAudioController>().Spawn();
@@ -91,17 +99,7 @@ public class ZombieSpawner : MonoBehaviour {
 
         ChoseNextPosition();
     }
-
-    private AICharacterControl CreateZombie()
-    {
-        AICharacterControl clone = Instantiate(Zombie) as AICharacterControl;
-        LifetimeComponent lifetimeComponent = clone.GetComponent<LifetimeComponent>();
-        lifetimeComponent.Autodestroy = false;
-        lifetimeComponent.OnDie += Zombie_OnDie;
-        clone.OnPositionReached += clone_OnPositionReached;
-        return clone;
-    }
-
+    
     private void Zombie_OnDie(LifetimeComponent lifetimeComponent)
     {
         var radarTrackable = lifetimeComponent.GetComponent<RadarTrackable>();
@@ -119,7 +117,7 @@ public class ZombieSpawner : MonoBehaviour {
         }
     }
 
-    private void clone_OnPositionReached(GameObject obj)
+    private void Zombie_OnPositionReached(GameObject obj)
     {
         var radarTrackable = obj.GetComponent<RadarTrackable>();
         RadarController.Instance.RemoveTrackedObject(radarTrackable);
@@ -135,8 +133,13 @@ public class ZombieSpawner : MonoBehaviour {
 
     private void DisposeZombie(GameObject go)
     {
+        AICharacterControl characterControl = go.GetComponent<AICharacterControl>();
+        LifetimeComponent lifetimeComponent = go.GetComponent<LifetimeComponent>();
+        characterControl.OnPositionReached -= Zombie_OnPositionReached;
+        lifetimeComponent.OnDie -= Zombie_OnDie;
+
         go.SetActive(false);
-        _zombiePool.Add(go.GetComponent<AICharacterControl>());
+        _zombiePool.Add(go);
     }
 
     private void ChoseNextPosition()

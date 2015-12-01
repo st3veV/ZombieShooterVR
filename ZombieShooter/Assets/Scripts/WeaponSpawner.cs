@@ -6,14 +6,15 @@ using Radar;
 using Utils;
 using Random = UnityEngine.Random;
 
-public class WeaponSpawner : MonoBehaviour {
+public class WeaponSpawner : AutoObject<WeaponSpawner>
+{
 
     public ZombieSpawner ZombieSpawner;
-    public GameObject TargetPrefab;
     
     public event Action<GameObject> OnWeaponTargetSpawned;
 
-    private Pool<GameObject> _targetPool;
+    private GameObject _targetPrefab;
+    private GameObjectPool _targetPool;
 
     private PlayerController _playerController;
     private WeaponDatabase _weaponDatabase;
@@ -34,7 +35,9 @@ public class WeaponSpawner : MonoBehaviour {
         
         _playerController.Inventory.Reset();
 
-        _targetPool = new Pool<GameObject>(CreateAmmo);
+
+        _targetPrefab = Resources.Load("Prefabs/AmmoTarget") as GameObject;
+        _targetPool = new GameObjectPool(_targetPrefab, gameObject);
 	}
 
     private void ZombieSpawner_OnZombieSpawned(GameObject zombie)
@@ -91,7 +94,11 @@ public class WeaponSpawner : MonoBehaviour {
         RadarController.Instance.AddTrackedObject(radarTrackable);
 
         LifetimeComponent targetLife = target.GetComponent<LifetimeComponent>();
-        if (!isNew)
+        if (isNew)
+        {
+            targetLife.LifetimeDamage = BalancingData.WEAPON_TARGET_HEALTH;
+        }
+        else
         {
             targetLife.Reset();
         }
@@ -100,15 +107,7 @@ public class WeaponSpawner : MonoBehaviour {
         target.SetActive(true);
         spawned(target);
     }
-
-    private GameObject CreateAmmo()
-    {
-        var target = Instantiate(TargetPrefab);
-        var targetLife = target.GetComponent<LifetimeComponent>();
-        targetLife.LifetimeDamage = BalancingData.WEAPON_TARGET_HEALTH;
-        return target;
-    }
-
+    
     private void targetLife_OnDie(LifetimeComponent obj)
     {
         var radarTrackable = obj.GetComponent<RadarTrackable>();
