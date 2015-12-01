@@ -1,5 +1,5 @@
-﻿using System.Collections;
-using Thalmic.Myo;
+﻿using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -7,9 +7,11 @@ namespace Controllers
 {
     public class SetupController:MonoBehaviour
     {
-        private bool waitingForMyo = false;
-        private ThalmicMyo myo;
-        private GameObject loader;
+        private bool _waitingForMyo = false;
+        private ThalmicMyo _myo;
+        private GameObject _loader;
+
+        public event Action OnSetupCompleted;
 
         public Text HeadingText;
         public Text ConnectText;
@@ -21,12 +23,13 @@ namespace Controllers
         
         void Start()
         {
+            Controller.Instance.SetSetupController(this);
             StartButton.enabled = false;
             InCardboardButton.gameObject.SetActive(false);
             StartingText.gameObject.SetActive(false);
 
-            myo = ThalmicHub.instance.GetComponentInChildren<ThalmicMyo>();
-            if (myo.isPaired)
+            _myo = ThalmicHub.instance.GetComponentInChildren<ThalmicMyo>();
+            if (_myo.isPaired)
             {
                 Synced();
             }
@@ -39,11 +42,11 @@ namespace Controllers
 
         void Update()
         {
-            if (waitingForMyo)
+            if (_waitingForMyo)
             {
-                if (myo.isPaired)
+                if (_myo.isPaired)
                 {
-                    waitingForMyo = false;
+                    _waitingForMyo = false;
                     Synced();
                 }
             }
@@ -52,7 +55,7 @@ namespace Controllers
         private void OnConnectClick()
         {
             ThalmicHub.instance.Init();
-            waitingForMyo = true;
+            _waitingForMyo = true;
         }
 
         private void Synced()
@@ -103,8 +106,16 @@ namespace Controllers
         {
             StartingText.gameObject.SetActive(true);
             yield return new WaitForSeconds(5);
-            LevelController levelController = LevelController.Instance;
-            levelController.LoadScene(Scene.Init);
+            OnOnSetupCompleted();
         }
+
+        #region Event invocators
+
+        protected virtual void OnOnSetupCompleted()
+        {
+            if (OnSetupCompleted != null) OnSetupCompleted();
+        }
+
+        #endregion
     }
 }

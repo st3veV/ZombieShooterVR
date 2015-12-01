@@ -8,13 +8,26 @@ namespace Controllers
         private GameController _gameController;
         private GameOverController _gameOverController;
         private LevelController _levelController;
+        private SetupController _setupController;
 
         private void Start()
         {
             _levelController = LevelController.Instance;
             
-            StartTutorial();
+            //StartTutorial();
             //StartGame();
+        }
+
+        public void SetSetupController(SetupController setupController)
+        {
+            _setupController = setupController;
+            _setupController.OnSetupCompleted += SetupController_OnSetupCompleted;
+        }
+
+        private void SetupController_OnSetupCompleted()
+        {
+            _setupController.OnSetupCompleted -= SetupController_OnSetupCompleted;
+            StartTutorial();
         }
 
         private void StartTutorial()

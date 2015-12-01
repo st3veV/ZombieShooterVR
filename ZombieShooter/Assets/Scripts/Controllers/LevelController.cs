@@ -51,8 +51,7 @@ namespace Controllers
 public enum Scene
 {
     Setup = 0,
-    Init = 1,//loaded automatically and continues to Tutorial
-    Tutorial = 2,
-    Game = 3,
-    GameOver = 4
+    Tutorial = 1,
+    Game = 2,
+    GameOver = 3
 }

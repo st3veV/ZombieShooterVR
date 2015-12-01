@@ -23,7 +23,7 @@ namespace Controllers
         {
             _zombieSpawner = ZombieSpawner.Create();
             _weaponSpawner = WeaponSpawner.Create();
-            _weaponSpawner.ZombieSpawner = _zombieSpawner;
+            _weaponSpawner.SetZombieSpawner(_zombieSpawner);
 
             PlayerController playerController = PlayerController.Instance;
             _playerGun = playerController.Gun;
@@ -34,13 +34,11 @@ namespace Controllers
 
         public void Initialize()
         {
-            _zombieSpawner.Reset();
             _zombieSpawner.IsSpawning = true;
 
             _playerGun.SetFlashlightEnabled(true);
             _playerGun.FiringEnabled = true;
-
-            _weaponSpawner.Reset();
+            
             _playerLifetime.OnDie += PlayerLifetime_OnDie;
         }
 

@@ -9,8 +9,6 @@ namespace Controllers
 
         public GameObject TutorialTarget;
         
-        public GameObject ZombieSpawnPoint;
-
         public List<GameObject> TutorialInstructions;
         public GameObject TutorialInstructionReoad;
 
@@ -42,15 +40,15 @@ namespace Controllers
 
             _zombieSpawner = ZombieSpawner.Create();
             _weaponSpawner = WeaponSpawner.Create();
-            _weaponSpawner.ZombieSpawner = _zombieSpawner;
-
-            ZombieSpawnPoint = GameObject.Find("ZombieSpawnPoint");
+            _weaponSpawner.SetZombieSpawner(_zombieSpawner);
             
             Initialize();
         }
 
         public void Initialize()
         {
+            _zombieSpawner.IsSpawning = false;
+
             TutorialTarget.SetActive(false);
             _targetLifetime = TutorialTarget.GetComponent<LifetimeComponent>();
             HideTutorialInstructions();
@@ -78,9 +76,7 @@ namespace Controllers
             _oldShellsInMagazine = _playerGun.ShellsInMagazine;
 
             _reloadDistance = Vector3.Distance(_playerTransform.position, TutorialInstructionReoad.transform.position);
-
-            //Vector3 oldPos = ZombieSpawnPoint.transform.position;
-            ZombieSpawnPoint.transform.position = new Vector3(0, 1, -30);
+            
         }
 
         private void HideTutorialInstructions()
@@ -119,7 +115,8 @@ namespace Controllers
             HideTutorialInstructions();
             TutorialInstructions[2].SetActive(true);
             TutorialInstructions[3].SetActive(true);
-            _zombieSpawner.IsSpawning = true;
+            
+            _zombieSpawner.SpawnZombieAt(new Vector3(0, 1, -30));
             _zombieSpawner.OnZombieSpawned += ZombieSpawner_OnZombieSpawned;
             _weaponSpawner.OnWeaponTargetSpawned += WeaponSpawner_OnWeaponTargetSpawned;
         }

@@ -8,14 +8,12 @@ using Random = UnityEngine.Random;
 
 public class WeaponSpawner : AutoObject<WeaponSpawner>
 {
-
-    public ZombieSpawner ZombieSpawner;
-    
     public event Action<GameObject> OnWeaponTargetSpawned;
 
     private GameObject _targetPrefab;
     private GameObjectPool _targetPool;
 
+    private ZombieSpawner _zombieSpawner;
     private PlayerController _playerController;
     private WeaponDatabase _weaponDatabase;
     private WeaponManager _weaponManager;
@@ -29,7 +27,7 @@ public class WeaponSpawner : AutoObject<WeaponSpawner>
         _playerLocation = _playerController.PlayerTransform;
 
 	    _weaponDatabase = WeaponDatabase.Instance;
-        ZombieSpawner.OnZombieSpawned += ZombieSpawner_OnZombieSpawned;
+        _zombieSpawner.OnZombieSpawned += ZombieSpawner_OnZombieSpawned;
 
         _weaponManager = WeaponManager.Instance;
         
@@ -142,6 +140,11 @@ public class WeaponSpawner : AutoObject<WeaponSpawner>
     public void Reset()
     {
         _targetPool.Clear();
+    }
+
+    public void SetZombieSpawner(ZombieSpawner zombieSpawner)
+    {
+        _zombieSpawner = zombieSpawner;
     }
 
     #region Event invocators
