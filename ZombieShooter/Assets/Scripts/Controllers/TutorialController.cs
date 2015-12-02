@@ -164,17 +164,15 @@ namespace Controllers
             EndTutorial();
         }
 
-        private void WeaponSpawner_OnWeaponTargetSpawned(GameObject obj)
+        private void WeaponSpawner_OnWeaponTargetSpawned(AmmoTarget target)
         {
             _weaponSpawner.OnWeaponTargetSpawned -= WeaponSpawner_OnWeaponTargetSpawned;
-            LifetimeComponent ammoTargetLifetime = obj.GetComponent<LifetimeComponent>();
-            ammoTargetLifetime.OnDie += ammoTargetLifetime_OnDie;
+            target.AddDieListener(AmmoTarget_OnDie);
         }
 
-        private void ammoTargetLifetime_OnDie(LifetimeComponent obj)
+        private void AmmoTarget_OnDie(AmmoTarget target)
         {
-            obj.OnDie -= ammoTargetLifetime_OnDie;
-            obj.gameObject.SetActive(false);
+            target.RemoveDieListener(AmmoTarget_OnDie);
             TutorialStep5();
         }
 

@@ -8,10 +8,10 @@ using Random = UnityEngine.Random;
 
 public class WeaponSpawner : AutoObject<WeaponSpawner>
 {
-    public event Action<GameObject> OnWeaponTargetSpawned;
+    public event Action<AmmoTarget> OnWeaponTargetSpawned;
 
     private GameObject _targetPrefab;
-    private GameObjectPool _targetPool;
+    private AutoObjectWrapperPool<AmmoTarget> _targetPool;
 
     private ZombieSpawner _zombieSpawner;
     private PlayerController _playerController;
@@ -35,7 +35,7 @@ public class WeaponSpawner : AutoObject<WeaponSpawner>
 
 
         _targetPrefab = Resources.Load("Prefabs/AmmoTarget") as GameObject;
-        _targetPool = new GameObjectPool(_targetPrefab, gameObject);
+        _targetPool = new AutoObjectWrapperPool<AmmoTarget>(_targetPrefab, gameObject);
 	}
 
     private void ZombieSpawner_OnZombieSpawned(Zombie zombie)
@@ -52,7 +52,7 @@ public class WeaponSpawner : AutoObject<WeaponSpawner>
     public void SpawnAmmo(Transform sourceTransform)
     {
         bool isNew;
-        GameObject target = _targetPool.Get(out isNew);
+        AmmoTarget target = _targetPool.Get(out isNew);
         
         Vector3 targetPosition = sourceTransform.position;
         targetPosition.y = 0;
@@ -82,46 +82,40 @@ public class WeaponSpawner : AutoObject<WeaponSpawner>
             pickable.ContainsAmmo = true;
 
         }
-
-        PickupHolder pickupHolder = target.GetComponent<PickupHolder>();
-        pickupHolder.Pickable = pickable;
-        pickupHolder.Activate();
-
-        var radarTrackable = target.GetComponent<RadarTrackable>();
-        RadarController.Instance.AddTrackedObject(radarTrackable);
-
-        LifetimeComponent targetLife = target.GetComponent<LifetimeComponent>();
+        
+        target.PickupHolder.Pickable = pickable;
+        target.PickupHolder.Activate();
+        
+        RadarController.Instance.AddTrackedObject(target.RadarTrackable);
+        
         if (isNew)
         {
-            targetLife.LifetimeDamage = BalancingData.WEAPON_TARGET_HEALTH;
+            target.Lifetime.LifetimeDamage = BalancingData.WEAPON_TARGET_HEALTH;
         }
         else
         {
-            targetLife.Reset();
+            target.Lifetime.Reset();
         }
-        targetLife.OnDie += targetLife_OnDie;
+        target.AddDieListener(ammoTarget_OnDie);
 
-        target.SetActive(true);
+        target.gameObject.SetActive(true);
         spawned(target);
     }
     
-    private void targetLife_OnDie(LifetimeComponent obj)
+    private void ammoTarget_OnDie(AmmoTarget target)
     {
-        var radarTrackable = obj.GetComponent<RadarTrackable>();
-        RadarController.Instance.RemoveTrackedObject(radarTrackable);
+        RadarController.Instance.RemoveTrackedObject(target.RadarTrackable);
 
-        obj.OnDie -= targetLife_OnDie;
-        PickAmmo(obj.gameObject);
+        target.RemoveDieListener(ammoTarget_OnDie);
+        PickAmmo(target);
 
-        obj.gameObject.SetActive(false);
-        _targetPool.Add(obj.gameObject);
+        target.gameObject.SetActive(false);
+        _targetPool.Add(target);
     }
 
-    public void PickAmmo(GameObject target)
+    public void PickAmmo(AmmoTarget target)
     {
-        //Debug.Log("Weapon target picked");
-        var pickupHolder = target.GetComponent<PickupHolder>();
-        var pickable = pickupHolder.Pickable;
+        var pickable = target.PickupHolder.Pickable;
         if (pickable != null)
         {
             if (pickable.ContainsWeapon)
@@ -133,7 +127,7 @@ public class WeaponSpawner : AutoObject<WeaponSpawner>
                 _playerController.Inventory.PickAmmo(pickable.Ammo);
             }
         }
-        pickupHolder.Clear();
+        target.PickupHolder.Clear();
     }
 	
     public void Reset()
@@ -148,7 +142,7 @@ public class WeaponSpawner : AutoObject<WeaponSpawner>
 
     #region Event invocators
 
-    private void spawned(GameObject target)
+    private void spawned(AmmoTarget target)
     {
         var handler = OnWeaponTargetSpawned;
         if (handler != null)

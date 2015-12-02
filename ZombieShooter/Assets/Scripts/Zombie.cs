@@ -67,17 +67,4 @@ public class Zombie : AutoObjectWrapper<Zombie>
             _positionReachedListeners.Remove(listener);
         }
     }
-    
-
-    private void ExecuteListeners(List<Action<Zombie>> listeners)
-    {
-        if (listeners.Count > 0)
-        {
-            for (int i = 0; i < listeners.Count; i++)
-            {
-                Action<Zombie> listener = listeners[i];
-                listener(this);
-            }
-        }
-    }
 }
