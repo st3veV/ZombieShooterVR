@@ -116,9 +116,9 @@ namespace Controllers
             TutorialInstructions[2].SetActive(true);
             TutorialInstructions[3].SetActive(true);
             
-            _zombieSpawner.SpawnZombieAt(new Vector3(0, 1, -30));
             _zombieSpawner.OnZombieSpawned += ZombieSpawner_OnZombieSpawned;
             _weaponSpawner.OnWeaponTargetSpawned += WeaponSpawner_OnWeaponTargetSpawned;
+            _zombieSpawner.SpawnZombieAt(new Vector3(0, 1, -30));
         }
 
         private void TutorialStep4()
