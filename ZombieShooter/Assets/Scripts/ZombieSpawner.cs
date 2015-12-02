@@ -14,7 +14,7 @@ public class ZombieSpawner : AutoObject<ZombieSpawner>
     private float _zombieDamage = BalancingData.ZOMBIE_DAMAGE;
     private float _spawnInterval = BalancingData.ZOMBIE_SPAWN_INTERVAL_INITIAL;
 
-    public event Action<GameObject> OnZombieSpawned;
+    public event Action<Zombie> OnZombieSpawned;
 
     private GameObject _zombie;
     private UserData _userData;
@@ -22,7 +22,7 @@ public class ZombieSpawner : AutoObject<ZombieSpawner>
 
     public bool IsSpawning = true;
 
-    private GameObjectPool _zombiePool;
+    private AutoObjectWrapperPool<Zombie> _zombiePool;
     private LifetimeComponent _attactTarget;
     private Transform _zombieTarget;
 
@@ -42,11 +42,11 @@ public class ZombieSpawner : AutoObject<ZombieSpawner>
         _zombieTarget = playerController.PlayerTransform;
 
         _zombie = Resources.Load("Prefabs/ZombieEnemy") as GameObject;
-        _zombiePool = new GameObjectPool(_zombie, gameObject);
+        _zombiePool = new AutoObjectWrapperPool<Zombie>(_zombie, gameObject);
         
         _timer = new InternalTimer();
-	    _timer.Set(_spawnInterval*1000);
-	}
+        _timer.Set(_spawnInterval*1000);
+    }
 
     void AttactTarget_OnDie(LifetimeComponent lifetimeComponent)
     {
@@ -60,6 +60,7 @@ public class ZombieSpawner : AutoObject<ZombieSpawner>
             if(_timer.Update())
             {
                 _timer.Reset();
+                ChoseNextPosition();
                 SpawnZombie();
                 _timer.Set(_spawnInterval*1000);
             }
@@ -75,43 +76,36 @@ public class ZombieSpawner : AutoObject<ZombieSpawner>
     public void SpawnZombie()
     {
         bool isNew;
-        GameObject clone = _zombiePool.Get(out isNew);
-
-        AICharacterControl characterControl = clone.GetComponent<AICharacterControl>();
-        LifetimeComponent lifetimeComponent = clone.GetComponent<LifetimeComponent>();
+        Zombie clone = _zombiePool.Get(out isNew);
+        
         if (isNew)
         {
-            lifetimeComponent.Autodestroy = false;
+            clone.Lifetime.Autodestroy = false;
         }
         else
         {
-            lifetimeComponent.Reset();
+            clone.Lifetime.Reset();
         }
-        lifetimeComponent.OnDie += Zombie_OnDie;
-        characterControl.OnPositionReached += Zombie_OnPositionReached;
+        clone.AddDieListener(Zombie_OnDie);
+        clone.AddPositionReachedListener(Zombie_OnPositionReached);
 
-        characterControl.SetTarget(_zombieTarget);
+        clone.AiCharacterControl.SetTarget(_zombieTarget);
         clone.transform.position = _spawnPoint.position;
         clone.gameObject.SetActive(true);
-        clone.GetComponent<ZombieAudioController>().Spawn();
+        clone.AudioController.Spawn();
+        
+        RadarController.Instance.AddTrackedObject(clone.RadarTrackable);
 
-        var radarTrackable = clone.GetComponent<RadarTrackable>();
-        RadarController.Instance.AddTrackedObject(radarTrackable);
-
-        zombieSpawned(clone.gameObject);
-
-        ChoseNextPosition();
+        zombieSpawned(clone);
     }
     
-    private void Zombie_OnDie(LifetimeComponent lifetimeComponent)
+    private void Zombie_OnDie(Zombie zombie)
     {
-        lifetimeComponent.OnDie -= Zombie_OnDie;
-
-        var radarTrackable = lifetimeComponent.GetComponent<RadarTrackable>();
-        RadarController.Instance.RemoveTrackedObject(radarTrackable);
+        RemoveZombieListeners(zombie);
+        RadarController.Instance.RemoveTrackedObject(zombie.RadarTrackable);
 
         //dispose zombie
-        lifetimeComponent.gameObject.GetComponent<ThirdPersonCharacter>().Die(DisposeZombie);
+        zombie.ThirdPersonCharacter.Die(DisposeZombie);
 
         //deal with score
         _userData.IncreaseScore(BalancingData.SCORE_FOR_ZOMBIE);
@@ -122,12 +116,12 @@ public class ZombieSpawner : AutoObject<ZombieSpawner>
         }
     }
 
-    private void Zombie_OnPositionReached(GameObject obj)
+    private void Zombie_OnPositionReached(Zombie zombie)
     {
-        var radarTrackable = obj.GetComponent<RadarTrackable>();
-        RadarController.Instance.RemoveTrackedObject(radarTrackable);
+        RemoveZombieListeners(zombie);
+        RadarController.Instance.RemoveTrackedObject(zombie.RadarTrackable);
 
-        obj.GetComponent<ThirdPersonCharacter>().Attack(AttackAndDispose);
+        zombie.ThirdPersonCharacter.Attack(AttackAndDispose);
     }
 
     private void AttackAndDispose(GameObject go)
@@ -138,19 +132,23 @@ public class ZombieSpawner : AutoObject<ZombieSpawner>
 
     private void DisposeZombie(GameObject go)
     {
-        AICharacterControl characterControl = go.GetComponent<AICharacterControl>();
-        LifetimeComponent lifetimeComponent = go.GetComponent<LifetimeComponent>();
-        characterControl.OnPositionReached -= Zombie_OnPositionReached;
-        lifetimeComponent.OnDie -= Zombie_OnDie;
+        Zombie zombie = go.GetComponent<Zombie>();
+        RemoveZombieListeners(zombie);
 
         go.SetActive(false);
-        _zombiePool.Add(go);
+        _zombiePool.Add(zombie);
+    }
+
+    private void RemoveZombieListeners(Zombie zombie)
+    {
+        zombie.RemovePositionReachedListener(Zombie_OnPositionReached);
+        zombie.RemoveDieListener(Zombie_OnDie);
     }
 
     private void ChoseNextPosition()
     {
         Random rand = new Random();
-        float angle = rand.Next(0,360);
+        float angle = rand.Next(0, 360);
         float value = angle * Mathf.Deg2Rad;
         float xpos = _diameter * Mathf.Cos(value);
         float zpos = _diameter * Mathf.Sin(value);
@@ -171,7 +169,7 @@ public class ZombieSpawner : AutoObject<ZombieSpawner>
 
     #region Event invocators
 
-    private void zombieSpawned(GameObject zombie)
+    private void zombieSpawned(Zombie zombie)
     {
         var handler = OnZombieSpawned;
         if (handler != null)

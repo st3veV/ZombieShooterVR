@@ -178,17 +178,16 @@ namespace Controllers
             TutorialStep5();
         }
 
-        private void ZombieSpawner_OnZombieSpawned(GameObject obj)
+        private void ZombieSpawner_OnZombieSpawned(Zombie zombie)
         {
             _zombieSpawner.OnZombieSpawned -= ZombieSpawner_OnZombieSpawned;
             _zombieSpawner.IsSpawning = false;
-            LifetimeComponent zombieLifetime = obj.GetComponent<LifetimeComponent>();
-            zombieLifetime.OnDie += zombieLifetime_OnDie;
+            zombie.AddDieListener(zombie_OnDie);
         }
 
-        private void zombieLifetime_OnDie(LifetimeComponent obj)
+        private void zombie_OnDie(Zombie zombie)
         {
-            obj.OnDie -= zombieLifetime_OnDie;
+            zombie.RemoveDieListener(zombie_OnDie);
             TutorialStep4();
         }
 

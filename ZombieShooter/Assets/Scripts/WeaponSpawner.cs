@@ -38,16 +38,15 @@ public class WeaponSpawner : AutoObject<WeaponSpawner>
         _targetPool = new GameObjectPool(_targetPrefab, gameObject);
 	}
 
-    private void ZombieSpawner_OnZombieSpawned(GameObject zombie)
+    private void ZombieSpawner_OnZombieSpawned(Zombie zombie)
     {
-        LifetimeComponent zombieLife = zombie.GetComponent<LifetimeComponent>();
-        zombieLife.OnDie += zombieLife_OnDie;
+        zombie.AddDieListener(zombie_OnDie);
     }
 
-    private void zombieLife_OnDie(LifetimeComponent obj)
+    private void zombie_OnDie(Zombie zombie)
     {
-        obj.OnDie -= zombieLife_OnDie;
-        SpawnAmmo(obj.transform);
+        zombie.RemoveDieListener(zombie_OnDie);
+        SpawnAmmo(zombie.transform);
     }
 
     public void SpawnAmmo(Transform sourceTransform)
