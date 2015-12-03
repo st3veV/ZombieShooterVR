@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Controllers;
 using UnityEngine;
 
 namespace Radar
@@ -27,6 +28,7 @@ namespace Radar
             GameObject helper = new GameObject("helper");
             helper.transform.SetParent(transform);
             _helperTransform = helper.transform;
+            EventManager.Instance.AddUpdateListener(OnUpdate);
         }
 
         public void SetCenterObject(GameObject centerObject)
@@ -50,7 +52,7 @@ namespace Radar
             }
         }
         
-        private void Update()
+        private void OnUpdate()
         {
             //Update radar view
             Vector3 eulerAngles = _centerGameObject.transform.rotation.eulerAngles;

@@ -1,4 +1,5 @@
 ﻿using System;
+using Controllers;
 using UnityEngine;
 
 namespace Shooting
@@ -13,7 +14,6 @@ namespace Shooting
         private float _currentStep = 0;
 
         public Action<GameObject> OnDone;
-        private bool _animate;
         private Vector3 _origin;
 
         private void Start()
@@ -27,13 +27,11 @@ namespace Shooting
             _destination = target;
             _distance = Vector3.Distance(origin, target);
             _currentStep = 0;
-            _animate = true;
+            EventManager.Instance.AddUpdateListener(AnimateUpdate);
         }
 
-        private void Update()
+        private void AnimateUpdate()
         {
-            if (_animate)
-            {
                 if (_currentStep < _distance)
                 {
                     float x0 = Mathf.Lerp(0, _distance, _currentStep);
@@ -51,10 +49,10 @@ namespace Shooting
                 }
                 else
                 {
-                    _animate = false;
+                    EventManager.Instance.RemoveUpdateListener(AnimateUpdate);
                     OnDone(gameObject);
                 }
-            }
+            
         }
     }
 }

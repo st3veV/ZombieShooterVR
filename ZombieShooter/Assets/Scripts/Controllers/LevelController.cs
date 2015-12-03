@@ -16,11 +16,12 @@ namespace Controllers
 
         private LoadingState _state = LoadingState.Idle;
 
-        private void Update()
+        private void OnUpdate()
         {
             if (_state == LoadingState.Loaded)
             {
                 OnOnSceneLoaded();
+                EventManager.Instance.RemoveUpdateListener(OnUpdate);
                 _state = LoadingState.Idle;
             }
         }
@@ -28,6 +29,7 @@ namespace Controllers
         public void LoadScene(Scene scene)
         {
             _state = LoadingState.Loading;
+            EventManager.Instance.AddUpdateListener(OnUpdate);
             Application.LoadLevel((int) scene);
         }
 

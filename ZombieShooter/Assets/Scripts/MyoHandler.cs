@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Controllers;
 using Thalmic.Myo;
 using UnityEngine;
 using Quaternion = UnityEngine.Quaternion;
@@ -32,14 +33,16 @@ public class MyoHandler : MonoBehaviour
         
         _thalmicMyo = ThalmicHub.instance.GetComponentInChildren<ThalmicMyo>();//myo.GetComponent<ThalmicMyo>();
         _myo = _thalmicMyo.gameObject;
+
+        EventManager.Instance.AddUpdateListener(OnUpdate);
     }
 
-    void GunOnWeaponKick()
+    private void GunOnWeaponKick()
     {
         _thalmicMyo.NotifyUserAction();
     }
 
-    void Update ()
+    private void OnUpdate ()
     {
         //move hand to the side to properly simulate hand position
         if (_thalmicMyo.arm != _lastArm)
@@ -127,8 +130,9 @@ public class MyoHandler : MonoBehaviour
 
     private void UpdateHandOffsetPosition()
     {
-        foreach (GameObject o in HandSideOffsetUpdate)
+        for (int i = 0; i < HandSideOffsetUpdate.Count; i++)
         {
+            GameObject o = HandSideOffsetUpdate[i];
             Vector3 localPosition = o.transform.position;
             if (_thalmicMyo.arm == Arm.Right)
             {
@@ -143,7 +147,7 @@ public class MyoHandler : MonoBehaviour
     }
 
 
-    float rollFromZero (Vector3 zeroRoll, Vector3 forward, Vector3 up)
+    private float rollFromZero (Vector3 zeroRoll, Vector3 forward, Vector3 up)
     {
         float cosine = Vector3.Dot (up, zeroRoll);
         Vector3 cp = Vector3.Cross (up, zeroRoll);
@@ -153,7 +157,7 @@ public class MyoHandler : MonoBehaviour
         return sign * Mathf.Rad2Deg * Mathf.Acos (cosine);
     }
 
-    Vector3 computeZeroRollVector (Vector3 forward)
+    private Vector3 computeZeroRollVector (Vector3 forward)
     {
         Vector3 antigravity = Vector3.up;
         Vector3 m = Vector3.Cross (_myo.transform.forward, antigravity);
@@ -162,7 +166,7 @@ public class MyoHandler : MonoBehaviour
         return roll.normalized;
     }
 
-    float normalizeAngle (float angle)
+    private float normalizeAngle (float angle)
     {
         if (angle > 180.0f) {
             return angle - 360.0f;
@@ -173,7 +177,7 @@ public class MyoHandler : MonoBehaviour
         return angle;
     }
 
-    void ExtendUnlockAndNotifyUserAction (ThalmicMyo myo)
+    private void ExtendUnlockAndNotifyUserAction (ThalmicMyo myo)
     {
         ThalmicHub hub = ThalmicHub.instance;
 
@@ -184,9 +188,13 @@ public class MyoHandler : MonoBehaviour
         myo.NotifyUserAction ();
     }
 
+    #region Event Invocators
+
     protected virtual void MyoReset()
     {
         var handler = OnMyoReset;
         if (handler != null) handler();
     }
+
+    #endregion
 }

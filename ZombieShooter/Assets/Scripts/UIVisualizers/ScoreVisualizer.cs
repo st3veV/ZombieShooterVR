@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Controllers;
+using UnityEngine;
 using UnityEngine.UI;
 
 public class ScoreVisualizer : MonoBehaviour
@@ -10,9 +11,10 @@ public class ScoreVisualizer : MonoBehaviour
 	void Start ()
 	{
 	    _userData = UserData.Instance;
+        EventManager.Instance.AddUpdateListener(OnUpdate);
 	}
 	
-	void Update ()
+	private void OnUpdate()
 	{
 	    TextOutput.text = _userData.Score.ToString();
 	}

@@ -21,7 +21,6 @@ namespace Controllers
         private Gun _playerGun;
         private Transform _playerTransform;
         private LifetimeComponent _targetLifetime;
-        private bool _checkingAmmo;
         private int _oldShellsInMagazine;
         private float _reloadDistance;
 
@@ -91,7 +90,6 @@ namespace Controllers
         {
             //Reset hand position
             Debug.Log("Tutorial step - reset hand position");
-            _checkingAmmo = false;
             _myoHandler.OnMyoReset += MyoHandler_OnMyoReset;
             TutorialInstructions[0].SetActive(true);
         }
@@ -103,7 +101,7 @@ namespace Controllers
             HideTutorialInstructions();
             TutorialInstructions[1].SetActive(true);
             TutorialTarget.SetActive(true);
-            _checkingAmmo = true;
+            EventManager.Instance.AddUpdateListener(CheckingAmmoUpdate);
             _playerGun.FiringEnabled = true;
             _targetLifetime.OnDie += _targetLifetime_OnDie;
         }
@@ -204,13 +202,11 @@ namespace Controllers
         }
 
 
-        private void Update()
+        private void CheckingAmmoUpdate()
         {
-            if (_checkingAmmo)
-            {
                 if (_playerGun.ShellsInMagazine > _oldShellsInMagazine)
                 {
-                    _checkingAmmo = false;
+                    EventManager.Instance.RemoveUpdateListener(CheckingAmmoUpdate);
                 }
                 _oldShellsInMagazine = _playerGun.ShellsInMagazine;
                 if (_playerGun.ShellsInMagazine == 0)
@@ -227,7 +223,6 @@ namespace Controllers
                 {
                     TutorialInstructionReoad.SetActive(false);
                 }
-            }
         }
 
         #region Event invocators

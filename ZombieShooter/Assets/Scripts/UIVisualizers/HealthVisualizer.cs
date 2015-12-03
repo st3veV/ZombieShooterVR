@@ -7,8 +7,6 @@ public class HealthVisualizer : MonoBehaviour
     public LifetimeComponent ObjectToMonitor;
     public Slider SliderVisual;
     
-
-	// Use this for initialization
 	void Start ()
 	{
 	    if (ObjectToMonitor != null)
@@ -44,9 +42,5 @@ public class HealthVisualizer : MonoBehaviour
         ObjectToMonitor.OnDamage -= ObjectToMonitor_OnDamage;
         ObjectToMonitor.OnDie -= ObjectToMonitor_OnDie;
     }
-
-    // Update is called once per frame
-	void Update () {
-	
-	}
+    
 }

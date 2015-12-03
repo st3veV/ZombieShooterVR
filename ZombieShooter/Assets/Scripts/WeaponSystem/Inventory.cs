@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Controllers;
 using Thalmic.Myo;
 using UnityEngine;
 
@@ -89,11 +90,11 @@ public class Inventory : MonoBehaviour
     {
         //Debug.Log(("inventory.start"));
         _myo = ThalmicHub.instance.GetComponentInChildren<ThalmicMyo>();
-
+        EventManager.Instance.AddUpdateListener(OnUpdate);
         InitInventory();
     }
 
-    private void Update()
+    private void OnUpdate()
     {
         if (_currentPose != _myo.pose)
         {
@@ -113,14 +114,12 @@ public class Inventory : MonoBehaviour
     public void PickWeapon(IWeapon weapon)
     {
         InitInventory();
-        //Debug.Log("Picked weapon: " + weapon.Name);
         _inventory.AddWeapon(weapon);
     }
 
     public void PickAmmo(IAmmo ammo)
     {
         InitInventory();
-        //Debug.Log("Picked ammo: " + ammo.Type + " (" + ammo.Amount + ")");
         _inventory.AddAmmo(ammo);
     }
 
@@ -132,8 +131,7 @@ public class Inventory : MonoBehaviour
             _inventory.Init();
         }
     }
-
-
+    
     public void Reset()
     {
         InitInventory();
@@ -144,15 +142,12 @@ public class Inventory : MonoBehaviour
     private void PickFirstWeapon()
     {
         //init - selecting first weapon
-        //Debug.Log("pick weapon");
         IWeapon weapon = WeaponManager.Instance.GetWeapon(WeaponDatabase.Instance.Weapons[0]);
-        //Debug.Log("selecting weapon: " + weapon.Name);
         PickWeapon(weapon);
 
         //adding enough bullets
         var modularAmmo = new ModularAmmo();
         modularAmmo.SetValues(weapon.BulletType, weapon.MagazineSize + 100);
         PickAmmo(modularAmmo);
-
     }
 }

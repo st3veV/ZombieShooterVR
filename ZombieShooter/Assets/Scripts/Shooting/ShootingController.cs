@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Controllers;
 using UnityEngine;
 using Utils;
 using Random = System.Random;
@@ -50,29 +51,30 @@ namespace Shooting
             _currentWeapon = obj;
         }
 
-        void Update()
+        private void CleanParticleSystems()
         {
-            if (_runningParticleSystems.Count > 0)
+            List<ParticleSystem> toRemove = new List<ParticleSystem>();
+            for (int i = 0; i < _runningParticleSystems.Count; i++)
             {
-                List<ParticleSystem> toRemove = new List<ParticleSystem>();
-                for (int i = 0; i < _runningParticleSystems.Count; i++)
+                ParticleSystem system = _runningParticleSystems[i];
+                if (system == null || !system.isPlaying)
                 {
-                    ParticleSystem system = _runningParticleSystems[i];
-                    if (system == null || !system.isPlaying)
-                    {
-                        toRemove.Add(system);
-                    }
+                    toRemove.Add(system);
                 }
-                for (int i = 0; i < toRemove.Count; i++)
+            }
+            for (int i = 0; i < toRemove.Count; i++)
+            {
+                ParticleSystem system = toRemove[i];
+                _runningParticleSystems.Remove(system);
+                if (system != null)
                 {
-                    ParticleSystem system = toRemove[i];
-                    _runningParticleSystems.Remove(system);
-                    if (system != null)
-                    {
-                        system.gameObject.SetActive(false);
-                        _particlePool.Add(system.gameObject);
-                    }
+                    system.gameObject.SetActive(false);
+                    _particlePool.Add(system.gameObject);
                 }
+            }
+            if (_runningParticleSystems.Count == 0)
+            {
+                EventManager.Instance.RemoveUpdateListener(CleanParticleSystems);
             }
         }
 
@@ -138,6 +140,10 @@ namespace Shooting
             burst.transform.position = location;
             ParticleSystem system = burst.GetComponent<ParticleSystem>();
             system.startColor = color;
+            if (_runningParticleSystems.Count == 0)
+            {
+                EventManager.Instance.AddUpdateListener(CleanParticleSystems);
+            }
             _runningParticleSystems.Add(system);
             burst.SetActive(true);
             system.Play();

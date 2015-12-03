@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Controllers;
+using UnityEngine;
 using Random = System.Random;
 
 [RequireComponent(typeof(AudioSource))]
@@ -22,20 +23,13 @@ public class ZombieAudioController : MonoBehaviour {
         _zombieLifetime = gameObject.GetComponent<LifetimeComponent>();
         _zombieLifetime.OnDamage += _zombieLifetime_OnDamage;
     }
-
-	void Start ()
-	{
-        
-	}
-
-
-
-    void _zombieLifetime_OnDamage(float obj)
+    
+    private void _zombieLifetime_OnDamage(float obj)
     {
         _audioSource.PlayOneShot(HitSound);
     }
 
-    void Update ()
+    private void OnUpdate ()
     {
         if (_timer.Update())
         {
@@ -47,8 +41,8 @@ public class ZombieAudioController : MonoBehaviour {
     public void Spawn()
     {
         _audioSource.PlayOneShot(SpawnSound);
-
-        _timer.Set(_random.Next(5, 10   )*1000);
+        EventManager.Instance.AddUpdateListener(OnUpdate);
+        _timer.Set(_random.Next(5, 10)*1000);
     }
 
 }

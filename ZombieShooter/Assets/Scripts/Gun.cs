@@ -1,4 +1,5 @@
 ﻿using System;
+using Controllers;
 using UnityEngine;
 
 public class Gun : MonoBehaviour {
@@ -27,22 +28,19 @@ public class Gun : MonoBehaviour {
         _weaponContainer = transform.FindChild("GunContainer").gameObject;
     }
     
-    void Update () {
-        if (_isFiring)
+    void FireUpdate () {
+        if (_timer.Update())
         {
-            if (_timer.Update())
+            if (_shellsInMagazine > 0)
             {
-                if (_shellsInMagazine > 0)
-                {
-                    _shellsInMagazine--;
-                    Fire();
-                }
-                else
-                {
-                    Klick();
-                }
-                _timer.Set(_currentWeapon.CooldownDelay);
+                _shellsInMagazine--;
+                Fire();
             }
+            else
+            {
+                Klick();
+            }
+            _timer.Set(_currentWeapon.CooldownDelay);
         }
     }
 
@@ -63,6 +61,7 @@ public class Gun : MonoBehaviour {
         if (FiringEnabled && _isFiring == false)
         {
             _isFiring = true;
+            EventManager.Instance.AddUpdateListener(FireUpdate);
             _timer.Set(0);
         }
     }
@@ -72,6 +71,7 @@ public class Gun : MonoBehaviour {
         if (FiringEnabled && _isFiring)
         {
             _isFiring = false;
+            EventManager.Instance.RemoveUpdateListener(FireUpdate);
             Kick();
         }
     }

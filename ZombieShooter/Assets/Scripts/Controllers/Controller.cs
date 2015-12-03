@@ -13,9 +13,6 @@ namespace Controllers
         private void Start()
         {
             _levelController = LevelController.Instance;
-            
-            //StartTutorial();
-            //StartGame();
         }
 
         public void SetSetupController(SetupController setupController)

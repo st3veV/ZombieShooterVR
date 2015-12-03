@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Controllers;
+using UnityEngine;
 
 [RequireComponent(typeof (LifetimeComponent))]
 public class PickupHolder : MonoBehaviour
@@ -9,25 +10,21 @@ public class PickupHolder : MonoBehaviour
 
     private LifetimeComponent _lifetime;
     private InternalTimer _timer;
-
-    void Awake()
-    {
-        Debug.Log("awaken");
-    }
-
+    
     void Start()
     {
-        Debug.Log("started");
         _lifetime = GetComponent<LifetimeComponent>();
         AssertTimer();
         _timer.Reset();
+        EventManager.Instance.AddUpdateListener(OnUpdate);
     }
 
-    void Update()
+    private void OnUpdate()
     {
         if (_timer.Update())
         {
             _lifetime.ReceiveDamage(BalancingData.WEAPON_TARGET_HEALTH);
+            EventManager.Instance.RemoveUpdateListener(OnUpdate);
         }
     }
 
@@ -35,7 +32,7 @@ public class PickupHolder : MonoBehaviour
     {
         AssertTimer();
         _timer.Reset();
-
+        EventManager.Instance.AddUpdateListener(OnUpdate);
         Texture decal = Pickable.Weapon.BulletImage;
 
         PickableVisualizer.material.mainTexture = decal;

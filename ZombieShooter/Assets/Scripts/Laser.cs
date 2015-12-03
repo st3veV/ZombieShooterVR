@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Controllers;
+using UnityEngine;
 
 [RequireComponent(typeof(LineRenderer))]
 public class Laser : MonoBehaviour
@@ -23,9 +24,11 @@ public class Laser : MonoBehaviour
         _myTransform = transform;
         
         _lineRenderer.SetVertexCount(2);
+
+        EventManager.Instance.AddUpdateListener(OnUpdate);
     }
 
-    void Update()
+    void OnUpdate()
     {
         RenderLaser();
     }
@@ -33,17 +36,16 @@ public class Laser : MonoBehaviour
     private void RenderLaser()
     {
         UpdateLength();
-        
-        _lineRenderer.SetPosition(1,new Vector3(0,0,_length));
+
+        _lineRenderer.SetPosition(1, new Vector3(0, 0, _length));
         _lineRenderer.SetColors(Color, Color);
     }
 
     private void UpdateLength()
     {
-        RaycastHit[] hit;
-        hit = Physics.RaycastAll(_myTransform.position, _myTransform.forward, MaxLength);
+        var hit = Physics.RaycastAll(_myTransform.position, _myTransform.forward, MaxLength);
 
-        int i = 0;
+        var i = 0;
         while (i < hit.Length)
         {
             if (!hit[i].collider.isTrigger)

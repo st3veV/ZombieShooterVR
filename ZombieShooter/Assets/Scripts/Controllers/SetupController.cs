@@ -7,9 +7,7 @@ namespace Controllers
 {
     public class SetupController:MonoBehaviour
     {
-        private bool _waitingForMyo = false;
         private ThalmicMyo _myo;
-        private GameObject _loader;
 
         public event Action OnSetupCompleted;
 
@@ -40,22 +38,19 @@ namespace Controllers
             }
         }
 
-        void Update()
+        void WaitForMyoUpdate()
         {
-            if (_waitingForMyo)
+            if (_myo.isPaired)
             {
-                if (_myo.isPaired)
-                {
-                    _waitingForMyo = false;
-                    Synced();
-                }
+                EventManager.Instance.RemoveUpdateListener(WaitForMyoUpdate);
+                Synced();
             }
         }
 
         private void OnConnectClick()
         {
+            EventManager.Instance.AddUpdateListener(WaitForMyoUpdate);
             ThalmicHub.instance.Init();
-            _waitingForMyo = true;
         }
 
         private void Synced()

@@ -20,7 +20,7 @@ public class ZombieSpawner : AutoObject<ZombieSpawner>
     private UserData _userData;
     private InternalTimer _timer;
 
-    public bool IsSpawning = true;
+    private bool _isSpawning = true;
 
     private AutoObjectWrapperPool<Zombie> _zombiePool;
     private LifetimeComponent _attactTarget;
@@ -48,23 +48,20 @@ public class ZombieSpawner : AutoObject<ZombieSpawner>
         _timer.Set(_spawnInterval*1000);
     }
 
-    void AttactTarget_OnDie(LifetimeComponent lifetimeComponent)
+    private void AttactTarget_OnDie(LifetimeComponent lifetimeComponent)
     {
         _attactTarget.OnDie -= AttactTarget_OnDie;
         IsSpawning = false;
     }
 	
-	void Update () {
-        if (IsSpawning)
-        {
-            if(_timer.Update())
-            {
-                _timer.Reset();
-                ChoseNextPosition();
-                SpawnZombie();
-                _timer.Set(_spawnInterval*1000);
-            }
-        }
+	private void OnUpdate() {
+	    if (_timer.Update())
+	    {
+	        _timer.Reset();
+	        ChoseNextPosition();
+	        SpawnZombie();
+	        _timer.Set(_spawnInterval*1000);
+	    }
 	}
 
     public void SpawnZombieAt(Vector3 position)
@@ -165,6 +162,23 @@ public class ZombieSpawner : AutoObject<ZombieSpawner>
         _spawnInterval = BalancingData.ZOMBIE_SPAWN_INTERVAL_INITIAL;
         IsSpawning = true;
         _timer.Set(_spawnInterval*1000);
+    }
+
+    public bool IsSpawning
+    {
+        get { return _isSpawning; }
+        set
+        {
+            _isSpawning = value;
+            if (_isSpawning)
+            {
+                EventManager.Instance.AddUpdateListener(OnUpdate);
+            }
+            else
+            {
+                EventManager.Instance.RemoveUpdateListener(OnUpdate);
+            }
+        }
     }
 
     #region Event invocators
