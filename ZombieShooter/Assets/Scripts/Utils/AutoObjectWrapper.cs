@@ -19,16 +19,61 @@ namespace Utils
         {
             OriginalPrefab = originalPrefab;
         }
-        
+
+        private readonly List<List<Action<T>>> _listenersInExecution = new List<List<Action<T>>>();
+        private readonly Dictionary<List<Action<T>>,List<Action<T>>> _listenersToRemove = new Dictionary<List<Action<T>>, List<Action<T>>>();
+
         protected void ExecuteListeners(List<Action<T>> listeners)
         {
+            _listenersInExecution.Add(listeners);
             if (listeners.Count > 0)
             {
-                for (int i = 0; i < listeners.Count; i++)
+                List<int> nullListeners = new List<int>();
+                for (var i = 0; i < listeners.Count; i++)
                 {
                     Action<T> listener = listeners[i];
-                    listener((T) this);
+                    if (listener != null)
+                    {
+                        listener((T) this);
+                    }
+                    else
+                    {
+                        nullListeners.Add(i);
+                    }
                 }
+                if (nullListeners.Count > 0)
+                {
+                    for (var i = nullListeners.Count - 1; i >= 0; i--)
+                    {
+                        listeners.RemoveAt(nullListeners[i]);
+                    }
+                }
+                if (_listenersToRemove.ContainsKey(listeners))
+                {
+                    for (var i = 0; i < _listenersToRemove[listeners].Count; i++)
+                    {
+                        var listener = _listenersToRemove[listeners][i];
+                        listeners.Remove(listener);
+                    }
+                    _listenersToRemove.Remove(listeners);
+                }
+            }
+            _listenersInExecution.Remove(listeners);
+        }
+
+        protected void RemoveListener(Action<T> listener, List<Action<T>> fromListeners)
+        {
+            if (_listenersInExecution.Contains(fromListeners))
+            {
+                if (!_listenersToRemove.ContainsKey(fromListeners))
+                {
+                    _listenersToRemove.Add(fromListeners, new List<Action<T>>());
+                }
+                _listenersToRemove[fromListeners].Add(listener);
+            }
+            else
+            {
+                fromListeners.Remove(listener);
             }
         }
     }

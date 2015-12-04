@@ -37,7 +37,7 @@ public class AmmoTarget : AutoObjectWrapper<AmmoTarget>
     {
         if (_dieListeners.Contains(listener))
         {
-            _dieListeners.Remove(listener);
+            RemoveListener(listener, _dieListeners);
         }
     }
 

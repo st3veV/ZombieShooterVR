@@ -51,7 +51,7 @@ public class Zombie : AutoObjectWrapper<Zombie>
     {
         if (_dieListeners.Contains(listener))
         {
-            _dieListeners.Remove(listener);
+            RemoveListener(listener, _dieListeners);
         }
     }
     
@@ -64,7 +64,7 @@ public class Zombie : AutoObjectWrapper<Zombie>
     {
         if (_positionReachedListeners.Contains(listener))
         {
-            _positionReachedListeners.Remove(listener);
+            RemoveListener(listener, _positionReachedListeners);
         }
     }
 }
