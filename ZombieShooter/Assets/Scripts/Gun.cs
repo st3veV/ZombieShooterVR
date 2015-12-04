@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using Controllers;
 using UnityEngine;
 
@@ -15,7 +16,6 @@ public class Gun : MonoBehaviour {
     public bool FiringEnabled;
 
     private bool _isFiring = false;
-    private InternalTimer _timer;
     private IWeapon _currentWeapon;
     private int _shellsInMagazine;
 
@@ -23,13 +23,14 @@ public class Gun : MonoBehaviour {
 
     void Awake ()
     {
-        _timer = new InternalTimer();
-
         _weaponContainer = transform.FindChild("GunContainer").gameObject;
     }
-    
-    void FireUpdate () {
-        if (_timer.Update())
+
+    private bool _isCoroutineRunning = false;
+    private IEnumerator FireCoroutine()
+    {
+        _isCoroutineRunning = true;
+        while (_isFiring)
         {
             if (_shellsInMagazine > 0)
             {
@@ -40,8 +41,9 @@ public class Gun : MonoBehaviour {
             {
                 Klick();
             }
-            _timer.Set(_currentWeapon.CooldownDelay);
+            yield return new WaitForSeconds(_currentWeapon.CooldownDelay/1000);
         }
+        _isCoroutineRunning = false;
     }
 
     private void Klick()
@@ -61,8 +63,10 @@ public class Gun : MonoBehaviour {
         if (FiringEnabled && _isFiring == false)
         {
             _isFiring = true;
-            EventManager.Instance.AddUpdateListener(FireUpdate);
-            _timer.Set(0);
+            if (!_isCoroutineRunning)
+            {
+                StartCoroutine(FireCoroutine());
+            }
         }
     }
 
@@ -71,7 +75,6 @@ public class Gun : MonoBehaviour {
         if (FiringEnabled && _isFiring)
         {
             _isFiring = false;
-            EventManager.Instance.RemoveUpdateListener(FireUpdate);
             Kick();
         }
     }

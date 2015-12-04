@@ -28,7 +28,7 @@ namespace Utils
             _listenersInExecution.Add(listeners);
             if (listeners.Count > 0)
             {
-                List<int> nullListeners = new List<int>();
+                var nullListeners = new List<int>();
                 for (var i = 0; i < listeners.Count; i++)
                 {
                     Action<T> listener = listeners[i];

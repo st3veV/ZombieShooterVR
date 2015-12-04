@@ -156,7 +156,6 @@ public class ZombieSpawner : AutoObject<ZombieSpawner>
         set
         {
             _isSpawning = value;
-            Debug.Log("IsSpawning: " + _isSpawning);
             if (!_isCoroutineRunning)
             {
                 StartCoroutine(SpawnZombieCoroutine());
@@ -172,7 +171,6 @@ public class ZombieSpawner : AutoObject<ZombieSpawner>
         while (_isSpawning)
         {
             yield return new WaitForSeconds(_spawnInterval);
-            Debug.Log("IsSpawning - C: " + _isSpawning);
             if (_isSpawning)
             {
                 ChoseNextPosition();
