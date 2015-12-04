@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using Controllers;
 using Radar;
 using UnityEngine;
@@ -18,9 +19,8 @@ public class ZombieSpawner : AutoObject<ZombieSpawner>
 
     private GameObject _zombie;
     private UserData _userData;
-    private InternalTimer _timer;
 
-    private bool _isSpawning = true;
+    private bool _isSpawning = false;
 
     private AutoObjectWrapperPool<Zombie> _zombiePool;
     private LifetimeComponent _attactTarget;
@@ -43,9 +43,6 @@ public class ZombieSpawner : AutoObject<ZombieSpawner>
 
         _zombie = Resources.Load("Prefabs/ZombieEnemy") as GameObject;
         _zombiePool = new AutoObjectWrapperPool<Zombie>(_zombie, gameObject);
-        
-        _timer = new InternalTimer();
-        _timer.Set(_spawnInterval*1000);
     }
 
     private void AttactTarget_OnDie(LifetimeComponent lifetimeComponent)
@@ -53,16 +50,6 @@ public class ZombieSpawner : AutoObject<ZombieSpawner>
         _attactTarget.OnDie -= AttactTarget_OnDie;
         IsSpawning = false;
     }
-	
-	private void OnUpdate() {
-	    if (_timer.Update())
-	    {
-	        _timer.Reset();
-	        ChoseNextPosition();
-	        SpawnZombie();
-	        _timer.Set(_spawnInterval*1000);
-	    }
-	}
 
     public void SpawnZombieAt(Vector3 position)
     {
@@ -161,7 +148,6 @@ public class ZombieSpawner : AutoObject<ZombieSpawner>
         }
         _spawnInterval = BalancingData.ZOMBIE_SPAWN_INTERVAL_INITIAL;
         IsSpawning = true;
-        _timer.Set(_spawnInterval*1000);
     }
 
     public bool IsSpawning
@@ -170,15 +156,30 @@ public class ZombieSpawner : AutoObject<ZombieSpawner>
         set
         {
             _isSpawning = value;
-            if (_isSpawning)
+            Debug.Log("IsSpawning: " + _isSpawning);
+            if (!_isCoroutineRunning)
             {
-                EventManager.Instance.AddUpdateListener(OnUpdate);
-            }
-            else
-            {
-                EventManager.Instance.RemoveUpdateListener(OnUpdate);
+                StartCoroutine(SpawnZombieCoroutine());
             }
         }
+    }
+
+    private bool _isCoroutineRunning = false;
+
+    private IEnumerator SpawnZombieCoroutine()
+    {
+        _isCoroutineRunning = true;
+        while (_isSpawning)
+        {
+            yield return new WaitForSeconds(_spawnInterval);
+            Debug.Log("IsSpawning - C: " + _isSpawning);
+            if (_isSpawning)
+            {
+                ChoseNextPosition();
+                SpawnZombie();
+            }
+        }
+        _isCoroutineRunning = false;
     }
 
     #region Event invocators
