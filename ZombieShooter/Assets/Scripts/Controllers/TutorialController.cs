@@ -72,17 +72,15 @@ namespace Controllers
 
             _weaponSpawner.ForceSpawn = forceSpawn;
 
-            _oldShellsInMagazine = _playerGun.ShellsInMagazine;
-
             _reloadDistance = Vector3.Distance(_playerTransform.position, TutorialInstructionReoad.transform.position);
             
         }
 
         private void HideTutorialInstructions()
         {
-            foreach (GameObject o in TutorialInstructions)
+            for (int i = 0; i < TutorialInstructions.Count; i++)
             {
-                o.SetActive(false);
+                TutorialInstructions[i].SetActive(false);
             }
         }
 
@@ -101,6 +99,7 @@ namespace Controllers
             HideTutorialInstructions();
             TutorialInstructions[1].SetActive(true);
             TutorialTarget.SetActive(true);
+            _oldShellsInMagazine = _playerGun.ShellsInMagazine;
             EventManager.Instance.AddUpdateListener(CheckingAmmoUpdate);
             _playerGun.FiringEnabled = true;
             _targetLifetime.OnDie += _targetLifetime_OnDie;
@@ -204,25 +203,25 @@ namespace Controllers
 
         private void CheckingAmmoUpdate()
         {
-                if (_playerGun.ShellsInMagazine > _oldShellsInMagazine)
-                {
-                    EventManager.Instance.RemoveUpdateListener(CheckingAmmoUpdate);
-                }
-                _oldShellsInMagazine = _playerGun.ShellsInMagazine;
-                if (_playerGun.ShellsInMagazine == 0)
-                {
-                    TutorialInstructionReoad.SetActive(true);
-                    TutorialInstructionReoad.transform.position = transform.position +
-                                                                  _reloadDistance*_playerTransform.forward;
-                    TutorialInstructionReoad.transform.LookAt(_playerTransform);
-                    Vector3 eulerAngles = TutorialInstructionReoad.transform.localRotation.eulerAngles;
-                    TutorialInstructionReoad.transform.localRotation = Quaternion.Euler(eulerAngles.x,
-                        eulerAngles.y + 180, eulerAngles.z);
-                }
-                else
-                {
-                    TutorialInstructionReoad.SetActive(false);
-                }
+            if (_playerGun.ShellsInMagazine > _oldShellsInMagazine)
+            {
+                EventManager.Instance.RemoveUpdateListener(CheckingAmmoUpdate);
+            }
+            _oldShellsInMagazine = _playerGun.ShellsInMagazine;
+            if (_playerGun.ShellsInMagazine == 0)
+            {
+                TutorialInstructionReoad.SetActive(true);
+                TutorialInstructionReoad.transform.position = transform.position +
+                                                              _reloadDistance*_playerTransform.forward;
+                TutorialInstructionReoad.transform.LookAt(_playerTransform);
+                Vector3 eulerAngles = TutorialInstructionReoad.transform.localRotation.eulerAngles;
+                TutorialInstructionReoad.transform.localRotation = Quaternion.Euler(eulerAngles.x,
+                    eulerAngles.y + 180, eulerAngles.z);
+            }
+            else
+            {
+                TutorialInstructionReoad.SetActive(false);
+            }
         }
 
         #region Event invocators

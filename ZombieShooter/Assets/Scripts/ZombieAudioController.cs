@@ -22,8 +22,14 @@ public class ZombieAudioController : MonoBehaviour {
         _audioSource = gameObject.GetComponent<AudioSource>();
         _zombieLifetime = gameObject.GetComponent<LifetimeComponent>();
         _zombieLifetime.OnDamage += _zombieLifetime_OnDamage;
+        _zombieLifetime.OnDie += _zombieLifetime_OnDie;
     }
-    
+
+    private void _zombieLifetime_OnDie(LifetimeComponent obj)
+    {
+        EventManager.Instance.RemoveUpdateListener(OnUpdate);
+    }
+
     private void _zombieLifetime_OnDamage(float obj)
     {
         _audioSource.PlayOneShot(HitSound);
@@ -33,9 +39,21 @@ public class ZombieAudioController : MonoBehaviour {
     {
         if (_timer.Update())
         {
+            if (gameObject == null || _audioSource == null)
+            {
+                EventManager.Instance.RemoveUpdateListener(OnUpdate);
+                RemoveListeners();
+                return;
+            }
             _timer.Set(_random.Next(5, 10) * 1000);
             _audioSource.PlayOneShot(WalkSound);
         }
+    }
+
+    private void RemoveListeners()
+    {
+        _zombieLifetime.OnDamage -= _zombieLifetime_OnDamage;
+        _zombieLifetime.OnDie -= _zombieLifetime_OnDie;
     }
 
     public void Spawn()

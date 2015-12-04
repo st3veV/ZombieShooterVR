@@ -63,6 +63,7 @@ public class PickupHolder : MonoBehaviour
     public void Clear()
     {
         this.Pickable = null;
+        EventManager.Instance.RemoveUpdateListener(OnUpdate);
     }
 }
 
