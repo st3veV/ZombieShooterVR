@@ -18,8 +18,8 @@ namespace Shooting
         private GameObjectPool _particlePool;
         private GameObjectPool _bulletTrailPool;
 
-        private readonly Color _hitGroundColor = new Color(0xDF, 0xD6, 0xB6, 0x55);
-        private readonly Color _hitEnemyColor = new Color(0x68, 0x00, 0x00, 0x55);
+        private readonly Color _hitGroundColor = new Color(0xDF, 0xD6, 0xB6, 0x15);
+        private readonly Color _hitEnemyColor = new Color(0x83, 0x00, 0x00, 0x15);
 
         private const float MaxBulletVisualRange = 20f;
 

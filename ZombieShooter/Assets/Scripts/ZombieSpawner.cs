@@ -11,9 +11,9 @@ public class ZombieSpawner : AutoObject<ZombieSpawner>
 {
     private Transform _spawnPoint;
     
-    private float _diameter = BalancingData.ZOMBIE_SPAWN_DIAMETER;
-    private float _zombieDamage = BalancingData.ZOMBIE_DAMAGE;
-    private float _spawnInterval = BalancingData.ZOMBIE_SPAWN_INTERVAL_INITIAL;
+    private float _diameter = BalancingData.ZombieSpawnDiameter;
+    private float _zombieDamage = BalancingData.ZombieDamage;
+    private float _spawnInterval = BalancingData.ZombieSpawnIntervalInitial;
 
     public event Action<Zombie> OnZombieSpawned;
 
@@ -92,11 +92,11 @@ public class ZombieSpawner : AutoObject<ZombieSpawner>
         zombie.ThirdPersonCharacter.Die(DisposeZombie);
 
         //deal with score
-        _userData.IncreaseScore(BalancingData.SCORE_FOR_ZOMBIE);
-        _spawnInterval -= BalancingData.ZOMBIE_SPAWN_INTERVAL_DECREASE;
-        if (_spawnInterval < BalancingData.ZOMBIE_SPAWN_INTERVAL_MINIMUM)
+        _userData.IncreaseScore(BalancingData.ScoreForZombie);
+        _spawnInterval -= BalancingData.ZombieSpawnIntervalDecrease;
+        if (_spawnInterval < BalancingData.ZombieSpawnIntervalMinimum)
         {
-            _spawnInterval = BalancingData.ZOMBIE_SPAWN_INTERVAL_MINIMUM;
+            _spawnInterval = BalancingData.ZombieSpawnIntervalMinimum;
         }
     }
 
@@ -146,7 +146,7 @@ public class ZombieSpawner : AutoObject<ZombieSpawner>
         {
             _zombiePool.Clear();
         }
-        _spawnInterval = BalancingData.ZOMBIE_SPAWN_INTERVAL_INITIAL;
+        _spawnInterval = BalancingData.ZombieSpawnIntervalInitial;
         IsSpawning = true;
     }
 

@@ -82,15 +82,13 @@ public class WeaponSpawner : AutoObject<WeaponSpawner>
             pickable.ContainsAmmo = true;
 
         }
-        
         target.PickupHolder.Pickable = pickable;
-        target.PickupHolder.Activate();
-        
+
         RadarController.Instance.AddTrackedObject(target.RadarTrackable);
         
         if (isNew)
         {
-            target.Lifetime.LifetimeDamage = BalancingData.WEAPON_TARGET_HEALTH;
+            target.Lifetime.LifetimeDamage = BalancingData.WeaponTargetHealth;
         }
         else
         {
@@ -99,6 +97,8 @@ public class WeaponSpawner : AutoObject<WeaponSpawner>
         target.AddDieListener(ammoTarget_OnDie);
 
         target.gameObject.SetActive(true);
+        target.PickupHolder.Activate();
+
         spawned(target);
     }
     

@@ -1,4 +1,4 @@
-﻿using Controllers;
+﻿using System.Collections;
 using UnityEngine;
 using Random = System.Random;
 
@@ -7,8 +7,8 @@ public class ZombieAudioController : MonoBehaviour {
 
     private AudioSource _audioSource;
     private LifetimeComponent _zombieLifetime;
-    private InternalTimer _timer;
     private Random _random;
+    private bool _moving = true;
 
     public AudioClip SpawnSound;
     public AudioClip HitSound;
@@ -17,7 +17,6 @@ public class ZombieAudioController : MonoBehaviour {
     void Awake()
     {
         _random = new Random();
-        _timer = new InternalTimer();
 
         _audioSource = gameObject.GetComponent<AudioSource>();
         _zombieLifetime = gameObject.GetComponent<LifetimeComponent>();
@@ -27,27 +26,30 @@ public class ZombieAudioController : MonoBehaviour {
 
     private void _zombieLifetime_OnDie(LifetimeComponent obj)
     {
-        EventManager.Instance.RemoveUpdateListener(OnUpdate);
+        _moving = false;
     }
 
     private void _zombieLifetime_OnDamage(float obj)
     {
         _audioSource.PlayOneShot(HitSound);
     }
-
-    private void OnUpdate ()
+    
+    private IEnumerator SoundCoroutine()
     {
-        if (_timer.Update())
+        while (_moving)
         {
-            if (gameObject == null || _audioSource == null)
+            yield return new WaitForSeconds(_random.Next(5, 10));
+            if (!_moving) continue;
+            if (_audioSource != null)
             {
-                EventManager.Instance.RemoveUpdateListener(OnUpdate);
-                RemoveListeners();
-                return;
+                _audioSource.PlayOneShot(WalkSound);
             }
-            _timer.Set(_random.Next(5, 10) * 1000);
-            _audioSource.PlayOneShot(WalkSound);
+            else
+            {
+                _moving = false;
+            }
         }
+        RemoveListeners();
     }
 
     private void RemoveListeners()
@@ -59,8 +61,7 @@ public class ZombieAudioController : MonoBehaviour {
     public void Spawn()
     {
         _audioSource.PlayOneShot(SpawnSound);
-        EventManager.Instance.AddUpdateListener(OnUpdate);
-        _timer.Set(_random.Next(5, 10)*1000);
+        StartCoroutine(SoundCoroutine());
     }
 
 }

@@ -26,7 +26,7 @@ namespace Controllers
             }
             if (_updateListenersToRemove.Count > 0)
             {
-                for (var i = _updateListenersToRemove.Count - 1; i > 0; i--)
+                for (var i = _updateListenersToRemove.Count - 1; i >= 0; i--)
                 {
                     _updateListeners.RemoveAt(_updateListenersToRemove[i]);
                 }
@@ -48,8 +48,7 @@ namespace Controllers
         {
             if (_updateListeners.Contains(listener))
             {
-                _updateListeners.Remove(listener);
-                NumListeners = _updateListeners.Count;
+                _updateListeners[_updateListeners.IndexOf(listener)] = null;
             }
         }
     }

@@ -1,4 +1,5 @@
-﻿using Controllers;
+﻿using System.Collections;
+using Controllers;
 using UnityEngine;
 
 [RequireComponent(typeof (LifetimeComponent))]
@@ -9,30 +10,38 @@ public class PickupHolder : MonoBehaviour
     public MeshRenderer PickableVisualizer;
 
     private LifetimeComponent _lifetime;
-    private InternalTimer _timer;
+    private bool _scheduleLifetimeListener = false;
+    private bool _shouldKill = false;
     
     void Start()
     {
         _lifetime = GetComponent<LifetimeComponent>();
-        AssertTimer();
-        _timer.Reset();
-        EventManager.Instance.AddUpdateListener(OnUpdate);
+        if (_scheduleLifetimeListener)
+        {
+            _scheduleLifetimeListener = false;
+            _lifetime.OnDie += _lifetime_OnDie;
+        }
     }
 
-    private void OnUpdate()
+    private void _lifetime_OnDie(LifetimeComponent obj)
     {
-        if (_timer.Update())
-        {
-            _lifetime.ReceiveDamage(BalancingData.WEAPON_TARGET_HEALTH);
-            EventManager.Instance.RemoveUpdateListener(OnUpdate);
-        }
+        _shouldKill = false;
+        _lifetime.OnDie -= _lifetime_OnDie;
     }
 
     public void Activate()
     {
-        AssertTimer();
-        _timer.Reset();
-        EventManager.Instance.AddUpdateListener(OnUpdate);
+        if (_lifetime == null)
+        {
+            _scheduleLifetimeListener = true;
+        }
+        else
+        {
+            _lifetime.OnDie += _lifetime_OnDie;
+        }
+        _shouldKill = true;
+        StartCoroutine(AutoPickup());
+
         Texture decal = Pickable.Weapon.BulletImage;
 
         PickableVisualizer.material.mainTexture = decal;
@@ -51,19 +60,19 @@ public class PickupHolder : MonoBehaviour
         
     }
 
-    private void AssertTimer()
+    private IEnumerator AutoPickup()
     {
-        if (_timer == null)
+        yield return new WaitForSeconds(BalancingData.WeaponTargetAutomaticPickupDelay);
+        if (_shouldKill)
         {
-            _timer = new InternalTimer();
-            _timer.Set(BalancingData.WEAPON_TARGET_AUTOMATIC_PICKUP_DELAY * 1000);
+            _lifetime.ReceiveDamage(BalancingData.WeaponTargetHealth);
         }
     }
-
+    
     public void Clear()
     {
         this.Pickable = null;
-        EventManager.Instance.RemoveUpdateListener(OnUpdate);
+        _shouldKill = false;
     }
 }
 
