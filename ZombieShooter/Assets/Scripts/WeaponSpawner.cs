@@ -9,8 +9,7 @@ using Random = UnityEngine.Random;
 public class WeaponSpawner : AutoObject<WeaponSpawner>
 {
     public event Action<AmmoTarget> OnWeaponTargetSpawned;
-
-    private GameObject _targetPrefab;
+    
     private AutoObjectWrapperPool<AmmoTarget> _targetPool;
 
     private ZombieSpawner _zombieSpawner;
@@ -32,10 +31,9 @@ public class WeaponSpawner : AutoObject<WeaponSpawner>
         _weaponManager = WeaponManager.Instance;
         
         _playerController.Inventory.Reset();
-
-
-        _targetPrefab = Resources.Load("Prefabs/AmmoTarget") as GameObject;
-        _targetPool = new AutoObjectWrapperPool<AmmoTarget>(_targetPrefab, gameObject);
+        
+        GameObject targetPrefab = Resources.Load("Prefabs/AmmoTarget") as GameObject;
+        _targetPool = new AutoObjectWrapperPool<AmmoTarget>(targetPrefab, gameObject);
 	}
 
     private void ZombieSpawner_OnZombieSpawned(Zombie zombie)

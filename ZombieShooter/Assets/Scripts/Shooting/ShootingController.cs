@@ -2,7 +2,7 @@
 using Controllers;
 using UnityEngine;
 using Utils;
-using Random = System.Random;
+using Random = UnityEngine.Random;
 
 namespace Shooting
 {
@@ -22,9 +22,7 @@ namespace Shooting
         private readonly Color _hitEnemyColor = new Color(0x83, 0x00, 0x00, 0x15);
 
         private const float MaxBulletVisualRange = 20f;
-
-        private Random _random;
-
+        
         void Awake()
         {
             _particleBurst = Resources.Load("Prefabs/Shooting/DustParticles") as GameObject;
@@ -32,11 +30,6 @@ namespace Shooting
 
             _particlePool = new GameObjectPool(_particleBurst, gameObject);
             _bulletTrailPool = new GameObjectPool(_bulletTrail, gameObject);
-        }
-
-        void Start()
-        {
-            _random = new Random();
         }
 
         public void SetGun(Gun gun)
@@ -85,10 +78,10 @@ namespace Shooting
                 RaycastHit hit;
                 if (_currentWeapon.BulletSpreadAngle > 0)
                 {
-                    float spreadX = (float)_random.NextDouble() * (_currentWeapon.BulletSpreadAngle) -
+                    float spreadX = Random.value * (_currentWeapon.BulletSpreadAngle) -
                                     (_currentWeapon.BulletSpreadAngle / 2);
-                    float spreadY = (float)_random.NextDouble() * (_currentWeapon.BulletSpreadAngle) -
-                                    (_currentWeapon.BulletSpreadAngle / 2);
+                    float spreadY = Random.value * (_currentWeapon.BulletSpreadAngle) -
+                                    (_currentWeapon.BulletSpreadAngle/2);
 
                     direction.x += spreadX;
                     direction.y += spreadY;

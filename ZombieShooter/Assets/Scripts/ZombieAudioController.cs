@@ -1,13 +1,11 @@
 ﻿using System.Collections;
 using UnityEngine;
-using Random = System.Random;
 
 [RequireComponent(typeof(AudioSource))]
 public class ZombieAudioController : MonoBehaviour {
 
     private AudioSource _audioSource;
     private LifetimeComponent _zombieLifetime;
-    private Random _random;
     private bool _moving = true;
 
     public AudioClip SpawnSound;
@@ -16,8 +14,6 @@ public class ZombieAudioController : MonoBehaviour {
 
     void Awake()
     {
-        _random = new Random();
-
         _audioSource = gameObject.GetComponent<AudioSource>();
         _zombieLifetime = gameObject.GetComponent<LifetimeComponent>();
         _zombieLifetime.OnDamage += _zombieLifetime_OnDamage;
@@ -38,7 +34,7 @@ public class ZombieAudioController : MonoBehaviour {
     {
         while (_moving)
         {
-            yield return new WaitForSeconds(_random.Next(5, 10));
+            yield return new WaitForSeconds(Random.Range(5, 10));
             if (!_moving) continue;
             if (_audioSource != null)
             {

@@ -3,21 +3,18 @@ using System.Collections;
 using Controllers;
 using Radar;
 using UnityEngine;
-using UnityStandardAssets.Characters.ThirdPerson;
 using Utils;
-using Random = System.Random;
+using Random = UnityEngine.Random;
 
 public class ZombieSpawner : AutoObject<ZombieSpawner>
 {
     private Transform _spawnPoint;
     
     private float _diameter = BalancingData.ZombieSpawnDiameter;
-    private float _zombieDamage = BalancingData.ZombieDamage;
     private float _spawnInterval = BalancingData.ZombieSpawnIntervalInitial;
 
     public event Action<Zombie> OnZombieSpawned;
-
-    private GameObject _zombie;
+    
     private UserData _userData;
 
     private bool _isSpawning = false;
@@ -41,8 +38,8 @@ public class ZombieSpawner : AutoObject<ZombieSpawner>
 
         _zombieTarget = playerController.PlayerTransform;
 
-        _zombie = Resources.Load("Prefabs/ZombieEnemy") as GameObject;
-        _zombiePool = new AutoObjectWrapperPool<Zombie>(_zombie, gameObject);
+        GameObject zombie = Resources.Load("Prefabs/ZombieEnemy") as GameObject;
+        _zombiePool = new AutoObjectWrapperPool<Zombie>(zombie, gameObject);
     }
 
     private void AttactTarget_OnDie(LifetimeComponent lifetimeComponent)
@@ -110,7 +107,7 @@ public class ZombieSpawner : AutoObject<ZombieSpawner>
 
     private void AttackAndDispose(GameObject go)
     {
-        _attactTarget.ReceiveDamage(_zombieDamage);
+        _attactTarget.ReceiveDamage(BalancingData.ZombieDamage);
         DisposeZombie(go);
     }
 
@@ -131,8 +128,7 @@ public class ZombieSpawner : AutoObject<ZombieSpawner>
 
     private void ChoseNextPosition()
     {
-        Random rand = new Random();
-        float angle = rand.Next(0, 360);
+        float angle = Random.Range(0, 360);
         float value = angle * Mathf.Deg2Rad;
         float xpos = _diameter * Mathf.Cos(value);
         float zpos = _diameter * Mathf.Sin(value);
