@@ -18,55 +18,100 @@ public class Weapon
     [SerializeField] private Texture _weaponImage;
     [SerializeField] private float _bulletSpreadAngle;
     [SerializeField] private int _numBulletsPerShot;
-
-    public void SetValues(string name, float damage, float cooldownDelay, int magazineSize, int bulletType,
-        int initialAmmo, GameObject weaponModel, AudioClip shootSound, AudioClip reloadSound, AudioClip klickSound,
-        Texture bulletImage, Texture weaponImage, float spreadAngle, int numBulletsPerShot)
+   
+    public int BulletType
     {
-        _name = name;
-        _damage = damage;
-        _cooldownDelay = cooldownDelay;
-        _magazineSize = magazineSize;
-        _bulletType = bulletType;
-        _availableAmmo = initialAmmo;
-        _weaponModel = weaponModel;
-        _shootSound = shootSound;
-        _reloadSound = reloadSound;
-        _klickSound = klickSound;
-        _bulletImage = bulletImage;
-        _weaponImage = weaponImage;
-        _bulletSpreadAngle = spreadAngle;
-        _numBulletsPerShot = numBulletsPerShot;
+        get { return _bulletType; }
+        set { _bulletType = value; }
     }
 
-    public int BulletType { get { return _bulletType; } }
-    public int MagazineSize { get { return _magazineSize; } }
-    public float CooldownDelay { get { return _cooldownDelay; } }
-    public float Damage { get { return _damage; } }
-    public string Name { get { return _name; } }
-    public int AvailableAmmo { get { return _availableAmmo; } }
-    public GameObject WeaponModel { get { return _weaponModel; } }
+    public int MagazineSize
+    {
+        get { return _magazineSize; }
+        set { _magazineSize = value; }
+    }
 
-    public AudioClip ShootSound { get { return _shootSound; } }
-    public AudioClip ReloadSound { get { return _reloadSound; } }
-    public AudioClip KlickSound { get { return _klickSound; } }
+    public float CooldownDelay
+    {
+        get { return _cooldownDelay; }
+        set { _cooldownDelay = value; }
+    }
 
-    public Texture BulletImage { get { return _bulletImage; } }
-    public Texture WeaponImage { get { return _weaponImage; } }
+    public float Damage
+    {
+        get { return _damage; }
+        set { _damage = value; }
+    }
 
-    public float BulletSpreadAngle { get { return _bulletSpreadAngle; } }
-    public int NumBulletsPerShot { get { return _numBulletsPerShot; } }
+    public string Name
+    {
+        get { return _name; }
+        set { _name = value; }
+    }
+
+    public int AvailableAmmo
+    {
+        get { return _availableAmmo; }
+        set { _availableAmmo = value; }
+    }
+
+    public GameObject WeaponModel
+    {
+        get { return _weaponModel; }
+        set { _weaponModel = value; }
+    }
+
+    public AudioClip ShootSound
+    {
+        get { return _shootSound; }
+        set { _shootSound = value; }
+    }
+
+    public AudioClip ReloadSound
+    {
+        get { return _reloadSound; }
+        set { _reloadSound = value; }
+    }
+
+    public AudioClip KlickSound
+    {
+        get { return _klickSound; }
+        set { _klickSound = value; }
+    }
+
+    public Texture BulletImage
+    {
+        get { return _bulletImage; }
+        set { _bulletImage = value; }
+    }
+
+    public Texture WeaponImage
+    {
+        get { return _weaponImage; }
+        set { _weaponImage = value; }
+    }
+
+    public float BulletSpreadAngle
+    {
+        get { return _bulletSpreadAngle; }
+        set { _bulletSpreadAngle = value; }
+    }
+
+    public int NumBulletsPerShot
+    {
+        get { return _numBulletsPerShot; }
+        set { _numBulletsPerShot = value; }
+    }
 }
 
 public class PlayerWeapon : IWeapon
 {
     private readonly Weapon _realWeapon;
-    private int _availableAmmo;
 
     public PlayerWeapon(Weapon realWeapon)
     {
         _realWeapon = realWeapon;
-        _availableAmmo = _realWeapon.AvailableAmmo;
+        AvailableAmmo = _realWeapon.AvailableAmmo;
     }
 
     public int BulletType { get { return _realWeapon.BulletType; } }
@@ -75,11 +120,8 @@ public class PlayerWeapon : IWeapon
     public float Damage { get { return _realWeapon.Damage; } }
     public string Name { get { return _realWeapon.Name; } }
 
-    public int AvailableAmmo
-    {
-        get { return _availableAmmo; }
-        set { _availableAmmo = value; }
-    }
+    public int AvailableAmmo { get; set; }
+
     public GameObject WeaponModel { get { return _realWeapon.WeaponModel; } }
 
     public AudioClip ShootSound { get { return _realWeapon.ShootSound; } }

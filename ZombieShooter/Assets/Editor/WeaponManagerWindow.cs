@@ -1,4 +1,5 @@
-﻿using UnityEditor;
+﻿using System;
+using UnityEditor;
 using UnityEngine;
 
 public class WeaponManagerWindow : EditorWindow {
@@ -13,172 +14,201 @@ public class WeaponManagerWindow : EditorWindow {
         window.Show();
     }
 
-    private int selectedWeaponIndex = -2;
-    private bool editMode = false;
-    private Weapon editedWeapon = null;
+    private int _selectedWeaponIndex = -1;
+    private Weapon _editedWeapon = null;
+
+    private State _state;
+
+    private enum State
+    {
+        Blank,
+        Edit,
+        Add
+    }
+
+    void OnEnable()
+    {
+        _state = State.Blank;
+    }
 
     void OnGUI()
     {
-        Rect weaponSelectionAreaSize = new Rect(0, 0, position.width*.3f, position.height - 100f);
-        Rect weaponDetailsAreaSize = new Rect(weaponSelectionAreaSize.x + weaponSelectionAreaSize.width, weaponSelectionAreaSize.y, position.width * .7f, position.height - 100f);
-
-        GUILayout.BeginArea(weaponSelectionAreaSize);
-        GUILayout.BeginVertical();
-
-        bool newWeapon = false;
-        if (!editMode)
-        {
-            editedWeapon = null;
-            selectedWeaponIndex = -2;
-            int i = 0;
-            foreach (Weapon weapon in Database.Weapons)
-            {
-                bool selected = GUILayout.Button(weapon.Name);
-                if (selected)
-                {
-                    selectedWeaponIndex = i;
-                }
-                i++;
-            }
-            if (selectedWeaponIndex > -1)
-            {
-                editedWeapon = Database.Weapons[selectedWeaponIndex];
-            }
-            EditorGUILayout.Separator();
-            newWeapon = GUILayout.Button("New weapon");
-            if (newWeapon)
-            {
-                selectedWeaponIndex = -1;
-            }
-
-            if (selectedWeaponIndex > -2)
-                editMode = true;
-
-        }
-        GUILayout.EndVertical();
-        GUILayout.EndArea();
-
-
-        GUILayout.BeginArea(weaponDetailsAreaSize);
-        GUILayout.BeginVertical();
-        if (editMode)
-        {
-            bool deleteWeapon = false;
-            bool save = false;
-            if (selectedWeaponIndex == -1)
-            {
-                editedWeapon = fillEditorWindow(editedWeapon, out deleteWeapon,out save);
-            }
-            else if (selectedWeaponIndex > -1)
-            {
-                editedWeapon = fillEditorWindow(editedWeapon, out deleteWeapon, out save);
-            }
-
-            int indexOf = Database.Weapons.IndexOf(editedWeapon);
-            if (deleteWeapon)
-            {
-                editMode = false;
-                if (indexOf > -1)
-                {
-                    Database.Weapons.Remove(editedWeapon);
-                    EditorUtility.SetDirty(Database);
-                }
-            }
-            else if(save)
-            {
-                editMode = false;
-                if (indexOf > -1)
-                    Database.Weapons[indexOf] = editedWeapon;
-                else
-                    Database.Weapons.Add(editedWeapon);
-                EditorUtility.SetDirty(Database);
-            }
-        }
-        GUILayout.EndVertical();
-        GUILayout.EndArea();
+        EditorGUILayout.BeginHorizontal(GUILayout.ExpandWidth(true));
+        DisplayList();
+        DisplayMain();
+        EditorGUILayout.EndHorizontal();
     }
 
-    private Weapon fillEditorWindow(Weapon weapon, out bool delete, out bool save)
+    private void DisplayList()
     {
-        string weaponName = weapon == null ? "New weapon" : weapon.Name;
-        float cooldownDelay = weapon == null ? 1000f : weapon.CooldownDelay;
-        float damage = weapon == null ? 100f : weapon.Damage;
-        int magazineSize = weapon == null ? 10 : weapon.MagazineSize;
-        int bulletType = weapon == null ? 0 : weapon.BulletType;
-        int initialAmmo = weapon == null ? 10 : weapon.AvailableAmmo;
-        GameObject weaponModel = weapon == null ? null : weapon.WeaponModel;
-        AudioClip shootSound = weapon == null ? null : weapon.ShootSound;
-        AudioClip reloadSound = weapon == null ? null : weapon.ReloadSound;
-        AudioClip klickSound = weapon == null ? null : weapon.KlickSound;
-        Texture bulletImage = weapon == null ? null : weapon.BulletImage;
-        Texture weaponImage = weapon == null ? null : weapon.WeaponImage;
+        GUILayout.BeginVertical(GUILayout.Width(250));
+        
+        for (var i = 0; i < Database.Weapons.Count; i++)
+        {
+            var weapon = Database.Weapons[i];
+            var selected = GUILayout.Button(weapon.Name, GUILayout.ExpandWidth(true));
+            if (selected)
+            {
+                _selectedWeaponIndex = i;
+                _editedWeapon = weapon;
+                _state = State.Edit;
+            }
+        }
+        EditorGUILayout.Separator();
+        var newWeapon = GUILayout.Button("New weapon");
+        if (newWeapon)
+        {
+            _selectedWeaponIndex = -1;
+            _state = State.Add;
+        }
+        
+        GUILayout.EndVertical();
+    }
 
-        float spreadAngle = weapon == null ? 0 : weapon.BulletSpreadAngle;
-        int numBulletsPerShot = weapon == null ? 1 : weapon.NumBulletsPerShot;
+    private void DisplayMain()
+    {
+        EditorGUILayout.BeginVertical(GUILayout.ExpandWidth(true));
+        switch (_state)
+        {
+            case State.Edit:
+                DisplayEdit();
+                break;
+            case State.Add:
+                DisplayAdd();
+                break;
+            case State.Blank:
+            default:
+                break;
+        }
+        EditorGUILayout.EndVertical();
+    }
 
+    private void DisplayEdit()
+    {
+        _editedWeapon = Database.Weapons[_selectedWeaponIndex];
+        bool delete;
+        bool save;
+        Database.Weapons[_selectedWeaponIndex] = FillEditorWindow(_editedWeapon, out delete, out save);
+        if (delete)
+        {
+            Database.Weapons.RemoveAt(_selectedWeaponIndex);
+            EditorUtility.SetDirty(Database);
+            _state = State.Blank;
+            _editedWeapon = null;
+        }
+        if (save)
+        {
+            EditorUtility.SetDirty(Database);
+            _state = State.Blank;
+            _editedWeapon = null;
+        }
+    }
+
+    private void DisplayAdd()
+    {
+        if (_editedWeapon == null)
+        {
+            _editedWeapon = new Weapon
+            {
+                Name = "New weapon",
+                CooldownDelay = 1000f,
+                Damage = 100f,
+                MagazineSize = 10,
+                BulletType = 0,
+                AvailableAmmo = 10,
+
+                BulletSpreadAngle = 0,
+                NumBulletsPerShot = 1
+            };
+        }
+        bool delete;
+        bool save;
+        _editedWeapon = FillEditorWindow(_editedWeapon, out delete, out save);
+        if (delete)
+        {
+            _editedWeapon = null;
+            _state = State.Blank;
+        }
+        if (save)
+        {
+            Database.Weapons.Add(_editedWeapon);
+            EditorUtility.SetDirty(Database);
+            _state = State.Blank;
+            _editedWeapon = null;
+        }
+    }
+    
+    private Weapon FillEditorWindow(Weapon weapon, out bool delete, out bool save)
+    {
         GUILayout.BeginHorizontal();
         GUILayout.Label("Name");
-        weaponName = GUILayout.TextField(weaponName);
+        weapon.Name = GUILayout.TextField(weapon.Name);
         GUILayout.EndHorizontal();
 
         GUILayout.BeginHorizontal();
         GUILayout.Label("Damage");
-        damage = EditorGUILayout.FloatField(damage);
+        weapon.Damage = EditorGUILayout.FloatField(weapon.Damage);
         GUILayout.EndHorizontal();
 
         GUILayout.BeginHorizontal();
         GUILayout.Label("Cooldown delay");
-        cooldownDelay = EditorGUILayout.FloatField(cooldownDelay);
+        weapon.CooldownDelay = EditorGUILayout.FloatField(weapon.CooldownDelay);
         GUILayout.EndHorizontal();
 
         GUILayout.BeginHorizontal();
         GUILayout.Label("Magazine size");
-        magazineSize = EditorGUILayout.IntField(magazineSize);
+        weapon.MagazineSize = EditorGUILayout.IntField(weapon.MagazineSize);
         GUILayout.EndHorizontal();
 
         GUILayout.BeginHorizontal();
         GUILayout.Label("Bullet type");
-        bulletType = EditorGUILayout.IntField(bulletType);
+        weapon.BulletType = EditorGUILayout.IntField(weapon.BulletType);
         GUILayout.EndHorizontal();
 
         GUILayout.BeginHorizontal();
         GUILayout.Label("Initial ammo");
-        initialAmmo = EditorGUILayout.IntField(initialAmmo);
+        weapon.AvailableAmmo = EditorGUILayout.IntField(weapon.AvailableAmmo);
         GUILayout.EndHorizontal();
 
         GUILayout.BeginHorizontal();
-        weaponModel = EditorGUILayout.ObjectField("Weapon model", weaponModel, typeof(GameObject), false) as GameObject;
+        weapon.WeaponModel = EditorGUILayout.ObjectField("Weapon model", weapon.WeaponModel, typeof(GameObject), false) as GameObject;
+        GUILayout.EndHorizontal();
+        
+        EditorGUILayout.Space();
+        EditorGUILayout.LabelField("Sounds");
+
+        GUILayout.BeginHorizontal();
+        weapon.ShootSound = EditorGUILayout.ObjectField("Shoot sound", weapon.ShootSound, typeof (AudioClip), false) as AudioClip;
         GUILayout.EndHorizontal();
 
         GUILayout.BeginHorizontal();
-        shootSound = EditorGUILayout.ObjectField("Shoot sound", shootSound, typeof (AudioClip), false) as AudioClip;
+        weapon.ReloadSound = EditorGUILayout.ObjectField("Reload sound", weapon.ReloadSound, typeof (AudioClip), false) as AudioClip;
         GUILayout.EndHorizontal();
 
         GUILayout.BeginHorizontal();
-        reloadSound = EditorGUILayout.ObjectField("Reload sound", reloadSound, typeof (AudioClip), false) as AudioClip;
+        weapon.KlickSound = EditorGUILayout.ObjectField("Klick sound", weapon.KlickSound, typeof(AudioClip), false) as AudioClip;
         GUILayout.EndHorizontal();
+        
+        EditorGUILayout.Space();
+        EditorGUILayout.LabelField("Icons");
 
         GUILayout.BeginHorizontal();
-        klickSound = EditorGUILayout.ObjectField("Klick sound", klickSound, typeof(AudioClip), false) as AudioClip;
-        GUILayout.EndHorizontal();
-
-        GUILayout.BeginHorizontal();
-        bulletImage = EditorGUILayout.ObjectField("Bullet image", bulletImage, typeof (Texture), false) as Texture;
+        weapon.BulletImage = EditorGUILayout.ObjectField("Bullet image", weapon.BulletImage, typeof (Texture), false) as Texture;
         GUILayout.EndHorizontal();
         
         GUILayout.BeginHorizontal();
-        weaponImage = EditorGUILayout.ObjectField("Weapon image", weaponImage, typeof (Texture), false) as Texture;
+        weapon.WeaponImage = EditorGUILayout.ObjectField("Weapon image", weapon.WeaponImage, typeof (Texture), false) as Texture;
         GUILayout.EndHorizontal();
 
         EditorGUILayout.Space();
         EditorGUILayout.LabelField("Shooting settings");
 
         GUILayout.BeginHorizontal();
-        spreadAngle = EditorGUILayout.FloatField("Spread angle", spreadAngle);
+        weapon.BulletSpreadAngle = EditorGUILayout.FloatField("Spread angle", weapon.BulletSpreadAngle);
         GUILayout.EndHorizontal();
 
         GUILayout.BeginHorizontal();
-        numBulletsPerShot = EditorGUILayout.IntField("Bullets per shot", numBulletsPerShot);
+        weapon.NumBulletsPerShot = EditorGUILayout.IntField("Bullets per shot", weapon.NumBulletsPerShot);
         GUILayout.EndHorizontal();
         
         
@@ -186,13 +216,7 @@ public class WeaponManagerWindow : EditorWindow {
         delete = GUILayout.Button("Delete");
         save = GUILayout.Button("Save");
         GUILayout.EndHorizontal();
-        
-        if (weapon == null)
-        {
-            weapon = new Weapon();
-        }
-        weapon.SetValues(weaponName, damage, cooldownDelay, magazineSize, bulletType, initialAmmo, weaponModel,
-            shootSound, reloadSound, klickSound, bulletImage, weaponImage, spreadAngle, numBulletsPerShot);
+
         return weapon;
     }
 }
