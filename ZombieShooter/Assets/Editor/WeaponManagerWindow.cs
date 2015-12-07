@@ -17,18 +17,18 @@ public class WeaponManagerWindow : EditorWindow {
     private int _selectedWeaponIndex = -1;
     private Weapon _editedWeapon = null;
 
-    private State _state;
+    private State _currentState;
 
     private enum State
     {
-        Blank,
+        Empty,
         Edit,
         Add
     }
 
     void OnEnable()
     {
-        _state = State.Blank;
+        _currentState = State.Empty;
     }
 
     void OnGUI()
@@ -51,7 +51,7 @@ public class WeaponManagerWindow : EditorWindow {
             {
                 _selectedWeaponIndex = i;
                 _editedWeapon = weapon;
-                _state = State.Edit;
+                _currentState = State.Edit;
             }
         }
         EditorGUILayout.Separator();
@@ -59,7 +59,7 @@ public class WeaponManagerWindow : EditorWindow {
         if (newWeapon)
         {
             _selectedWeaponIndex = -1;
-            _state = State.Add;
+            _currentState = State.Add;
         }
         
         GUILayout.EndVertical();
@@ -68,7 +68,7 @@ public class WeaponManagerWindow : EditorWindow {
     private void DisplayMain()
     {
         EditorGUILayout.BeginVertical(GUILayout.ExpandWidth(true));
-        switch (_state)
+        switch (_currentState)
         {
             case State.Edit:
                 DisplayEdit();
@@ -76,7 +76,7 @@ public class WeaponManagerWindow : EditorWindow {
             case State.Add:
                 DisplayAdd();
                 break;
-            case State.Blank:
+            case State.Empty:
             default:
                 break;
         }
@@ -93,13 +93,13 @@ public class WeaponManagerWindow : EditorWindow {
         {
             Database.Weapons.RemoveAt(_selectedWeaponIndex);
             EditorUtility.SetDirty(Database);
-            _state = State.Blank;
+            _currentState = State.Empty;
             _editedWeapon = null;
         }
         if (save)
         {
             EditorUtility.SetDirty(Database);
-            _state = State.Blank;
+            _currentState = State.Empty;
             _editedWeapon = null;
         }
     }
@@ -127,13 +127,13 @@ public class WeaponManagerWindow : EditorWindow {
         if (delete)
         {
             _editedWeapon = null;
-            _state = State.Blank;
+            _currentState = State.Empty;
         }
         if (save)
         {
             Database.Weapons.Add(_editedWeapon);
             EditorUtility.SetDirty(Database);
-            _state = State.Blank;
+            _currentState = State.Empty;
             _editedWeapon = null;
         }
     }

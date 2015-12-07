@@ -7,25 +7,25 @@ using UnityEditor;
 
 [Serializable]
 public class WeaponDatabase : ScriptableObject {
-    private const string databaseName = "WeaponDB";
-    private const string databasePath = "Assets/Resources/" + databaseName + ".asset";
+    private const string DatabaseName = "WeaponDB";
+    private const string DatabasePath = "Assets/Resources/" + DatabaseName + ".asset";
 
     private static WeaponDatabase _instance;
     public static WeaponDatabase Instance
     {
         get
         {
-            _instance = Resources.Load(databaseName, typeof(WeaponDatabase)) as WeaponDatabase;
+            _instance = Resources.Load(DatabaseName, typeof(WeaponDatabase)) as WeaponDatabase;
             if (_instance == null)
             {
 #if UNITY_EDITOR
-                _instance = (WeaponDatabase)AssetDatabase.LoadAssetAtPath(databasePath, typeof(WeaponDatabase));
+                _instance = (WeaponDatabase)AssetDatabase.LoadAssetAtPath(DatabasePath, typeof(WeaponDatabase));
 #endif
                 if (_instance == null)
                 {
                     _instance = CreateInstance<WeaponDatabase>();
 #if UNITY_EDITOR
-                    AssetDatabase.CreateAsset(_instance, databasePath);
+                    AssetDatabase.CreateAsset(_instance, DatabasePath);
                     AssetDatabase.SaveAssets();
                     AssetDatabase.Refresh();
 #endif
@@ -41,6 +41,7 @@ public class WeaponDatabase : ScriptableObject {
     }
 
     [SerializeField]
+    [HideInInspector]
     public List<Weapon> Weapons;
 
     void OnEnable()
