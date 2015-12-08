@@ -3,6 +3,7 @@ Almost every asset in the whole game was obtained for free from multiple places.
 A big thank you to all people who shares their work for free.
 
 Following assets were used:
+
 * 2D graphics
     * Icons
         * http://opengameart.org/content/fps-ui-misc-pack-1-ctatz
