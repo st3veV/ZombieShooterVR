@@ -3,7 +3,11 @@
 Proof of concept game integrating Thalmic Myo and Google Cardboard.
 
 # Screenshots #
-![Screenshot](screenshots/InGameScreenshot_small.png)
+## Tutorial ##
+[![Tutorial](screenshots/TutorialScreenshot_small.png)](screenshots/TutorialScreenshot.png)
+## In Game ##
+[![In Game 1](screenshots/InGameScreenshot_small.png)](screenshots/InGameScreenshot.png)
+[![In Game 2](screenshots/InGameScreenshot2_small.png)](screenshots/InGameScreenshot2.png)
 
 # Controls #
 * Hand movement controls gun independently on head movement.
