@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace Controllers
 {
@@ -9,6 +10,14 @@ namespace Controllers
         private readonly List<int> _updateListenersToRemove = new List<int>();
 
         public int NumListeners = 0;
+
+        void Start()
+        {
+            if (Application.platform == RuntimePlatform.Android)
+            {
+                AddUpdateListener(HandleQuit);
+            }
+        }
 
         void Update()
         {
@@ -49,6 +58,15 @@ namespace Controllers
             if (_updateListeners.Contains(listener))
             {
                 _updateListeners[_updateListeners.IndexOf(listener)] = null;
+            }
+        }
+
+        private void HandleQuit()
+        {
+            if (Input.GetKey(KeyCode.Escape))
+            {
+                Debug.Log("quitting");
+                Application.Quit();
             }
         }
     }

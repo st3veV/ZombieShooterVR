@@ -18,6 +18,7 @@ namespace Controllers
         public Text InCardboardText;
         public Button InCardboardButton;
         public Text StartingText;
+        public Button QuitButton;
         
         void Start()
         {
@@ -25,6 +26,8 @@ namespace Controllers
             StartButton.enabled = false;
             InCardboardButton.gameObject.SetActive(false);
             StartingText.gameObject.SetActive(false);
+
+            QuitButton.onClick.AddListener(OnQuit);
 
             _myo = ThalmicHub.instance.GetComponentInChildren<ThalmicMyo>();
             if (_myo.isPaired)
@@ -45,6 +48,11 @@ namespace Controllers
                 EventManager.Instance.RemoveUpdateListener(WaitForMyoUpdate);
                 Synced();
             }
+        }
+
+        private void OnQuit()
+        {
+            Application.Quit();
         }
 
         private void OnConnectClick()
