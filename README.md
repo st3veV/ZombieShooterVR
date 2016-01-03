@@ -19,3 +19,6 @@ Proof of concept game integrating Thalmic Myo and Google Cardboard.
 
 # Credits #
 [See credits here](Credits.md)
+
+# Download #
+[Download the game from GooglePlay](https://play.google.com/store/apps/details?id=com.st3vev.games.zombieshooter)
